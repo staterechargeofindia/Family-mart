@@ -1,72 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Family Mart</title>
 
-  <!-- MAIN CSS (ONLY ONE) -->
   <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
 
-<!-- ================= SIDE MENU ================= -->
+<!-- MENU -->
 <div id="menu" class="side-menu">
-  <a href="login.html" data-en="Profile" data-hi="प्रोफ़ाइल">Profile</a>
-  <a href="cart.html" data-en="My Cart" data-hi="मेरा कार्ट">My Cart</a>
-  <a href="#" data-en="My Orders" data-hi="मेरे ऑर्डर">My Orders</a>
-  <a href="#" data-en="Address" data-hi="पता">Address</a>
-  <a href="merchant-login.html"><b data-en="Merchant" data-hi="व्यापारी">Merchant</b></a>
+  <a href="login.html">Profile</a>
+  <a href="cart.html">My Cart</a>
+  <a href="merchant-login.html"><b>Merchant</b></a>
   <a href="admin.html"><b>Admin</b></a>
 </div>
 
-<!-- ================= HEADER ================= -->
-<header style="display:flex;align-items:center;justify-content:space-between;">
-  <span onclick="toggleMenu()" style="font-size:22px;cursor:pointer;">☰</span>
-
-  <img src="assets/logo.png" alt="Family Mart" height="32">
-
-  <div style="display:flex;align-items:center;gap:10px;">
-    <button class="lang-btn" onclick="toggleLang()">Hindi</button>
-    <a href="cart.html" style="color:white;text-decoration:none;">
-      🛒 <span id="cartCount">0</span>
-    </a>
-  </div>
+<!-- HEADER -->
+<header style="display:flex;justify-content:space-between;align-items:center;">
+  <span onclick="toggleMenu()" style="font-size:22px;">☰</span>
+  <img src="assets/logo.png" height="30">
+  <a href="cart.html" style="color:white;text-decoration:none;">
+    🛒 <span id="cartCount">0</span>
+  </a>
 </header>
 
-<!-- ================= PRODUCT LIST ================= -->
-<div id="productList" class="products"></div>
+<!-- PRODUCTS -->
+<div class="products" id="productList"></div>
 
-<!-- ================= JS FILES (NO DUPLICATE) ================= -->
+<!-- JS FILES (ORDER IMPORTANT) -->
 <script src="js/main.js"></script>
 <script src="js/cart.js"></script>
 
-<!-- ================= PAGE LOGIC ================= -->
 <script>
-  const productDiv = document.getElementById("productList");
+  const productBox = document.getElementById("productList");
   const products = JSON.parse(localStorage.getItem("products")) || [];
 
   if (products.length === 0) {
-    productDiv.innerHTML = `
+    productBox.innerHTML = `
       <div class="card">
-        <p class="small" data-en="No products available"
-           data-hi="कोई प्रोडक्ट उपलब्ध नहीं है">
-           No products available
+        <p class="small">
+          No products yet.<br>
+          Merchant please publish products.
         </p>
       </div>
     `;
   } else {
     products.forEach(p => {
-      productDiv.innerHTML += `
+      productBox.innerHTML += `
         <div class="card-product">
-          <img src="${p.image ? p.image : 'assets/placeholder.png'}">
+          <img src="${p.image || 'assets/placeholder.png'}">
           <p><b>${p.name}</b></p>
           <div class="price">₹${p.price}</div>
           <button class="btn btn-warning"
-            onclick="addToCart('${p.name}', ${p.price})"
-            data-en="Add to Cart"
-            data-hi="कार्ट में जोड़ें">
+            onclick="addToCart('${p.name}', ${p.price})">
             Add to Cart
           </button>
           <div class="small">Sold by: ${p.merchant}</div>
@@ -75,7 +63,6 @@
     });
   }
 
-  // update cart count safely
   updateCartCount();
 </script>
 
