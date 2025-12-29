@@ -7,153 +7,74 @@
 
   <!-- CSS -->
   <link rel="stylesheet" href="css/style.css">
-
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f6f6f6;
-    }
-
-    header {
-      background: #0a7cff;
-      color: white;
-      padding: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .menu-btn {
-      font-size: 22px;
-      cursor: pointer;
-    }
-
-    .lang-btn {
-      background: white;
-      color: #0a7cff;
-      border: none;
-      padding: 6px 10px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .products {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      padding: 10px;
-    }
-
-    .card {
-      background: white;
-      border-radius: 8px;
-      padding: 10px;
-      text-align: center;
-    }
-
-    .card img {
-      width: 100%;
-      height: 150px;
-      object-fit: cover;
-      border-radius: 5px;
-    }
-
-    .price {
-      font-weight: bold;
-      margin: 5px 0;
-    }
-
-    .add-btn {
-      background: #ff9f00;
-      border: none;
-      padding: 8px;
-      width: 100%;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    /* Side Menu */
-    .side-menu {
-      position: fixed;
-      top: 0;
-      left: -250px;
-      width: 250px;
-      height: 100%;
-      background: white;
-      box-shadow: 2px 0 5px rgba(0,0,0,0.3);
-      padding: 15px;
-      transition: 0.3s;
-    }
-
-    .side-menu a {
-      display: block;
-      margin: 10px 0;
-      text-decoration: none;
-      color: black;
-    }
-  </style>
 </head>
 
 <body>
 
 <!-- SIDE MENU -->
 <div id="menu" class="side-menu">
-  <a href="#">Profile</a>
-  <a href="cart.html">My Cart</a>
-  <a href="#">My Orders</a>
-  <a href="#">Address</a>
-  <a href="merchant-login.html"><b>Merchant</b></a>
+  <a href="login.html" data-en="Profile" data-hi="प्रोफ़ाइल">Profile</a>
+  <a href="cart.html" data-en="My Cart" data-hi="मेरा कार्ट">My Cart</a>
+  <a href="#" data-en="My Orders" data-hi="मेरे ऑर्डर">My Orders</a>
+  <a href="#" data-en="Address" data-hi="पता">Address</a>
+  <a href="merchant-login.html"><b data-en="Merchant" data-hi="व्यापारी">Merchant</b></a>
+  <a href="admin.html"><b>Admin</b></a>
 </div>
 
 <!-- HEADER -->
-<header>
-  <span class="menu-btn" onclick="toggleMenu()">☰</span>
-  <h3>Family Mart</h3>
-  <button class="lang-btn" onclick="toggleLang()">Hindi</button>
+<header style="display:flex;align-items:center;justify-content:space-between;">
+  <span onclick="toggleMenu()" style="font-size:22px;cursor:pointer;">☰</span>
+
+  <img src="assets/logo.png" alt="Family Mart" height="32">
+
+  <div style="display:flex;align-items:center;gap:10px;">
+    <button class="lang-btn" onclick="toggleLang()">Hindi</button>
+    <a href="cart.html" style="color:white;text-decoration:none;">
+      🛒 <span id="cartCount">0</span>
+    </a>
+  </div>
 </header>
 
 <!-- PRODUCTS -->
-<div class="products">
-
-  <div class="card">
-    <img src="https://via.placeholder.com/300" />
-    <p>Men T-Shirt</p>
-    <div class="price">₹499</div>
-    <button class="add-btn" onclick="addToCart('Men T-Shirt',499)">Add to Cart</button>
-  </div>
-
-  <div class="card">
-    <img src="https://via.placeholder.com/300" />
-    <p>Bluetooth Earbuds</p>
-    <div class="price">₹1299</div>
-    <button class="add-btn" onclick="addToCart('Bluetooth Earbuds',1299)">Add to Cart</button>
-  </div>
-
-</div>
+<div class="products" id="productList"></div>
 
 <!-- JS -->
+<script src="js/main.js"></script>
+<script src="js/cart.js"></script>
+
 <script>
-  let menuOpen = false;
-  let hindi = false;
+  /* =========================
+     LOAD PRODUCTS
+  ========================= */
+  const products = JSON.parse(localStorage.getItem("products")) || [];
+  const productDiv = document.getElementById("productList");
 
-  function toggleMenu() {
-    document.getElementById("menu").style.left = menuOpen ? "-250px" : "0";
-    menuOpen = !menuOpen;
+  if (products.length === 0) {
+    productDiv.innerHTML = `
+      <p style="padding:15px;color:#555;" data-en="No products available"
+         data-hi="कोई प्रोडक्ट उपलब्ध नहीं है">
+         No products available
+      </p>`;
+  } else {
+    products.forEach((p, index) => {
+      productDiv.innerHTML += `
+        <div class="card-product">
+          <img src="${p.image || 'assets/placeholder.png'}">
+          <p><b>${p.name}</b></p>
+          <div class="price">₹${p.price}</div>
+          <button class="btn btn-warning"
+            onclick="addToCart('${p.name}', ${p.price})"
+            data-en="Add to Cart"
+            data-hi="कार्ट में जोड़ें">
+            Add to Cart
+          </button>
+          <div class="small">Sold by: ${p.merchant}</div>
+        </div>
+      `;
+    });
   }
 
-  function toggleLang() {
-    hindi = !hindi;
-    document.querySelector(".lang-btn").innerText = hindi ? "English" : "Hindi";
-    alert(hindi ? "Hindi ON" : "English ON");
-  }
-
-  function addToCart(name, price) {
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
-    cart.push({ name, price });
-    localStorage.setItem("cart", JSON.stringify(cart));
-    alert("Added to cart");
-  }
+  updateCartCount();
 </script>
 
 </body>
