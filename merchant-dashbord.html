@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Merchant Dashboard | Family Mart</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+    }
+
+    header {
+      background: #ff9f00;
+      padding: 12px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .container {
+      padding: 15px;
+    }
+
+    .card {
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+
+    .card h3 {
+      margin: 0 0 10px;
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .publish {
+      background: #0a7cff;
+      color: #fff;
+    }
+
+    .orders {
+      background: #28a745;
+      color: #fff;
+    }
+
+    .logout {
+      background: #dc3545;
+      color: #fff;
+    }
+
+    .merchant-info {
+      font-size: 14px;
+      color: #333;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  Merchant Dashboard – Family Mart
+</header>
+
+<div class="container">
+
+  <div class="card">
+    <h3>Welcome</h3>
+    <div class="merchant-info" id="merchantInfo"></div>
+  </div>
+
+  <div class="card">
+    <h3>Actions</h3>
+    <button class="btn publish" onclick="goPublish()">➕ Publish Product</button>
+    <button class="btn orders" onclick="viewOrders()">📦 View Orders</button>
+  </div>
+
+  <div class="card">
+    <button class="btn logout" onclick="logout()">Logout</button>
+  </div>
+
+</div>
+
+<script>
+  // Load merchant info
+  const merchant = JSON.parse(localStorage.getItem("merchant"));
+
+  if (!merchant) {
+    alert("Please login as merchant first");
+    window.location.href = "merchant-login.html";
+  } else {
+    document.getElementById("merchantInfo").innerHTML =
+      `<b>Shop:</b> ${merchant.shopName}<br>
+       <b>Mobile:</b> ${merchant.mobile}`;
+  }
+
+  function goPublish() {
+    window.location.href = "publish-product.html";
+  }
+
+  function viewOrders() {
+    alert("Orders page will be connected next");
+    // future: redirect to merchant-orders.html
+  }
+
+  function logout() {
+    localStorage.removeItem("merchant");
+    alert("Logged out");
+    window.location.href = "merchant-login.html";
+  }
+</script>
+
+</body>
+</html>
