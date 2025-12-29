@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Family Mart</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f6f6f6;
+    }
+
+    header {
+      background: #0a7cff;
+      color: white;
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .menu-btn {
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    .lang-btn {
+      background: white;
+      color: #0a7cff;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .products {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      padding: 10px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .card img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 5px;
+    }
+
+    .price {
+      font-weight: bold;
+      margin: 5px 0;
+    }
+
+    .add-btn {
+      background: #ff9f00;
+      border: none;
+      padding: 8px;
+      width: 100%;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    /* Side Menu */
+    .side-menu {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      width: 250px;
+      height: 100%;
+      background: white;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.3);
+      padding: 15px;
+      transition: 0.3s;
+    }
+
+    .side-menu a {
+      display: block;
+      margin: 10px 0;
+      text-decoration: none;
+      color: black;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- SIDE MENU -->
+<div id="menu" class="side-menu">
+  <a href="#">Profile</a>
+  <a href="cart.html">My Cart</a>
+  <a href="#">My Orders</a>
+  <a href="#">Address</a>
+  <a href="merchant-login.html"><b>Merchant</b></a>
+</div>
+
+<!-- HEADER -->
+<header>
+  <span class="menu-btn" onclick="toggleMenu()">☰</span>
+  <h3>Family Mart</h3>
+  <button class="lang-btn" onclick="toggleLang()">Hindi</button>
+</header>
+
+<!-- PRODUCTS -->
+<div class="products">
+
+  <div class="card">
+    <img src="https://via.placeholder.com/300" />
+    <p>Men T-Shirt</p>
+    <div class="price">₹499</div>
+    <button class="add-btn" onclick="addToCart('Men T-Shirt',499)">Add to Cart</button>
+  </div>
+
+  <div class="card">
+    <img src="https://via.placeholder.com/300" />
+    <p>Bluetooth Earbuds</p>
+    <div class="price">₹1299</div>
+    <button class="add-btn" onclick="addToCart('Bluetooth Earbuds',1299)">Add to Cart</button>
+  </div>
+
+</div>
+
+<!-- JS -->
+<script>
+  let menuOpen = false;
+  let hindi = false;
+
+  function toggleMenu() {
+    document.getElementById("menu").style.left = menuOpen ? "-250px" : "0";
+    menuOpen = !menuOpen;
+  }
+
+  function toggleLang() {
+    hindi = !hindi;
+    document.querySelector(".lang-btn").innerText = hindi ? "English" : "Hindi";
+    alert(hindi ? "Hindi ON" : "English ON");
+  }
+
+  function addToCart(name, price) {
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    cart.push({ name, price });
+    localStorage.setItem("cart", JSON.stringify(cart));
+    alert("Added to cart");
+  }
+</script>
+
+</body>
+</html>
