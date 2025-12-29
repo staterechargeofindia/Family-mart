@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard | Family Mart</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+    }
+
+    header {
+      background: #111;
+      color: #fff;
+      padding: 12px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .container {
+      padding: 12px;
+    }
+
+    .card {
+      background: #fff;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+
+    .card h3 {
+      margin: 0 0 8px;
+    }
+
+    .small {
+      font-size: 13px;
+      color: #555;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      background: #28a745;
+      color: #fff;
+      margin-left: 6px;
+    }
+
+    .order {
+      border-top: 1px solid #eee;
+      padding-top: 8px;
+      margin-top: 8px;
+    }
+
+    .logout {
+      width: 100%;
+      padding: 12px;
+      background: #dc3545;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  Admin Dashboard – Family Mart
+</header>
+
+<div class="container">
+
+  <!-- SUMMARY -->
+  <div class="card">
+    <h3>Overview</h3>
+    <div class="small" id="summary"></div>
+  </div>
+
+  <!-- ORDERS -->
+  <div class="card">
+    <h3>All Orders</h3>
+    <div id="ordersList"></div>
+  </div>
+
+  <!-- MERCHANTS -->
+  <div class="card">
+    <h3>Registered Merchants</h3>
+    <div id="merchantList"></div>
+  </div>
+
+  <button class="logout" onclick="logout()">Logout</button>
+
+</div>
+
+<script>
+  // Simple admin protection (for now)
+  const adminKey = localStorage.getItem("admin");
+  if (!adminKey) {
+    // auto set for testing
+    localStorage.setItem("admin", "true");
+  }
+
+  const orders = JSON.parse(localStorage.getItem("orders")) || [];
+  const products = JSON.parse(localStorage.getItem("products")) || [];
+
+  // Collect merchants from products
+  const merchants = [...new Set(products.map(p => p.merchant))];
+
+  // SUMMARY
+  document.getElementById("summary").innerHTML = `
+    Total Orders: <b>${orders.length}</b><br>
+    Total Merchants: <b>${merchants.length}</b>
+  `;
+
+  // ORDERS LIST
+  const ordersDiv = document.getElementById("ordersList");
+  if (orders.length === 0) {
+    ordersDiv.innerHTML = "<p class='small'>No orders yet</p>";
+  } else {
+    orders.forEach(order => {
+      let merchantNames = Object.keys(order.ordersByMerchant || {}).join(", ");
+      ordersDiv.innerHTML += `
+        <div class="order">
+          <b>Order ID:</b> ${order.id}
+          <span class="badge">${order.status}</span><br>
+          <b>Customer:</b> ${order.customer.name}<br>
+          <b>Mobile:</b> ${order.customer.mobile}<br>
+          <b>Address:</b> ${order.customer.address}<br>
+          <b>Merchant(s):</b> ${merchantNames}<br>
+          <b>Total:</b> ₹${order.total}<br>
+          <span class="small">${order.createdAt}</span>
+        </div>
+      `;
+    });
+  }
+
+  // MERCHANT LIST
+  const merchantDiv = document.getElementById("merchantList");
+  if (merchants.length === 0) {
+    merchantDiv.innerHTML = "<p class='small'>No merchants yet</p>";
+  } else {
+    merchants.forEach(m => {
+      merchantDiv.innerHTML += `<div class="small">🏪 ${m}</div>`;
+    });
+  }
+
+  function logout() {
+    localStorage.removeItem("admin");
+    alert("Admin logged out");
+    window.location.href = "index.html";
+  }
+</script>
+
+</body>
+</html>
