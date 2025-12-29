@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login | Family Mart</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f6f6f6;
+    }
+
+    .container {
+      max-width: 350px;
+      margin: 60px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #0a7cff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .switch {
+      text-align: center;
+      margin-top: 10px;
+      color: #0a7cff;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+  <h2 id="title">User Login</h2>
+
+  <input type="text" id="name" placeholder="Full Name" style="display:none;">
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Password">
+
+  <button onclick="login()">Login</button>
+
+  <div class="switch" onclick="toggleMode()">Create new account</div>
+</div>
+
+<script>
+  let registerMode = false;
+
+  function toggleMode() {
+    registerMode = !registerMode;
+
+    document.getElementById("title").innerText =
+      registerMode ? "User Register" : "User Login";
+
+    document.getElementById("name").style.display =
+      registerMode ? "block" : "none";
+
+    document.querySelector("button").innerText =
+      registerMode ? "Register" : "Login";
+
+    document.querySelector(".switch").innerText =
+      registerMode ? "Already have an account? Login"
+                   : "Create new account";
+  }
+
+  function login() {
+    const email = document.getElementById("email").value;
+    const name  = document.getElementById("name").value;
+
+    if (!email) {
+      alert("Please enter email");
+      return;
+    }
+
+    let user = {
+      name: name || "User",
+      email: email
+    };
+
+    localStorage.setItem("user", JSON.stringify(user));
+    alert(registerMode ? "Registered successfully" : "Login successful");
+    window.location.href = "index.html";
+  }
+</script>
+
+</body>
+</html>
