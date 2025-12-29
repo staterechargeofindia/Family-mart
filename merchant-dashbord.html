@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Merchant Login | Family Mart</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+    }
+
+    .container {
+      max-width: 360px;
+      margin: 60px auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #ff9f00;
+      color: #000;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    .switch {
+      text-align: center;
+      margin-top: 12px;
+      color: #0a7cff;
+      cursor: pointer;
+    }
+
+    .note {
+      font-size: 13px;
+      color: #666;
+      text-align: center;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+  <h2 id="title">Merchant Login</h2>
+
+  <input type="text" id="shop" placeholder="Shop / Business Name" style="display:none;">
+  <input type="text" id="mobile" placeholder="Mobile Number">
+  <input type="password" id="password" placeholder="Password">
+
+  <button onclick="merchantLogin()">Login</button>
+
+  <div class="switch" onclick="toggleMode()">Register as new merchant</div>
+
+  <div class="note">
+    Free registration • COD orders • All India
+  </div>
+</div>
+
+<script>
+  let registerMode = false;
+
+  function toggleMode() {
+    registerMode = !registerMode;
+
+    document.getElementById("title").innerText =
+      registerMode ? "Merchant Register" : "Merchant Login";
+
+    document.getElementById("shop").style.display =
+      registerMode ? "block" : "none";
+
+    document.querySelector("button").innerText =
+      registerMode ? "Register" : "Login";
+
+    document.querySelector(".switch").innerText =
+      registerMode ? "Already a merchant? Login"
+                   : "Register as new merchant";
+  }
+
+  function merchantLogin() {
+    const mobile = document.getElementById("mobile").value;
+    const shop   = document.getElementById("shop").value;
+
+    if (!mobile) {
+      alert("Please enter mobile number");
+      return;
+    }
+
+    let merchant = {
+      shopName: shop || "Merchant Shop",
+      mobile: mobile
+    };
+
+    localStorage.setItem("merchant", JSON.stringify(merchant));
+    alert(registerMode ? "Merchant registered successfully" : "Login successful");
+    window.location.href = "merchant-dashboard.html";
+  }
+</script>
+
+</body>
+</html>
