@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Family Mart</title>
 
-  <!-- CSS -->
+  <!-- MAIN CSS (ONLY ONE) -->
   <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
 
-<!-- SIDE MENU -->
+<!-- ================= SIDE MENU ================= -->
 <div id="menu" class="side-menu">
   <a href="login.html" data-en="Profile" data-hi="प्रोफ़ाइल">Profile</a>
   <a href="cart.html" data-en="My Cart" data-hi="मेरा कार्ट">My Cart</a>
@@ -21,7 +21,7 @@
   <a href="admin.html"><b>Admin</b></a>
 </div>
 
-<!-- HEADER -->
+<!-- ================= HEADER ================= -->
 <header style="display:flex;align-items:center;justify-content:space-between;">
   <span onclick="toggleMenu()" style="font-size:22px;cursor:pointer;">☰</span>
 
@@ -35,31 +35,32 @@
   </div>
 </header>
 
-<!-- PRODUCTS -->
-<div class="products" id="productList"></div>
+<!-- ================= PRODUCT LIST ================= -->
+<div id="productList" class="products"></div>
 
-<!-- JS -->
+<!-- ================= JS FILES (NO DUPLICATE) ================= -->
 <script src="js/main.js"></script>
 <script src="js/cart.js"></script>
 
+<!-- ================= PAGE LOGIC ================= -->
 <script>
-  /* =========================
-     LOAD PRODUCTS
-  ========================= */
-  const products = JSON.parse(localStorage.getItem("products")) || [];
   const productDiv = document.getElementById("productList");
+  const products = JSON.parse(localStorage.getItem("products")) || [];
 
   if (products.length === 0) {
     productDiv.innerHTML = `
-      <p style="padding:15px;color:#555;" data-en="No products available"
-         data-hi="कोई प्रोडक्ट उपलब्ध नहीं है">
-         No products available
-      </p>`;
+      <div class="card">
+        <p class="small" data-en="No products available"
+           data-hi="कोई प्रोडक्ट उपलब्ध नहीं है">
+           No products available
+        </p>
+      </div>
+    `;
   } else {
-    products.forEach((p, index) => {
+    products.forEach(p => {
       productDiv.innerHTML += `
         <div class="card-product">
-          <img src="${p.image || 'assets/placeholder.png'}">
+          <img src="${p.image ? p.image : 'assets/placeholder.png'}">
           <p><b>${p.name}</b></p>
           <div class="price">₹${p.price}</div>
           <button class="btn btn-warning"
@@ -74,6 +75,7 @@
     });
   }
 
+  // update cart count safely
   updateCartCount();
 </script>
 
