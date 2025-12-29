@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Checkout | Family Mart</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+    }
+
+    header {
+      background: #0a7cff;
+      color: #fff;
+      padding: 12px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .container {
+      padding: 15px;
+    }
+
+    .card {
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      margin-bottom: 12px;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    textarea {
+      resize: none;
+    }
+
+    .total {
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .cod {
+      background: #e9f7ef;
+      padding: 10px;
+      border-radius: 6px;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #ff9f00;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 12px;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  Checkout (Cash on Delivery)
+</header>
+
+<div class="container">
+
+  <!-- ADDRESS CARD -->
+  <div class="card">
+    <h3>Delivery Address</h3>
+    <input type="text" id="name" placeholder="Full Name">
+    <input type="text" id="mobile" placeholder="Mobile Number">
+    <textarea id="address" placeholder="Full Address"></textarea>
+  </div>
+
+  <!-- PAYMENT CARD -->
+  <div class="card">
+    <h3>Payment Method</h3>
+    <div class="cod">
+      ✔ Cash on Delivery (Pay at your doorstep)
+    </div>
+    <div class="total" id="totalAmount">Total: ₹0</div>
+  </div>
+
+  <button onclick="confirmOrder()">Confirm Order</button>
+
+</div>
+
+<script>
+  const cart = JSON.parse(localStorage.getItem("cart")) || [];
+  const products = JSON.parse(localStorage.getItem("products")) || [];
+  const user = JSON.parse(localStorage.getItem("user")) || null;
+
+  let total = 0;
+  cart.forEach(item => total += Number(item.price));
+  document.getElementById("totalAmount").innerText = "Total: ₹" + total;
+
+  // Pre-fill user data if available
+  if (user) {
+    document.getElementById("name").value = user.name || "";
+  }
+
+  function confirmOrder() {
+    const name = document.getElementById("name").value.trim();
+    const mobile = document.getElementById("mobile").value.trim();
+    const address = document.getElementById("address").value.trim();
+
+    if (!name || !mobile || !address) {
+      alert("Please fill all address details");
+      return;
+    }
+
+    if (cart.length === 0) {
+      alert("Cart is empty");
+      return;
+    }
+
+    // Prepare orders per merchant
+    const ordersByMerchant = {};
+    cart.forEach(item => {
+      const p = products.find(x => x.name === item.name);
+      const merchant = p ? p.merchant : "Unknown Merchant";
+      if (!ordersByMerchant[merchant]) ordersByMerchant[merchant] = [];
+      ordersByMerchant[merchant].push(item);
+    });
+
+    const order = {
+      id: "ORD-" + Date.now(),
+      customer: { name, mobile, address },
+      items: cart,
+      ordersByMerchant, // for merchant notifications
+      total,
+      payment: "COD",
+      status: "New",
+      createdAt: new Date().toISOString()
+    };
+
+    const allOrders = JSON.parse(localStorage.getItem("orders")) || [];
+    allOrders.push(order);
+    localStorage.setItem("orders", JSON.stringify(allOrders));
+
+    // Clear cart
+    localStorage.removeItem("cart");
+
+    alert("Order confirmed! Merchant & Admin will be notified.");
+    window.location.href = "index.html";
+  }
+</script>
+
+</body>
+</html>
