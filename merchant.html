@@ -1,67 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Merchant Login | Family Mart</title>
-  <link rel="stylesheet" href="css/style.css">
+<title>Merchant Login</title>
+<link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
-
-<header>Merchant Login</header>
-
-<div class="container">
-
-  <div class="card">
-    <h3 id="title">Merchant Login</h3>
-
-    <input type="text" id="shop" placeholder="Shop Name (for register)" style="display:none;">
-    <input type="text" id="mobile" placeholder="Mobile Number">
-    <input type="password" id="password" placeholder="Password">
-
-    <button class="btn btn-warning" onclick="submitMerchant()">Login</button>
-
-    <p class="small" style="margin-top:10px;cursor:pointer;color:blue;"
-       onclick="toggleMode()">
-       New merchant? Register here
-    </p>
-  </div>
-
+<header>Merchant</header>
+<div class="container card">
+<input id="shop" placeholder="Shop Name">
+<input id="mobile" placeholder="Mobile">
+<button onclick="login()">Login</button>
 </div>
-
 <script>
-  let registerMode = false;
-
-  function toggleMode() {
-    registerMode = !registerMode;
-
-    document.getElementById("shop").style.display =
-      registerMode ? "block" : "none";
-
-    document.getElementById("title").innerText =
-      registerMode ? "Merchant Register" : "Merchant Login";
-  }
-
-  function submitMerchant() {
-    const shop = document.getElementById("shop").value;
-    const mobile = document.getElementById("mobile").value;
-    const pass = document.getElementById("password").value;
-
-    if (!mobile || !pass || (registerMode && !shop)) {
-      alert("Please fill all details");
-      return;
-    }
-
-    const merchant = {
-      shopName: shop || "Merchant Shop",
-      mobile: mobile
-    };
-
-    localStorage.setItem("merchant", JSON.stringify(merchant));
-    window.location.href = "merchant-dashboard.html";
-  }
+function login(){
+ localStorage.setItem("merchant",
+ JSON.stringify({shopName:shop.value,mobile:mobile.value}));
+ location.href="merchant-dashboard.html";
+}
 </script>
-
 </body>
 </html>
