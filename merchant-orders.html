@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Merchant Orders</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header>My Orders</header>
+<div class="container" id="box"></div>
+<script>
+const m=JSON.parse(localStorage.getItem("merchant"));
+const orders=JSON.parse(localStorage.getItem("orders"))||[];
+orders.forEach(o=>{
+ const items=o.items.filter(i=>i.merchant===m.shopName);
+ if(items.length){
+  box.innerHTML+=`
+  <div class="card ${o.status==='Delivered'?'delivered':''}">
+  <b>${o.id}</b><br>
+  ${o.status}
+  </div>`;
+ }
+});
+</script>
+</body>
+</html>
