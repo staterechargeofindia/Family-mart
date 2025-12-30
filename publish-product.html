@@ -1,134 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Publish Product | Family Mart</title>
-
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
-    }
-
-    header {
-      background: #0a7cff;
-      color: white;
-      padding: 12px;
-      text-align: center;
-      font-weight: bold;
-    }
-
-    .container {
-      padding: 15px;
-    }
-
-    .card {
-      background: #fff;
-      padding: 15px;
-      border-radius: 8px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
-    }
-
-    input, textarea {
-      width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-
-    textarea {
-      resize: none;
-    }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      background: #ff9f00;
-      border: none;
-      border-radius: 6px;
-      font-size: 16px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    .note {
-      font-size: 13px;
-      color: #555;
-      margin-top: 8px;
-    }
-  </style>
+<title>Publish Product</title>
+<link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
-
-<header>
-  Publish Product
-</header>
-
-<div class="container">
-  <div class="card">
-
-    <input type="text" id="name" placeholder="Product Name" required>
-    <input type="number" id="price" placeholder="Price (₹)" required>
-    <textarea id="desc" placeholder="Product Description"></textarea>
-
-    <input type="file" id="image" accept="image/*">
-
-    <button onclick="publishProduct()">Publish</button>
-
-    <div class="note">
-      Product will be visible on Family Mart home page
-    </div>
-
-  </div>
+<header>Publish Product</header>
+<div class="container card">
+<input id="name" placeholder="Product Name">
+<input id="price" placeholder="Price">
+<input id="image" placeholder="Image URL">
+<button onclick="publish()">Publish</button>
 </div>
-
 <script>
-  // Check merchant login
-  const merchant = JSON.parse(localStorage.getItem("merchant"));
-  if (!merchant) {
-    alert("Please login as merchant first");
-    window.location.href = "merchant-login.html";
-  }
-
-  function publishProduct() {
-    const name = document.getElementById("name").value;
-    const price = document.getElementById("price").value;
-    const desc = document.getElementById("desc").value;
-    const imageInput = document.getElementById("image");
-
-    if (!name || !price) {
-      alert("Please fill product name and price");
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = function () {
-      const products = JSON.parse(localStorage.getItem("products")) || [];
-
-      products.push({
-        name: name,
-        price: price,
-        desc: desc,
-        image: reader.result,
-        merchant: merchant.shopName
-      });
-
-      localStorage.setItem("products", JSON.stringify(products));
-      alert("Product published successfully");
-      window.location.href = "merchant-dashboard.html";
-    };
-
-    if (imageInput.files[0]) {
-      reader.readAsDataURL(imageInput.files[0]);
-    } else {
-      alert("Please select a product image");
-    }
-  }
+const m=JSON.parse(localStorage.getItem("merchant"));
+function publish(){
+ const p={name:name.value,price:price.value,image:image.value,merchant:m.shopName};
+ const arr=JSON.parse(localStorage.getItem("products"))||[];
+ arr.push(p);
+ localStorage.setItem("products",JSON.stringify(arr));
+ alert("Published");
+}
 </script>
-
 </body>
 </html>
