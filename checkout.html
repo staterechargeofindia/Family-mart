@@ -9,53 +9,46 @@
 
 <body>
 
-<header>
-  Checkout – Cash on Delivery
-</header>
+<header>Checkout – Cash on Delivery</header>
 
 <div class="container">
 
-  <!-- ================= ADDRESS ================= -->
+  <!-- DELIVERY ADDRESS -->
   <div class="card">
     <h3>Delivery Address</h3>
 
-    <input type="text" id="name" placeholder="Full Name *">
-    <input type="text" id="mobile" placeholder="Mobile Number *">
+    <input type="text" id="name" placeholder="Full Name">
+    <input type="text" id="mobile" placeholder="Mobile Number">
 
     <input type="text" id="house" placeholder="House / Flat / Shop No">
     <input type="text" id="street" placeholder="Street / Locality">
     <input type="text" id="nearby" placeholder="Near By / Landmark">
 
-    <input type="text" id="village" placeholder="Village / Area *">
-    <input type="text" id="district" placeholder="District *">
+    <input type="text" id="village" placeholder="Village / Area">
+    <input type="text" id="district" placeholder="District">
 
-    <input type="text" id="pincode" placeholder="Pin Code *" maxlength="6"
-           onblur="detectState()">
+    <input type="text" id="pincode" placeholder="Pin Code" maxlength="6">
+    <input type="text" id="state" placeholder="State">
 
-    <input type="text" id="state" placeholder="State" readonly>
-
-    <textarea id="address" placeholder="Complete Address *"></textarea>
+    <textarea id="address" placeholder="Complete Address (Optional)"></textarea>
 
     <button class="btn btn-warning" onclick="saveProfile()">
       Save Address
     </button>
   </div>
 
-  <!-- ================= ORDER SUMMARY ================= -->
+  <!-- ORDER SUMMARY -->
   <div class="card">
     <h3>Order Summary</h3>
     <div id="orderItems"></div>
     <hr>
-    <b>Total Amount: ₹<span id="totalAmount">0</span></b>
+    <b>Total: ₹<span id="totalAmount">0</span></b>
   </div>
 
-  <!-- ================= PAYMENT ================= -->
+  <!-- PAYMENT -->
   <div class="card">
     <h3>Payment Method</h3>
-    <p>
-      <input type="radio" checked>
-      Cash on Delivery (Pay at delivery)
-    </p>
+    <p>✔ Cash on Delivery</p>
   </div>
 
   <button class="btn btn-warning" onclick="confirmOrder()">
@@ -65,7 +58,7 @@
 </div>
 
 <script>
-  /* ================= LOAD DATA ================= */
+  /* LOAD DATA */
   const cart = JSON.parse(localStorage.getItem("cart")) || [];
   const profile = JSON.parse(localStorage.getItem("profile")) || {};
   const orderBox = document.getElementById("orderItems");
@@ -73,66 +66,27 @@
 
   let total = 0;
 
-  /* ================= SHOW CART ================= */
-  if (cart.length === 0) {
-    orderBox.innerHTML = "<p class='small'>Your cart is empty</p>";
-  } else {
-    cart.forEach(item => {
-      total += Number(item.price);
-      orderBox.innerHTML += `<p>${item.name} – ₹${item.price}</p>`;
-    });
-  }
+  /* SHOW CART */
+  cart.forEach(item => {
+    total += Number(item.price);
+    orderBox.innerHTML += `<p>${item.name} – ₹${item.price}</p>`;
+  });
   totalBox.innerText = total;
 
-  /* ================= AUTO FILL PROFILE ================= */
+  /* AUTO FILL PROFILE (IF ANY) */
   name.value     = profile.name     || "";
   mobile.value   = profile.mobile   || "";
-  village.value  = profile.village  || "";
-  district.value = profile.district || "";
-  address.value  = profile.address  || "";
-  pincode.value  = profile.pincode  || "";
-  state.value    = profile.state    || "";
-  nearby.value   = profile.nearby   || "";
   house.value    = profile.house    || "";
   street.value   = profile.street  || "";
+  nearby.value   = profile.nearby   || "";
+  village.value  = profile.village  || "";
+  district.value = profile.district || "";
+  pincode.value  = profile.pincode  || "";
+  state.value    = profile.state    || "";
+  address.value  = profile.address  || "";
 
-  /* ================= PIN CODE → STATE ================= */
-  function detectState() {
-    const pin = pincode.value;
-    if (pin.length !== 6) return;
-
-    const first = pin.charAt(0);
-    const map = {
-      "1": "Delhi / Haryana / Punjab",
-      "2": "Uttar Pradesh",
-      "3": "Rajasthan / Gujarat",
-      "4": "Maharashtra / Madhya Pradesh",
-      "5": "Andhra Pradesh / Telangana",
-      "6": "Karnataka / Tamil Nadu",
-      "7": "Kerala",
-      "8": "Odisha / West Bengal",
-      "9": "North East / Bihar / Jharkhand"
-    };
-
-    state.value = map[first] || "India";
-    buildFullAddress();
-  }
-
-  /* ================= BUILD FULL ADDRESS ================= */
-  function buildFullAddress() {
-    address.value =
-      `${house.value}, ${street.value}, Near ${nearby.value}, ` +
-      `${village.value}, ${district.value}, ` +
-      `${state.value} - ${pincode.value}`;
-  }
-
-  /* ================= SAVE PROFILE ================= */
+  /* SAVE ADDRESS (NO CHECK) */
   function saveProfile() {
-    if (!name.value || !mobile.value || !address.value || !pincode.value) {
-      alert("Please fill complete delivery address");
-      return;
-    }
-
     const data = {
       name: name.value,
       mobile: mobile.value,
@@ -145,26 +99,15 @@
       state: state.value,
       address: address.value
     };
-
     localStorage.setItem("profile", JSON.stringify(data));
-    alert("Address saved successfully");
+    alert("Address saved");
   }
 
-  /* ================= CONFIRM ORDER ================= */
+  /* CONFIRM ORDER (NO VALIDATION) */
   function confirmOrder() {
-    if (cart.length === 0) {
-      alert("Cart is empty");
-      return;
-    }
-
-    if (!name.value || !mobile.value || !address.value || !pincode.value) {
-      alert("Please complete address details");
-      return;
-    }
-
     const order = {
       id: "ORD-" + Date.now(),
-      customer: JSON.parse(localStorage.getItem("profile")),
+      customer: JSON.parse(localStorage.getItem("profile")) || {},
       items: cart,
       total: total,
       payment: "COD",
