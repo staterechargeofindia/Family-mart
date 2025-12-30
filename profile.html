@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile | Family Mart</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<header>My Profile</header>
+
+<div class="container">
+  <div class="card">
+
+    <input type="text" id="name" placeholder="Full Name">
+    <input type="text" id="mobile" placeholder="Mobile Number">
+    <input type="text" id="village" placeholder="Village / Area">
+    <input type="text" id="district" placeholder="District">
+    <textarea id="address" placeholder="Complete Address"></textarea>
+
+    <button class="btn btn-warning" onclick="saveProfile()">
+      Save Profile
+    </button>
+
+  </div>
+</div>
+
+<script>
+  const profile = JSON.parse(localStorage.getItem("profile"));
+  if (profile) {
+    name.value = profile.name || "";
+    mobile.value = profile.mobile || "";
+    village.value = profile.village || "";
+    district.value = profile.district || "";
+    address.value = profile.address || "";
+  }
+
+  function saveProfile() {
+    const data = {
+      name: name.value,
+      mobile: mobile.value,
+      village: village.value,
+      district: district.value,
+      address: address.value
+    };
+
+    if (!data.name || !data.mobile || !data.address) {
+      alert("Please fill required fields");
+      return;
+    }
+
+    localStorage.setItem("profile", JSON.stringify(data));
+    alert("Profile saved");
+    window.location.href = "index.html";
+  }
+</script>
+
+</body>
+</html>
