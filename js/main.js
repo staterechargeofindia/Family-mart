@@ -1,17 +1,12 @@
-let menuOpen = false;
 
-document.addEventListener("DOMContentLoaded", function () {
-  const menuBtn = document.getElementById("menuBtn");
-  const menu = document.getElementById("menu");
-
-  if (menuBtn && menu) {
-    menuBtn.addEventListener("click", function () {
-      if (menuOpen) {
-        menu.style.left = "-260px";
-      } else {
-        menu.style.left = "0";
-      }
-      menuOpen = !menuOpen;
-    });
+let open=false;
+document.addEventListener("DOMContentLoaded",()=>{
+ const btn=document.getElementById("menuBtn");
+ const menu=document.getElementById("menu");
+ if(btn&&menu){
+  btn.onclick=()=>{
+   menu.style.left=open?"-260px":"0";
+   open=!open;
   }
+ }
 });
