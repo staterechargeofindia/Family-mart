@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>My Profile | Family Mart</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <link rel="stylesheet" href="css/style.css">
 
   <style>
@@ -16,10 +17,6 @@
       display: block;
       margin-bottom: 4px;
     }
-    .required {
-      color: red;
-      font-size: 12px;
-    }
   </style>
 </head>
 
@@ -30,53 +27,45 @@
 <div class="container">
   <div class="card">
 
-    <!-- NAME -->
     <div class="form-group">
-      <label>Full Name <span class="required">*</span></label>
+      <label>Full Name</label>
       <input type="text" id="name" placeholder="Enter full name">
     </div>
 
-    <!-- MOBILE -->
     <div class="form-group">
-      <label>Mobile Number <span class="required">*</span></label>
-      <input type="text" id="mobile" placeholder="10 digit mobile number">
+      <label>Mobile Number</label>
+      <input type="text" id="mobile" placeholder="Enter mobile number">
     </div>
 
-    <!-- PINCODE -->
     <div class="form-group">
-      <label>Pin Code <span class="required">*</span></label>
+      <label>Pin Code</label>
       <input type="text" id="pincode" maxlength="6"
              placeholder="Enter pin code" onblur="detectState()">
     </div>
 
-    <!-- STATE -->
     <div class="form-group">
       <label>State</label>
       <input type="text" id="state" placeholder="Auto detected" readonly>
     </div>
 
-    <!-- DISTRICT -->
     <div class="form-group">
-      <label>District <span class="required">*</span></label>
+      <label>District</label>
       <input type="text" id="district" placeholder="Enter district">
     </div>
 
-    <!-- VILLAGE -->
     <div class="form-group">
       <label>Village / Area</label>
       <input type="text" id="village" placeholder="Optional">
     </div>
 
-    <!-- LANDMARK -->
     <div class="form-group">
       <label>Near By / Landmark</label>
       <input type="text" id="nearby" placeholder="Optional">
     </div>
 
-    <!-- FULL ADDRESS -->
     <div class="form-group">
       <label>Complete Address</label>
-      <textarea id="address" placeholder="Auto generated, you can edit"></textarea>
+      <textarea id="address" placeholder="Auto generated / editable"></textarea>
     </div>
 
     <button class="btn btn-warning" onclick="saveProfile()">
@@ -87,7 +76,7 @@
 </div>
 
 <script>
-  /* LOAD SAVED PROFILE */
+  /* LOAD PROFILE (IF ANY) */
   const profile = JSON.parse(localStorage.getItem("profile")) || {};
   name.value     = profile.name     || "";
   mobile.value   = profile.mobile   || "";
@@ -98,7 +87,7 @@
   nearby.value   = profile.nearby   || "";
   address.value  = profile.address  || "";
 
-  /* PIN → STATE */
+  /* PIN → STATE (OPTIONAL) */
   function detectState() {
     if (pincode.value.length !== 6) return;
 
@@ -118,7 +107,7 @@
     buildAddress();
   }
 
-  /* BUILD ADDRESS */
+  /* BUILD ADDRESS (OPTIONAL) */
   function buildAddress() {
     address.value =
       `${village.value || ""}, ${district.value || ""}, ` +
@@ -126,13 +115,8 @@
       (nearby.value ? `, Near ${nearby.value}` : "");
   }
 
-  /* SAVE PROFILE (ONLY 4 REQUIRED) */
+  /* SAVE PROFILE (NO CHECKS) */
   function saveProfile() {
-    if (!name.value || !mobile.value || !pincode.value || !district.value) {
-      alert("Name, Mobile, Pin Code and District are required");
-      return;
-    }
-
     const data = {
       name: name.value,
       mobile: mobile.value,
@@ -145,7 +129,7 @@
     };
 
     localStorage.setItem("profile", JSON.stringify(data));
-    alert("Profile saved successfully");
+    alert("Profile saved");
     window.location.href = "index.html";
   }
 </script>
