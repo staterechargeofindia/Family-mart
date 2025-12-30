@@ -2,40 +2,42 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Family Mart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!-- MAIN CSS -->
   <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
 
-<!-- SIDE MENU -->
+<!-- ================= SIDE MENU ================= -->
 <div id="menu" class="side-menu">
-  <a href="login.html">Profile</a>
+  <a href="profile.html">My Profile</a>
   <a href="cart.html">My Cart</a>
-  <a href="merchant-login.html"><b>Merchant</b></a>
+  <a href="merchant.html"><b>Merchant</b></a>
   <a href="admin.html"><b>Admin</b></a>
 </div>
 
-<!-- HEADER -->
+<!-- ================= HEADER ================= -->
 <header>
   <span id="menuBtn" style="font-size:24px;cursor:pointer;">☰</span>
 
-  <img src="assets/logo.png" alt="Family Mart" height="30">
+  <img src="assets/logo.png" alt="Family Mart" height="32">
 
   <a href="cart.html" style="color:white;text-decoration:none;">
     🛒 <span id="cartCount">0</span>
   </a>
 </header>
 
-<!-- PRODUCTS -->
+<!-- ================= MAIN CONTENT ================= -->
 <div class="products" id="productList"></div>
 
-<!-- JS -->
+<!-- ================= JS FILES ================= -->
 <script src="js/main.js"></script>
 <script src="js/cart.js"></script>
 
+<!-- ================= PAGE SCRIPT ================= -->
 <script>
   const productBox = document.getElementById("productList");
   const products = JSON.parse(localStorage.getItem("products")) || [];
@@ -44,7 +46,7 @@
     productBox.innerHTML = `
       <div class="card-product">
         <p class="small">
-          No products yet.<br>
+          No products available.<br>
           Merchant please publish products.
         </p>
       </div>
