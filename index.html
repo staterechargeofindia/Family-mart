@@ -1,77 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Family Mart</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- MAIN CSS -->
-  <link rel="stylesheet" href="css/style.css">
+<title>ISI</title>
+<meta name="viewport" content="width=device-width">
+<link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
 
-<!-- ================= SIDE MENU ================= -->
 <div id="menu" class="side-menu">
-  <a href="profile.html">My Profile</a>
-  <a href="cart.html">My Cart</a>
-  <a href="merchant.html"><b>Merchant</b></a>
-  <a href="admin.html"><b>Admin</b></a>
+<a href="profile.html">My Profile</a>
+<a href="cart.html">My Cart</a>
+<a href="merchant.html"><b>Merchant</b></a>
+<a href="admin.html"><b>Admin</b></a>
 </div>
 
-<!-- ================= HEADER ================= -->
 <header>
-  <span id="menuBtn" style="font-size:24px;cursor:pointer;">☰</span>
-
-  <img src="assets/logo.png" alt="Family Mart" height="32">
-
-  <a href="cart.html" style="color:white;text-decoration:none;">
-    🛒 <span id="cartCount">0</span>
-  </a>
+<span id="menuBtn">☰</span>
+<b>ISI</b>
+<a href="cart.html">🛒 <span id="cartCount">0</span></a>
 </header>
 
-<!-- ================= MAIN CONTENT ================= -->
-<div class="products" id="productList"></div>
+<div class="products" id="list"></div>
 
-<!-- ================= JS FILES ================= -->
 <script src="js/main.js"></script>
 <script src="js/cart.js"></script>
-
-<!-- ================= PAGE SCRIPT ================= -->
 <script>
-  const productBox = document.getElementById("productList");
-  const products = JSON.parse(localStorage.getItem("products")) || [];
-
-  if (products.length === 0) {
-    productBox.innerHTML = `
-      <div class="card-product">
-        <p class="small">
-          No products available.<br>
-          Merchant please publish products.
-        </p>
-      </div>
-    `;
-  } else {
-    products.forEach(p => {
-      productBox.innerHTML += `
-        <div class="card-product">
-          <img src="${p.image || 'assets/placeholder.png'}">
-          <p><b>${p.name}</b></p>
-          <div class="price">₹${p.price}</div>
-          <button class="btn btn-warning"
-            onclick="addToCart('${p.name}', ${p.price})">
-            Add to Cart
-          </button>
-          <div class="small">Sold by: ${p.merchant}</div>
-        </div>
-      `;
-    });
-  }
-
-  if (typeof updateCartCount === "function") {
-    updateCartCount();
-  }
+const products=JSON.parse(localStorage.getItem("products"))||[];
+const box=document.getElementById("list");
+if(products.length===0){box.innerHTML="<div class='card'>No products</div>";}
+products.forEach(p=>{
+ box.innerHTML+=`
+ <div class="card-product">
+ <img src="${p.image||'assets/placeholder.png'}">
+ <b>${p.name}</b>
+ <div class="price">₹${p.price}</div>
+ <button onclick="addToCart('${p.name}',${p.price},'${p.merchant}')">Add to Cart</button>
+ <small>Sold by ${p.merchant}</small>
+ </div>`;
+});
+updateCartCount();
 </script>
-
 </body>
 </html>
