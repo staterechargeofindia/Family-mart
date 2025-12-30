@@ -1,138 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>My Profile | Family Mart</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <link rel="stylesheet" href="css/style.css">
-
-  <style>
-    .form-group {
-      margin-bottom: 12px;
-    }
-    .form-group label {
-      font-size: 13px;
-      color: #333;
-      display: block;
-      margin-bottom: 4px;
-    }
-  </style>
+<title>Profile</title>
+<link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
-
 <header>My Profile</header>
-
-<div class="container">
-  <div class="card">
-
-    <div class="form-group">
-      <label>Full Name</label>
-      <input type="text" id="name" placeholder="Enter full name">
-    </div>
-
-    <div class="form-group">
-      <label>Mobile Number</label>
-      <input type="text" id="mobile" placeholder="Enter mobile number">
-    </div>
-
-    <div class="form-group">
-      <label>Pin Code</label>
-      <input type="text" id="pincode" maxlength="6"
-             placeholder="Enter pin code" onblur="detectState()">
-    </div>
-
-    <div class="form-group">
-      <label>State</label>
-      <input type="text" id="state" placeholder="Auto detected" readonly>
-    </div>
-
-    <div class="form-group">
-      <label>District</label>
-      <input type="text" id="district" placeholder="Enter district">
-    </div>
-
-    <div class="form-group">
-      <label>Village / Area</label>
-      <input type="text" id="village" placeholder="Optional">
-    </div>
-
-    <div class="form-group">
-      <label>Near By / Landmark</label>
-      <input type="text" id="nearby" placeholder="Optional">
-    </div>
-
-    <div class="form-group">
-      <label>Complete Address</label>
-      <textarea id="address" placeholder="Auto generated / editable"></textarea>
-    </div>
-
-    <button class="btn btn-warning" onclick="saveProfile()">
-      Save Profile
-    </button>
-
-  </div>
+<div class="container card">
+<input id="name" placeholder="Name">
+<input id="mobile" placeholder="Mobile">
+<input id="district" placeholder="District">
+<input id="pincode" placeholder="Pin Code">
+<textarea id="address" placeholder="Address"></textarea>
+<button onclick="save()">Save</button>
 </div>
-
 <script>
-  /* LOAD PROFILE (IF ANY) */
-  const profile = JSON.parse(localStorage.getItem("profile")) || {};
-  name.value     = profile.name     || "";
-  mobile.value   = profile.mobile   || "";
-  pincode.value  = profile.pincode  || "";
-  state.value    = profile.state    || "";
-  district.value = profile.district || "";
-  village.value  = profile.village  || "";
-  nearby.value   = profile.nearby   || "";
-  address.value  = profile.address  || "";
-
-  /* PIN → STATE (OPTIONAL) */
-  function detectState() {
-    if (pincode.value.length !== 6) return;
-
-    const map = {
-      "1": "Delhi / Haryana / Punjab",
-      "2": "Uttar Pradesh",
-      "3": "Rajasthan / Gujarat",
-      "4": "Maharashtra / MP",
-      "5": "Telangana / Andhra",
-      "6": "Karnataka / Tamil Nadu",
-      "7": "Kerala",
-      "8": "Odisha / West Bengal",
-      "9": "Bihar / Jharkhand / NE"
-    };
-
-    state.value = map[pincode.value[0]] || "India";
-    buildAddress();
-  }
-
-  /* BUILD ADDRESS (OPTIONAL) */
-  function buildAddress() {
-    address.value =
-      `${village.value || ""}, ${district.value || ""}, ` +
-      `${state.value || ""} - ${pincode.value || ""}` +
-      (nearby.value ? `, Near ${nearby.value}` : "");
-  }
-
-  /* SAVE PROFILE (NO CHECKS) */
-  function saveProfile() {
-    const data = {
-      name: name.value,
-      mobile: mobile.value,
-      pincode: pincode.value,
-      state: state.value,
-      district: district.value,
-      village: village.value,
-      nearby: nearby.value,
-      address: address.value
-    };
-
-    localStorage.setItem("profile", JSON.stringify(data));
-    alert("Profile saved");
-    window.location.href = "index.html";
-  }
+const p=JSON.parse(localStorage.getItem("profile"))||{};
+["name","mobile","district","pincode","address"].forEach(i=>{
+ if(p[i]) document.getElementById(i).value=p[i];
+});
+function save(){
+ localStorage.setItem("profile",JSON.stringify({
+ name:name.value,mobile:mobile.value,
+ district:district.value,pincode:pincode.value,
+ address:address.value
+ }));
+ alert("Saved");
+ location.href="index.html";
+}
 </script>
-
 </body>
 </html>
