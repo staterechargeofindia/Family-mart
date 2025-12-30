@@ -1,129 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Checkout | Family Mart</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="css/style.css">
+<title>Checkout</title>
+<link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
-
-<header>Checkout – Cash on Delivery</header>
-
-<div class="container">
-
-  <!-- DELIVERY ADDRESS -->
-  <div class="card">
-    <h3>Delivery Address</h3>
-
-    <input type="text" id="name" placeholder="Full Name">
-    <input type="text" id="mobile" placeholder="Mobile Number">
-
-    <input type="text" id="house" placeholder="House / Flat / Shop No">
-    <input type="text" id="street" placeholder="Street / Locality">
-    <input type="text" id="nearby" placeholder="Near By / Landmark">
-
-    <input type="text" id="village" placeholder="Village / Area">
-    <input type="text" id="district" placeholder="District">
-
-    <input type="text" id="pincode" placeholder="Pin Code" maxlength="6">
-    <input type="text" id="state" placeholder="State">
-
-    <textarea id="address" placeholder="Complete Address (Optional)"></textarea>
-
-    <button class="btn btn-warning" onclick="saveProfile()">
-      Save Address
-    </button>
-  </div>
-
-  <!-- ORDER SUMMARY -->
-  <div class="card">
-    <h3>Order Summary</h3>
-    <div id="orderItems"></div>
-    <hr>
-    <b>Total: ₹<span id="totalAmount">0</span></b>
-  </div>
-
-  <!-- PAYMENT -->
-  <div class="card">
-    <h3>Payment Method</h3>
-    <p>✔ Cash on Delivery</p>
-  </div>
-
-  <button class="btn btn-warning" onclick="confirmOrder()">
-    Confirm Order
-  </button>
-
+<header>Checkout</header>
+<div class="container card">
+<button onclick="order()">Confirm Order</button>
 </div>
-
 <script>
-  /* LOAD DATA */
-  const cart = JSON.parse(localStorage.getItem("cart")) || [];
-  const profile = JSON.parse(localStorage.getItem("profile")) || {};
-  const orderBox = document.getElementById("orderItems");
-  const totalBox = document.getElementById("totalAmount");
-
-  let total = 0;
-
-  /* SHOW CART */
-  cart.forEach(item => {
-    total += Number(item.price);
-    orderBox.innerHTML += `<p>${item.name} – ₹${item.price}</p>`;
-  });
-  totalBox.innerText = total;
-
-  /* AUTO FILL PROFILE (IF ANY) */
-  name.value     = profile.name     || "";
-  mobile.value   = profile.mobile   || "";
-  house.value    = profile.house    || "";
-  street.value   = profile.street  || "";
-  nearby.value   = profile.nearby   || "";
-  village.value  = profile.village  || "";
-  district.value = profile.district || "";
-  pincode.value  = profile.pincode  || "";
-  state.value    = profile.state    || "";
-  address.value  = profile.address  || "";
-
-  /* SAVE ADDRESS (NO CHECK) */
-  function saveProfile() {
-    const data = {
-      name: name.value,
-      mobile: mobile.value,
-      house: house.value,
-      street: street.value,
-      nearby: nearby.value,
-      village: village.value,
-      district: district.value,
-      pincode: pincode.value,
-      state: state.value,
-      address: address.value
-    };
-    localStorage.setItem("profile", JSON.stringify(data));
-    alert("Address saved");
-  }
-
-  /* CONFIRM ORDER (NO VALIDATION) */
-  function confirmOrder() {
-    const order = {
-      id: "ORD-" + Date.now(),
-      customer: JSON.parse(localStorage.getItem("profile")) || {},
-      items: cart,
-      total: total,
-      payment: "COD",
-      status: "New",
-      createdAt: new Date().toLocaleString()
-    };
-
-    const orders = JSON.parse(localStorage.getItem("orders")) || [];
-    orders.push(order);
-    localStorage.setItem("orders", JSON.stringify(orders));
-
-    localStorage.removeItem("cart");
-    alert("Order placed successfully");
-    window.location.href = "index.html";
-  }
+function order(){
+ const cart=JSON.parse(localStorage.getItem("cart"))||[];
+ const profile=JSON.parse(localStorage.getItem("profile"))||{};
+ const orders=JSON.parse(localStorage.getItem("orders"))||[];
+ orders.push({
+ id:"ORD-"+Date.now(),
+ customer:profile,
+ items:cart,
+ status:"New",
+ createdAt:new Date().toLocaleString()
+ });
+ localStorage.setItem("orders",JSON.stringify(orders));
+ localStorage.removeItem("cart");
+ alert("Order placed");
+ location.href="index.html";
+}
 </script>
-
 </body>
 </html>
