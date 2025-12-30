@@ -2,9 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Profile | Family Mart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <link rel="stylesheet" href="css/style.css">
+
+  <style>
+    .row {
+      display: flex;
+      gap: 10px;
+    }
+    .row input {
+      flex: 1;
+    }
+  </style>
 </head>
 
 <body>
@@ -14,11 +25,27 @@
 <div class="container">
   <div class="card">
 
-    <input type="text" id="name" placeholder="Full Name">
-    <input type="text" id="mobile" placeholder="Mobile Number">
-    <input type="text" id="village" placeholder="Village / Area">
-    <input type="text" id="district" placeholder="District">
-    <textarea id="address" placeholder="Complete Address"></textarea>
+    <!-- BASIC INFO -->
+    <div class="row">
+      <input type="text" id="name" placeholder="Full Name *">
+      <input type="text" id="mobile" placeholder="Mobile Number *">
+    </div>
+
+    <!-- LOCATION -->
+    <div class="row">
+      <input type="text" id="village" placeholder="Village / Area *">
+      <input type="text" id="district" placeholder="District *">
+    </div>
+
+    <div class="row">
+      <input type="text" id="pincode" placeholder="Pin Code *" maxlength="6"
+             onblur="detectState()">
+      <input type="text" id="state" placeholder="State" readonly>
+    </div>
+
+    <!-- EXTRA DETAILS -->
+    <input type="text" id="nearby" placeholder="Near By / Landmark">
+    <textarea id="address" placeholder="Complete Address *"></textarea>
 
     <button class="btn btn-warning" onclick="saveProfile()">
       Save Profile
@@ -28,31 +55,66 @@
 </div>
 
 <script>
-  const profile = JSON.parse(localStorage.getItem("profile"));
-  if (profile) {
-    name.value = profile.name || "";
-    mobile.value = profile.mobile || "";
-    village.value = profile.village || "";
-    district.value = profile.district || "";
-    address.value = profile.address || "";
+  /* LOAD PROFILE */
+  const profile = JSON.parse(localStorage.getItem("profile")) || {};
+
+  name.value     = profile.name     || "";
+  mobile.value   = profile.mobile   || "";
+  village.value  = profile.village  || "";
+  district.value = profile.district || "";
+  pincode.value  = profile.pincode  || "";
+  state.value    = profile.state    || "";
+  nearby.value   = profile.nearby   || "";
+  address.value  = profile.address  || "";
+
+  /* PIN → STATE */
+  function detectState() {
+    if (pincode.value.length !== 6) return;
+
+    const map = {
+      "1": "Delhi / Haryana / Punjab",
+      "2": "Uttar Pradesh",
+      "3": "Rajasthan / Gujarat",
+      "4": "Maharashtra / Madhya Pradesh",
+      "5": "Telangana / Andhra Pradesh",
+      "6": "Karnataka / Tamil Nadu",
+      "7": "Kerala",
+      "8": "Odisha / West Bengal",
+      "9": "Bihar / Jharkhand / North East"
+    };
+
+    state.value = map[pincode.value[0]] || "India";
+    buildAddress();
   }
 
+  /* BUILD FULL ADDRESS */
+  function buildAddress() {
+    address.value =
+      `${village.value}, ${district.value}, ` +
+      `${state.value} - ${pincode.value}` +
+      (nearby.value ? `, Near ${nearby.value}` : "");
+  }
+
+  /* SAVE PROFILE */
   function saveProfile() {
+    if (!name.value || !mobile.value || !address.value) {
+      alert("Please fill required fields");
+      return;
+    }
+
     const data = {
       name: name.value,
       mobile: mobile.value,
       village: village.value,
       district: district.value,
+      pincode: pincode.value,
+      state: state.value,
+      nearby: nearby.value,
       address: address.value
     };
 
-    if (!data.name || !data.mobile || !data.address) {
-      alert("Please fill required fields");
-      return;
-    }
-
     localStorage.setItem("profile", JSON.stringify(data));
-    alert("Profile saved");
+    alert("Profile saved successfully");
     window.location.href = "index.html";
   }
 </script>
