@@ -4,16 +4,21 @@
   <meta charset="UTF-8">
   <title>My Profile | Family Mart</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <link rel="stylesheet" href="css/style.css">
 
   <style>
-    .row {
-      display: flex;
-      gap: 10px;
+    .form-group {
+      margin-bottom: 12px;
     }
-    .row input {
-      flex: 1;
+    .form-group label {
+      font-size: 13px;
+      color: #333;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .required {
+      color: red;
+      font-size: 12px;
     }
   </style>
 </head>
@@ -25,27 +30,54 @@
 <div class="container">
   <div class="card">
 
-    <!-- BASIC INFO -->
-    <div class="row">
-      <input type="text" id="name" placeholder="Full Name *">
-      <input type="text" id="mobile" placeholder="Mobile Number *">
+    <!-- NAME -->
+    <div class="form-group">
+      <label>Full Name <span class="required">*</span></label>
+      <input type="text" id="name" placeholder="Enter full name">
     </div>
 
-    <!-- LOCATION -->
-    <div class="row">
-      <input type="text" id="village" placeholder="Village / Area *">
-      <input type="text" id="district" placeholder="District *">
+    <!-- MOBILE -->
+    <div class="form-group">
+      <label>Mobile Number <span class="required">*</span></label>
+      <input type="text" id="mobile" placeholder="10 digit mobile number">
     </div>
 
-    <div class="row">
-      <input type="text" id="pincode" placeholder="Pin Code *" maxlength="6"
-             onblur="detectState()">
-      <input type="text" id="state" placeholder="State" readonly>
+    <!-- PINCODE -->
+    <div class="form-group">
+      <label>Pin Code <span class="required">*</span></label>
+      <input type="text" id="pincode" maxlength="6"
+             placeholder="Enter pin code" onblur="detectState()">
     </div>
 
-    <!-- EXTRA DETAILS -->
-    <input type="text" id="nearby" placeholder="Near By / Landmark">
-    <textarea id="address" placeholder="Complete Address *"></textarea>
+    <!-- STATE -->
+    <div class="form-group">
+      <label>State</label>
+      <input type="text" id="state" placeholder="Auto detected" readonly>
+    </div>
+
+    <!-- DISTRICT -->
+    <div class="form-group">
+      <label>District <span class="required">*</span></label>
+      <input type="text" id="district" placeholder="Enter district">
+    </div>
+
+    <!-- VILLAGE -->
+    <div class="form-group">
+      <label>Village / Area</label>
+      <input type="text" id="village" placeholder="Optional">
+    </div>
+
+    <!-- LANDMARK -->
+    <div class="form-group">
+      <label>Near By / Landmark</label>
+      <input type="text" id="nearby" placeholder="Optional">
+    </div>
+
+    <!-- FULL ADDRESS -->
+    <div class="form-group">
+      <label>Complete Address</label>
+      <textarea id="address" placeholder="Auto generated, you can edit"></textarea>
+    </div>
 
     <button class="btn btn-warning" onclick="saveProfile()">
       Save Profile
@@ -55,15 +87,14 @@
 </div>
 
 <script>
-  /* LOAD PROFILE */
+  /* LOAD SAVED PROFILE */
   const profile = JSON.parse(localStorage.getItem("profile")) || {};
-
   name.value     = profile.name     || "";
   mobile.value   = profile.mobile   || "";
-  village.value  = profile.village  || "";
-  district.value = profile.district || "";
   pincode.value  = profile.pincode  || "";
   state.value    = profile.state    || "";
+  district.value = profile.district || "";
+  village.value  = profile.village  || "";
   nearby.value   = profile.nearby   || "";
   address.value  = profile.address  || "";
 
@@ -75,40 +106,40 @@
       "1": "Delhi / Haryana / Punjab",
       "2": "Uttar Pradesh",
       "3": "Rajasthan / Gujarat",
-      "4": "Maharashtra / Madhya Pradesh",
-      "5": "Telangana / Andhra Pradesh",
+      "4": "Maharashtra / MP",
+      "5": "Telangana / Andhra",
       "6": "Karnataka / Tamil Nadu",
       "7": "Kerala",
       "8": "Odisha / West Bengal",
-      "9": "Bihar / Jharkhand / North East"
+      "9": "Bihar / Jharkhand / NE"
     };
 
     state.value = map[pincode.value[0]] || "India";
     buildAddress();
   }
 
-  /* BUILD FULL ADDRESS */
+  /* BUILD ADDRESS */
   function buildAddress() {
     address.value =
-      `${village.value}, ${district.value}, ` +
-      `${state.value} - ${pincode.value}` +
+      `${village.value || ""}, ${district.value || ""}, ` +
+      `${state.value || ""} - ${pincode.value || ""}` +
       (nearby.value ? `, Near ${nearby.value}` : "");
   }
 
-  /* SAVE PROFILE */
+  /* SAVE PROFILE (ONLY 4 REQUIRED) */
   function saveProfile() {
-    if (!name.value || !mobile.value || !address.value) {
-      alert("Please fill required fields");
+    if (!name.value || !mobile.value || !pincode.value || !district.value) {
+      alert("Name, Mobile, Pin Code and District are required");
       return;
     }
 
     const data = {
       name: name.value,
       mobile: mobile.value,
-      village: village.value,
-      district: district.value,
       pincode: pincode.value,
       state: state.value,
+      district: district.value,
+      village: village.value,
       nearby: nearby.value,
       address: address.value
     };
