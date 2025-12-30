@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Merchant Dashboard | Family Mart</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<header>Merchant Dashboard</header>
+
+<div class="container" id="dash"></div>
+
+<script>
+  const merchant = JSON.parse(localStorage.getItem("merchant"));
+  if (!merchant) {
+    alert("Please login as merchant");
+    location.href = "merchant.html";
+  }
+
+  const dash = document.getElementById("dash");
+
+  dash.innerHTML = `
+    <div class="card">
+      <b>Shop:</b> ${merchant.shopName}<br>
+      <b>Mobile:</b> ${merchant.mobile}
+    </div>
+
+    <div class="card">
+      <button class="btn btn-warning" onclick="goPublish()">➕ Publish Product</button>
+      <button class="btn btn-warning" style="margin-top:8px;" onclick="goOrders()">📦 My Orders</button>
+      <button class="btn btn-warning" style="margin-top:8px;background:#dc3545;color:white;"
+        onclick="logout()">Logout</button>
+    </div>
+  `;
+
+  function goPublish() {
+    window.location.href = "publish-product.html";
+  }
+
+  function goOrders() {
+    window.location.href = "merchant-orders.html";
+  }
+
+  function logout() {
+    localStorage.removeItem("merchant");
+    window.location.href = "merchant.html";
+  }
+</script>
+
+</body>
+</html>
