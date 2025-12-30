@@ -7,9 +7,10 @@
 
   <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
-<!-- MENU -->
+<!-- SIDE MENU -->
 <div id="menu" class="side-menu">
   <a href="login.html">Profile</a>
   <a href="cart.html">My Cart</a>
@@ -18,9 +19,11 @@
 </div>
 
 <!-- HEADER -->
-<header style="display:flex;justify-content:space-between;align-items:center;">
-  <span onclick="toggleMenu()" style="font-size:22px;">☰</span>
-  <img src="assets/logo.png" height="30">
+<header>
+  <span id="menuBtn" style="font-size:24px;cursor:pointer;">☰</span>
+
+  <img src="assets/logo.png" alt="Family Mart" height="30">
+
   <a href="cart.html" style="color:white;text-decoration:none;">
     🛒 <span id="cartCount">0</span>
   </a>
@@ -29,7 +32,7 @@
 <!-- PRODUCTS -->
 <div class="products" id="productList"></div>
 
-<!-- JS FILES (ORDER IMPORTANT) -->
+<!-- JS -->
 <script src="js/main.js"></script>
 <script src="js/cart.js"></script>
 
@@ -39,7 +42,7 @@
 
   if (products.length === 0) {
     productBox.innerHTML = `
-      <div class="card">
+      <div class="card-product">
         <p class="small">
           No products yet.<br>
           Merchant please publish products.
@@ -63,7 +66,9 @@
     });
   }
 
-  updateCartCount();
+  if (typeof updateCartCount === "function") {
+    updateCartCount();
+  }
 </script>
 
 </body>
