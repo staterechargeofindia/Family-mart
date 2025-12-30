@@ -1,26 +1,58 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Publish Product</title>
-<link rel="stylesheet" href="css/style.css">
+  <title>Publish Product</title>
+  <meta name="viewport" content="width=device-width">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
 <header>Publish Product</header>
+
 <div class="container card">
-<input id="name" placeholder="Product Name">
-<input id="price" placeholder="Price">
-<input id="image" placeholder="Image URL">
-<button onclick="publish()">Publish</button>
+  <input id="name" placeholder="Product Name">
+  <input id="price" placeholder="Price">
+
+  <!-- GALLERY IMAGE -->
+  <input type="file" id="image" accept="image/*">
+
+  <button onclick="publish()">Publish</button>
 </div>
+
 <script>
-const m=JSON.parse(localStorage.getItem("merchant"));
+const merchant = JSON.parse(localStorage.getItem("merchant"));
+let imageData = "";
+
+document.getElementById("image").addEventListener("change", function(e){
+  const file = e.target.files[0];
+  const reader = new FileReader();
+  reader.onload = () => {
+    imageData = reader.result; // base64 demo
+  };
+  reader.readAsDataURL(file);
+});
+
 function publish(){
- const p={name:name.value,price:price.value,image:image.value,merchant:m.shopName};
- const arr=JSON.parse(localStorage.getItem("products"))||[];
- arr.push(p);
- localStorage.setItem("products",JSON.stringify(arr));
- alert("Published");
+  if(!name.value || !price.value || !imageData){
+    alert("Fill all fields");
+    return;
+  }
+
+  const product = {
+    name: name.value,
+    price: price.value,
+    image: imageData,
+    merchant: merchant.shopName
+  };
+
+  const products = JSON.parse(localStorage.getItem("products")) || [];
+  products.push(product);
+  localStorage.setItem("products", JSON.stringify(products));
+
+  alert("Product Published");
+  location.href="merchant-dashboard.html";
 }
 </script>
+
 </body>
 </html>
