@@ -1,46 +1,36 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <title>Profile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
 <header style="display:flex;align-items:center;justify-content:space-between;
 padding:12px;background:#2874f0;color:white">
-
-  <!-- BACK BUTTON -->
-  <span onclick="history.back()" style="font-size:22px;cursor:pointer">
-    ⬅️
-  </span>
-
-  <!-- PAGE TITLE -->
-  <b>Publish Product</b>
-
-  <!-- HOME BUTTON -->
-  <span onclick="location.href='index.html'" style="font-size:22px;cursor:pointer">
-    🏠
-  </span>
-
+  <span onclick="history.back()">⬅️</span>
+  <b>Profile</b>
+  <span onclick="location.href='index.html'">🏠</span>
 </header>
-<body>
-<header>My Profile</header>
+
 <div class="container card">
-<input id="name" placeholder="Name">
-<input id="mobile" placeholder="Mobile">
-<input id="district" placeholder="District">
-<input id="pincode" placeholder="Pin Code">
-<textarea id="address" placeholder="Address"></textarea>
-<button onclick="save()">Save</button>
+  <input id="name" placeholder="Name">
+  <input id="mobile" placeholder="Mobile">
+  <textarea id="address" placeholder="Address"></textarea>
+  <button onclick="save()">Save</button>
 </div>
+
 <script>
-const p=JSON.parse(localStorage.getItem("profile"))||{};
-["name","mobile","district","pincode","address"].forEach(i=>{
- if(p[i]) document.getElementById(i).value=p[i];
-});
 function save(){
- localStorage.setItem("profile",JSON.stringify({
- name:name.value,mobile:mobile.value,
- district:district.value,pincode:pincode.value,
- address:address.value
- }));
- alert("Saved");
- location.href="index.html";
+  localStorage.setItem("profile",JSON.stringify({
+    name:name.value,
+    mobile:mobile.value,
+    address:address.value
+  }));
+  alert("Saved");
 }
 </script>
+
 </body>
 </html>
