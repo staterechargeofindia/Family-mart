@@ -1,75 +1,115 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Publish Product</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <title>ISI – Publish Product</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
+<!-- ================= HEADER ================= -->
 <header style="display:flex;align-items:center;justify-content:space-between;
 padding:12px;background:#2874f0;color:white">
 
-  <!-- BACK BUTTON -->
-  <span onclick="history.back()" style="font-size:22px;cursor:pointer">
-    ⬅️
-  </span>
-
-  <!-- PAGE TITLE -->
+  <span onclick="history.back()" style="font-size:22px;cursor:pointer">⬅️</span>
   <b>Publish Product</b>
-
-  <!-- HOME BUTTON -->
-  <span onclick="location.href='index.html'" style="font-size:22px;cursor:pointer">
-    🏠
-  </span>
+  <span onclick="location.href='index.html'" style="font-size:22px;cursor:pointer">🏠</span>
 
 </header>
-<div class="container card">
-  <input id="pname" placeholder="Product Name">
-  <textarea id="desc" placeholder="Product Description"></textarea>
 
-  <input id="mrp" placeholder="Original Price (MRP)">
-  <input id="price" placeholder="Selling Price">
+<!-- ================= FORM ================= -->
+<div class="container">
 
-  <label>Product Image 1</label>
-  <input type="file" id="img1" accept="image/*">
+  <div class="card">
+    <h3>Product Details</h3>
 
-  <label>Product Image 2</label>
-  <input type="file" id="img2" accept="image/*">
+    <input id="pname" placeholder="Product Name">
+    <textarea id="pdesc" placeholder="Product Description"></textarea>
 
-  <button onclick="publish()">Publish</button>
+    <input id="mrp" type="number" placeholder="Original Price (MRP)">
+    <input id="price" type="number" placeholder="Selling Price">
+
+    <p style="font-size:13px;color:#555">
+      Discount: <b><span id="discountText">0</span>% OFF</b>
+    </p>
+
+    <label>Product Image 1</label>
+    <input type="file" id="img1" accept="image/*">
+
+    <label>Product Image 2</label>
+    <input type="file" id="img2" accept="image/*">
+
+    <button onclick="publishProduct()">Publish Product</button>
+  </div>
+
 </div>
 
+<!-- ================= SCRIPT ================= -->
 <script>
 const merchant = JSON.parse(localStorage.getItem("merchant"));
-let imgData1 = "", imgData2 = "";
-
-function loadImage(input, cb){
-  if(!input.files[0]) return;
-  const r = new FileReader();
-  r.onload = ()=>cb(r.result);
-  r.readAsDataURL(input.files[0]);
+if(!merchant){
+  alert("Merchant not logged in");
+  location.href = "merchant.html";
 }
 
-img1.onchange = ()=>loadImage(img1, d=>imgData1=d);
-img2.onchange = ()=>loadImage(img2, d=>imgData2=d);
+let image1 = "";
+let image2 = "";
 
-function publish(){
-  const MRP = Number(mrp.value);
-  const SELL = Number(price.value);
-  const discount = MRP > 0 ? Math.round(((MRP - SELL)/MRP)*100) : 0;
+/* LOAD IMAGE */
+function loadImage(input, callback){
+  if(!input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = () => callback(reader.result);
+  reader.readAsDataURL(input.files[0]);
+}
+
+img1.onchange = () => loadImage(img1, data => image1 = data);
+img2.onchange = () => loadImage(img2, data => image2 = data);
+
+/* AUTO DISCOUNT */
+mrp.oninput = price.oninput = () => {
+  const m = Number(mrp.value);
+  const s = Number(price.value);
+  if(m > 0 && s > 0 && s <= m){
+    discountText.innerText = Math.round(((m - s) / m) * 100);
+  } else {
+    discountText.innerText = 0;
+  }
+};
+
+/* PUBLISH */
+function publishProduct(){
+
+  if(!pname.value || !pdesc.value){
+    alert("Please fill product name and description");
+    return;
+  }
+
+  if(!image1 || !image2){
+    alert("Please select at least 2 images");
+    return;
+  }
+
+  const m = Number(mrp.value);
+  const s = Number(price.value);
+
+  if(!m || !s || s > m){
+    alert("Check price details");
+    return;
+  }
+
+  const discount = Math.round(((m - s) / m) * 100);
 
   const product = {
     id: Date.now(),
     name: pname.value,
-    desc: desc.value,
-    mrp: MRP,
-    price: SELL,
+    desc: pdesc.value,
+    mrp: m,
+    price: s,
     discount: discount,
-    images: [
-      imgData1 || "assets/placeholder.png",
-      imgData2 || "assets/placeholder.png"
-    ],
+    images: [image1, image2],
     merchant: merchant.shopName
   };
 
@@ -77,8 +117,8 @@ function publish(){
   products.push(product);
   localStorage.setItem("products", JSON.stringify(products));
 
-  alert("Product Published");
-  location.href="merchant-dashboard.html";
+  alert("Product published successfully");
+  location.href = "merchant-dashboard.html";
 }
 </script>
 
