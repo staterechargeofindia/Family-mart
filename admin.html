@@ -1,31 +1,46 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Admin</title>
-<link rel="stylesheet" href="css/style.css">
+  <title>Admin Panel</title>
+  <meta name="viewport" content="width=device-width">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<header>Admin Panel</header>
-<div class="container" id="box"></div>
+
+<header>Admin Settings</header>
+
+<div class="container card">
+  <h3>UPI ID</h3>
+  <input id="upi" placeholder="Enter UPI ID">
+  <button onclick="saveUPI()">Save</button>
+</div>
+
+<hr>
+
+<div class="container" id="orders"></div>
+
 <script>
-let orders=JSON.parse(localStorage.getItem("orders"))||[];
-function render(){
- box.innerHTML="";
- orders.forEach((o,i)=>{
-  box.innerHTML+=`
-  <div class="card ${o.status==='Delivered'?'delivered':''}">
-  <b>${o.id}</b><br>
-  Status: ${o.status}<br>
-  ${o.status!=='Delivered'?`<button onclick="confirm(${i})">Confirm Delivered</button>`:""}
-  </div>`;
- });
+const admin = JSON.parse(localStorage.getItem("admin")) || {};
+upi.value = admin.upi || "";
+
+function saveUPI(){
+  localStorage.setItem("admin", JSON.stringify({ upi: upi.value }));
+  alert("UPI ID Updated");
 }
-function confirm(i){
- orders[i].status="Delivered";
- localStorage.setItem("orders",JSON.stringify(orders));
- render();
-}
-render();
+
+/* ORDERS VIEW */
+const orders = JSON.parse(localStorage.getItem("orders")) || [];
+orders.forEach(o=>{
+  ordersDiv = document.getElementById("orders");
+  ordersDiv.innerHTML += `
+    <div class="card ${o.status==='Delivered'?'delivered':''}">
+      <b>${o.id}</b><br>
+      Payment: ${o.payment}<br>
+      Status: ${o.status}
+    </div>
+  `;
+});
 </script>
+
 </body>
 </html>
