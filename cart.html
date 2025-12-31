@@ -1,25 +1,93 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Cart</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <title>ISI – My Cart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
+<!-- ================= HEADER ================= -->
 <header style="display:flex;align-items:center;justify-content:space-between;
 padding:12px;background:#2874f0;color:white">
-  <span onclick="history.back()">⬅️</span>
-  <b>Cart</b>
-  <span onclick="location.href='index.html'">🏠</span>
+
+  <!-- BACK -->
+  <span onclick="history.back()" style="font-size:22px;cursor:pointer">⬅️</span>
+
+  <!-- TITLE -->
+  <b>My Cart</b>
+
+  <!-- HOME -->
+  <span onclick="location.href='index.html'" style="font-size:22px;cursor:pointer">🏠</span>
+
 </header>
 
-<div class="container card" id="cartBox"></div>
-<a href="checkout.html"><button>Checkout</button></a>
+<!-- ================= CART CONTENT ================= -->
+<div class="container">
 
+  <div class="card" id="cartItems"></div>
+
+  <div class="card">
+    <b>Total Amount:</b> ₹<span id="totalAmount">0</span>
+  </div>
+
+  <button onclick="goCheckout()">Proceed to Checkout</button>
+
+</div>
+
+<!-- ================= SCRIPT ================= -->
 <script>
-const cart=JSON.parse(localStorage.getItem("cart"))||[];
-cartBox.innerHTML=cart.map(i=>`${i.name} - ₹${i.price}`).join("<br>");
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+const box = document.getElementById("cartItems");
+const totalBox = document.getElementById("totalAmount");
+
+function renderCart(){
+  box.innerHTML = "";
+  let total = 0;
+
+  if(cart.length === 0){
+    box.innerHTML = "<p>Your cart is empty</p>";
+    totalBox.innerText = "0";
+    return;
+  }
+
+  cart.forEach((item, index) => {
+    total += Number(item.price);
+
+    box.innerHTML += `
+      <div style="border-bottom:1px solid #eee;padding:8px 0">
+        <b>${item.name}</b><br>
+        ₹${item.price}<br>
+        <small>Seller: ${item.merchant}</small><br><br>
+
+        <button onclick="removeItem(${index})"
+          style="background:#ff3b3b;color:white">
+          Remove
+        </button>
+      </div>
+    `;
+  });
+
+  totalBox.innerText = total;
+}
+
+function removeItem(i){
+  cart.splice(i,1);
+  localStorage.setItem("cart", JSON.stringify(cart));
+  renderCart();
+}
+
+function goCheckout(){
+  if(cart.length === 0){
+    alert("Cart is empty");
+    return;
+  }
+  location.href = "checkout.html";
+}
+
+renderCart();
 </script>
 
 </body>
