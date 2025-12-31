@@ -1,63 +1,110 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>ISI – Merchant Login</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="css/style.css">
+<meta charset="UTF-8">
+<title>Merchant Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
-<body>
+<body style="margin:0;font-family:Arial;background:#f1f3f6">
 
 <!-- ================= HEADER ================= -->
-<header style="display:flex;align-items:center;justify-content:space-between;
-padding:12px;background:#2874f0;color:white">
-
+<header style="
+display:flex;align-items:center;justify-content:space-between;
+padding:12px;background:#222;color:white">
   <span onclick="history.back()" style="font-size:22px;cursor:pointer">⬅️</span>
-  <b>Merchant Login</b>
+  <b>Merchant Dashboard</b>
   <span onclick="location.href='index.html'" style="font-size:22px;cursor:pointer">🏠</span>
-
 </header>
 
-<!-- ================= LOGIN FORM ================= -->
-<div class="container">
+<div style="padding:10px">
 
-  <div class="card">
-    <h3>Merchant Account</h3>
+<!-- ================= MERCHANT INFO ================= -->
+<div class="card">
+  <h3 id="shopName">Merchant Shop</h3>
+  <button onclick="location.href='publish-product.html'">
+    ➕ Publish New Product
+  </button>
+</div>
 
-    <input id="shopName" placeholder="Shop Name">
-    <input id="merchantId" placeholder="Merchant ID">
-    <input id="password" type="password" placeholder="Password">
+<!-- ================= CURRENT ORDERS ================= -->
+<div class="card">
+  <h3>Current Orders</h3>
+  <div id="currentOrders"></div>
+</div>
 
-    <button onclick="loginMerchant()">Login</button>
-
-    <p style="font-size:13px;color:#666;margin-top:10px">
-      * Demo login (Firebase will be added later)
-    </p>
-  </div>
+<!-- ================= ORDER HISTORY ================= -->
+<div class="card">
+  <h3>Order History</h3>
+  <div id="orderHistory"></div>
+</div>
 
 </div>
 
-<!-- ================= SCRIPT ================= -->
 <script>
-function loginMerchant(){
+/* MERCHANT INFO */
+const merchantName = localStorage.getItem("merchantName") || "Merchant Shop";
+document.getElementById("shopName").innerText = merchantName;
 
-  if(!shopName.value || !merchantId.value || !password.value){
-    alert("Please fill all details");
-    return;
-  }
+/* LOAD ORDERS */
+const orders = JSON.parse(localStorage.getItem("orders")) || [];
+const currentBox = document.getElementById("currentOrders");
+const historyBox = document.getElementById("orderHistory");
 
-  const merchant = {
-    shopName: shopName.value,
-    merchantId: merchantId.value
-  };
+/* FILTER ORDERS FOR THIS MERCHANT */
+const myOrders = orders.filter(o =>
+  o.items.some(i => i.merchant === merchantName)
+);
 
-  localStorage.setItem("merchant", JSON.stringify(merchant));
-
-  alert("Login successful");
-  location.href = "merchant-dashboard.html";
+if(myOrders.length === 0){
+  currentBox.innerHTML = "<p>No orders yet</p>";
 }
+
+/* RENDER ORDERS */
+myOrders.forEach(o => {
+
+  const products = o.items
+    .filter(i => i.merchant === merchantName)
+    .map(i => `${i.name} – ₹${i.price}`)
+    .join("<br>");
+
+  const box = o.status === "Delivered" ? historyBox : currentBox;
+
+  box.innerHTML += `
+    <div style="
+      background:#fafafa;
+      padding:10px;
+      margin-bottom:10px;
+      border-radius:8px;
+      ${o.status === "Delivered" ? "opacity:0.6" : ""}
+    ">
+      <b>Order ID:</b> ${o.id}<br>
+      <b>Products:</b><br>${products}<br><br>
+      <b>Amount:</b> ₹${o.amount}<br>
+      <b>Payment:</b> ${o.payment}<br>
+      <b>Status:</b> ${o.status}
+    </div>
+  `;
+});
 </script>
+
+<style>
+.card{
+  background:#fff;
+  padding:15px;
+  margin-bottom:15px;
+  border-radius:10px;
+}
+button{
+  width:100%;
+  padding:10px;
+  background:#2874f0;
+  color:white;
+  border:none;
+  border-radius:6px;
+}
+</style>
 
 </body>
 </html>
