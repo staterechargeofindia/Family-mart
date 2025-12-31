@@ -9,18 +9,28 @@
 
 <body>
 
-<!-- ================= HEADER ================= -->
+<!-- ================= SIDE MENU ================= -->
+<div id="menu" class="side-menu">
+  <a href="profile.html">My Profile</a>
+  <a href="cart.html">My Cart</a>
+  <a href="merchant.html">Merchant</a>
+  <a href="admin.html">Admin</a>
+</div>
+
+<!-- ================= HEADER (HOME SPECIAL) ================= -->
 <header style="display:flex;align-items:center;justify-content:space-between;
 padding:12px;background:#2874f0;color:white">
 
-  <!-- BACK -->
-  <span onclick="history.back()" style="font-size:22px;cursor:pointer">⬅️</span>
+  <!-- MENU -->
+  <span id="menuBtn" style="font-size:22px;cursor:pointer">☰</span>
 
   <!-- TITLE -->
   <b>ISI</b>
 
-  <!-- HOME -->
-  <span onclick="location.href='index.html'" style="font-size:22px;cursor:pointer">🏠</span>
+  <!-- CART -->
+  <span onclick="location.href='cart.html'" style="font-size:22px;cursor:pointer">
+    🛒 <span id="cartCount">0</span>
+  </span>
 
 </header>
 
@@ -28,14 +38,15 @@ padding:12px;background:#2874f0;color:white">
 <div class="products" id="productList"></div>
 
 <!-- ================= JS ================= -->
+<script src="js/main.js"></script>
 <script src="js/cart.js"></script>
 
 <script>
 const products = JSON.parse(localStorage.getItem("products")) || [];
 const box = document.getElementById("productList");
 
-/* NO PRODUCT */
-if (products.length === 0) {
+/* NO PRODUCTS */
+if(products.length === 0){
   box.innerHTML = `
     <div class="card">
       No products available.<br>
@@ -83,6 +94,11 @@ products.forEach((p, index) => {
   `;
 });
 
+/* CART COUNT */
+if(typeof updateCartCount === "function"){
+  updateCartCount();
+}
+
 /* IMAGE SLIDER AUTO */
 document.querySelectorAll(".slider").forEach(slider=>{
   let i = 0;
@@ -95,7 +111,7 @@ document.querySelectorAll(".slider").forEach(slider=>{
 });
 
 /* IMAGE ZOOM */
-function zoomImage(src) {
+function zoomImage(src){
   const overlay = document.createElement("div");
   overlay.style = `
     position:fixed;
