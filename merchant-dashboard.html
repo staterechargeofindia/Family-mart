@@ -2,49 +2,21 @@
 <html>
 <head>
   <title>Merchant Dashboard</title>
-  <meta name="viewport" content="width=device-width">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-<header>Merchant Dashboard</header>
+<header style="display:flex;align-items:center;justify-content:space-between;
+padding:12px;background:#2874f0;color:white">
+  <span onclick="history.back()">⬅️</span>
+  <b>Dashboard</b>
+  <span onclick="location.href='index.html'">🏠</span>
+</header>
 
-<div class="container">
-  <button onclick="location.href='publish-product.html'">+ Publish Product</button>
-  <div id="myProducts"></div>
+<div class="container card">
+  <button onclick="location.href='publish-product.html'">Publish Product</button>
 </div>
-
-<script>
-const merchant = JSON.parse(localStorage.getItem("merchant"));
-let products = JSON.parse(localStorage.getItem("products")) || [];
-const box = document.getElementById("myProducts");
-
-function render(){
-  box.innerHTML="";
-  products.forEach((p,i)=>{
-    if(p.merchant===merchant.shopName){
-      box.innerHTML+=`
-      <div class="card">
-        <b>${p.name}</b><br>
-        ₹${p.price} <del>₹${p.mrp}</del> (${p.discount}% OFF)
-        <button onclick="del(${i})" style="background:red;color:white">
-          Delete
-        </button>
-      </div>`;
-    }
-  });
-}
-
-function del(i){
-  if(confirm("Delete product?")){
-    products.splice(i,1);
-    localStorage.setItem("products",JSON.stringify(products));
-    render();
-  }
-}
-
-render();
-</script>
 
 </body>
 </html>
