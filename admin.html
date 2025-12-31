@@ -2,44 +2,87 @@
 <html>
 <head>
   <title>Admin Panel</title>
-  <meta name="viewport" content="width=device-width">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-<header>Admin Settings</header>
+<!-- HEADER -->
+<header style="display:flex;align-items:center;justify-content:space-between;
+padding:12px;background:#2874f0;color:white">
+  <span onclick="history.back()" style="font-size:22px">⬅️</span>
+  <b>Admin Panel</b>
+  <span onclick="location.href='index.html'" style="font-size:22px">🏠</span>
+</header>
 
+<!-- ADMIN SETTINGS -->
 <div class="container card">
-  <h3>UPI ID</h3>
-  <input id="upi" placeholder="Enter UPI ID">
-  <button onclick="saveUPI()">Save</button>
+  <h3>Payment Settings</h3>
+  <input id="upi" placeholder="Admin UPI ID">
+  <button onclick="saveUPI()">Save UPI</button>
 </div>
 
-<hr>
-
-<div class="container" id="orders"></div>
+<!-- ORDERS -->
+<div class="container">
+  <h3>All Orders</h3>
+  <div id="ordersBox"></div>
+</div>
 
 <script>
+/* SAVE UPI */
 const admin = JSON.parse(localStorage.getItem("admin")) || {};
-upi.value = admin.upi || "";
+upi.value = admin.upi || "paytmgr5m9yhroptys";
 
 function saveUPI(){
   localStorage.setItem("admin", JSON.stringify({ upi: upi.value }));
-  alert("UPI ID Updated");
+  alert("UPI Updated");
 }
 
-/* ORDERS VIEW */
-const orders = JSON.parse(localStorage.getItem("orders")) || [];
-orders.forEach(o=>{
-  ordersDiv = document.getElementById("orders");
-  ordersDiv.innerHTML += `
-    <div class="card ${o.status==='Delivered'?'delivered':''}">
-      <b>${o.id}</b><br>
-      Payment: ${o.payment}<br>
-      Status: ${o.status}
-    </div>
-  `;
-});
+/* LOAD ORDERS */
+let orders = JSON.parse(localStorage.getItem("orders")) || [];
+const box = document.getElementById("ordersBox");
+
+function render(){
+  box.innerHTML = "";
+  orders.forEach((o, index) => {
+    box.innerHTML += `
+      <div class="card ${o.status==='Delivered'?'delivered':''}">
+        <b>Order ID:</b> ${o.id}<br><br>
+
+        <b>Customer:</b><br>
+        ${o.customer?.name || ""}<br>
+        ${o.customer?.mobile || ""}<br>
+        ${o.address || ""}<br><br>
+
+        <b>Payment:</b> ${o.payment}<br>
+        <b>Status:</b> ${o.status}<br><br>
+
+        <b>Products:</b><br>
+        ${o.items.map(i=>`
+          ${i.name} – ₹${i.price}
+          <small>(Merchant: ${i.merchant})</small>
+        `).join("<br>")}
+        <br><br>
+
+        ${
+          o.status !== "Delivered"
+          ? `<button onclick="confirm(${index})">Confirm Delivered</button>`
+          : `<span style="color:green">✔ Delivered</span>`
+        }
+      </div>
+    `;
+  });
+}
+
+function confirm(i){
+  if(confirm("Mark order as Delivered?")){
+    orders[i].status = "Delivered";
+    localStorage.setItem("orders", JSON.stringify(orders));
+    render();
+  }
+}
+
+render();
 </script>
 
 </body>
