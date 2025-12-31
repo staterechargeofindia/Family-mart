@@ -1,31 +1,96 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Checkout</title>
-<link rel="stylesheet" href="css/style.css">
+  <title>Checkout</title>
+  <meta name="viewport" content="width=device-width">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<header>Checkout</header>
+
+<header>Payment</header>
+
 <div class="container card">
-<button onclick="order()">Confirm Order</button>
+
+  <h3>Select Payment Method</h3>
+
+  <label>
+    <input type="radio" name="pay" checked onclick="show('cod')">
+    Cash on Delivery
+  </label><br><br>
+
+  <label>
+    <input type="radio" name="pay" onclick="show('upi')">
+    UPI
+  </label><br><br>
+
+  <label>
+    <input type="radio" name="pay" onclick="show('card')">
+    Debit / Credit Card
+  </label>
+
+  <!-- COD -->
+  <div id="cod" class="card">
+    <p>Pay on delivery</p>
+  </div>
+
+  <!-- UPI -->
+  <div id="upi" class="card" style="display:none">
+    <p>Pay to UPI ID:</p>
+    <b id="upiId"></b>
+  </div>
+
+  <!-- DEBIT CARD -->
+  <div id="card" class="card" style="display:none">
+    <input placeholder="Card Number">
+    <input placeholder="Name on Card">
+    <input placeholder="Expiry">
+    <input placeholder="CVV">
+  </div>
+ 
+  <!-- CREDIT CARD -->
+  <div id="card" class="card" style="display:none">
+    <input placeholder="Card Number">
+    <input placeholder="Name on Card">
+    <input placeholder="Expiry">
+    <input placeholder="CVV">
+  </div>
+
+  <button onclick="placeOrder()">Place Order</button>
 </div>
+
 <script>
-function order(){
- const cart=JSON.parse(localStorage.getItem("cart"))||[];
- const profile=JSON.parse(localStorage.getItem("profile"))||{};
- const orders=JSON.parse(localStorage.getItem("orders"))||[];
- orders.push({
- id:"ORD-"+Date.now(),
- customer:profile,
- items:cart,
- status:"New",
- createdAt:new Date().toLocaleString()
- });
- localStorage.setItem("orders",JSON.stringify(orders));
- localStorage.removeItem("cart");
- alert("Order placed");
- location.href="index.html";
+const admin = JSON.parse(localStorage.getItem("admin")) || {};
+document.getElementById("upiId").innerText =
+  admin.upi || "upi@demo";
+
+function show(id){
+  cod.style.display="none";
+  upi.style.display="none";
+  card.style.display="none";
+  document.getElementById(id).style.display="block";
+}
+
+function placeOrder(){
+  const cart = JSON.parse(localStorage.getItem("cart")) || [];
+  const profile = JSON.parse(localStorage.getItem("profile")) || {};
+  const orders = JSON.parse(localStorage.getItem("orders")) || [];
+
+  orders.push({
+    id: "ORD-"+Date.now(),
+    customer: profile,
+    items: cart,
+    payment: document.querySelector('input[name=pay]:checked').parentNode.innerText.trim(),
+    status: "New",
+    createdAt: new Date().toLocaleString()
+  });
+
+  localStorage.setItem("orders", JSON.stringify(orders));
+  localStorage.removeItem("cart");
+
+  alert("Order placed (Demo)");
+  location.href="index.html";
 }
 </script>
+
 </body>
 </html>
