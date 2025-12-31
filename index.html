@@ -1,54 +1,137 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>ISI</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <title>ISI – Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
+<!-- ================= HEADER ================= -->
 <header style="display:flex;align-items:center;justify-content:space-between;
 padding:12px;background:#2874f0;color:white">
-  <span onclick="history.back()">⬅️</span>
+
+  <!-- BACK -->
+  <span onclick="history.back()" style="font-size:22px;cursor:pointer">⬅️</span>
+
+  <!-- TITLE -->
   <b>ISI</b>
-  <span onclick="location.href='index.html'">🏠</span>
+
+  <!-- HOME -->
+  <span onclick="location.href='index.html'" style="font-size:22px;cursor:pointer">🏠</span>
+
 </header>
 
+<!-- ================= PRODUCTS ================= -->
 <div class="products" id="productList"></div>
 
+<!-- ================= JS ================= -->
 <script src="js/cart.js"></script>
+
 <script>
 const products = JSON.parse(localStorage.getItem("products")) || [];
 const box = document.getElementById("productList");
 
-if(products.length===0){
-  box.innerHTML="<div class='card'>No products</div>";
+/* NO PRODUCT */
+if (products.length === 0) {
+  box.innerHTML = `
+    <div class="card">
+      No products available.<br>
+      Merchant please publish products.
+    </div>
+  `;
 }
 
-products.forEach(p=>{
-  box.innerHTML+=`
-  <div class="card-product">
-    <img src="${p.images[0]}" onclick="zoom('${p.images[0]}')">
-    <img src="${p.images[1]}" onclick="zoom('${p.images[1]}')" style="margin-top:6px">
-    <b>${p.name}</b>
-    <p>${p.desc}</p>
-    <div class="price">
-      ₹${p.price} <del>₹${p.mrp}</del> ${p.discount}% OFF
+/* SHOW PRODUCTS */
+products.forEach((p, index) => {
+  box.innerHTML += `
+    <div class="card-product">
+
+      <!-- IMAGE SLIDER -->
+      <div class="slider" id="slider-${index}">
+        <img src="${p.images[0]}" class="slide active"
+             onclick="zoomImage('${p.images[0]}')">
+        <img src="${p.images[1]}" class="slide"
+             onclick="zoomImage('${p.images[1]}')">
+      </div>
+
+      <b>${p.name}</b>
+
+      <p style="font-size:13px;color:#555">
+        ${p.desc}
+      </p>
+
+      <div class="price">
+        ₹${p.price}
+        <del style="color:#888">₹${p.mrp}</del>
+        <span style="color:green;font-size:13px">
+          ${p.discount}% OFF
+        </span>
+      </div>
+
+      <button onclick="addToCart('${p.name}', ${p.price}, '${p.merchant}')">
+        Add to Cart
+      </button>
+
+      <small style="display:block;margin-top:6px">
+        Sold by ${p.merchant}
+      </small>
+
     </div>
-    <button onclick="addToCart('${p.name}',${p.price},'${p.merchant}')">
-      Add to Cart
-    </button>
-  </div>`;
+  `;
 });
 
-function zoom(src){
-  const o=document.createElement("div");
-  o.style="position:fixed;top:0;left:0;width:100%;height:100%;background:black;display:flex;align-items:center;justify-content:center;z-index:9999";
-  o.innerHTML=`<img src="${src}" style="max-width:95%;max-height:95%">`;
-  o.onclick=()=>document.body.removeChild(o);
-  document.body.appendChild(o);
+/* IMAGE SLIDER AUTO */
+document.querySelectorAll(".slider").forEach(slider=>{
+  let i = 0;
+  const slides = slider.querySelectorAll(".slide");
+  setInterval(()=>{
+    slides[i].classList.remove("active");
+    i = (i + 1) % slides.length;
+    slides[i].classList.add("active");
+  }, 3000);
+});
+
+/* IMAGE ZOOM */
+function zoomImage(src) {
+  const overlay = document.createElement("div");
+  overlay.style = `
+    position:fixed;
+    top:0;left:0;
+    width:100%;height:100%;
+    background:rgba(0,0,0,0.9);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:9999;
+  `;
+  overlay.innerHTML = `
+    <img src="${src}" style="max-width:95%;max-height:95%">
+  `;
+  overlay.onclick = () => document.body.removeChild(overlay);
+  document.body.appendChild(overlay);
 }
 </script>
+
+<style>
+.slider{
+  position:relative;
+  height:160px;
+  overflow:hidden;
+}
+.slide{
+  position:absolute;
+  width:100%;
+  height:160px;
+  object-fit:cover;
+  display:none;
+}
+.slide.active{
+  display:block;
+}
+</style>
 
 </body>
 </html>
