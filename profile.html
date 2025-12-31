@@ -1,34 +1,88 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Profile</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <title>ISI – My Profile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
+<!-- ================= HEADER ================= -->
 <header style="display:flex;align-items:center;justify-content:space-between;
 padding:12px;background:#2874f0;color:white">
-  <span onclick="history.back()">⬅️</span>
-  <b>Profile</b>
-  <span onclick="location.href='index.html'">🏠</span>
+
+  <!-- BACK -->
+  <span onclick="history.back()" style="font-size:22px;cursor:pointer">⬅️</span>
+
+  <!-- TITLE -->
+  <b>My Profile</b>
+
+  <!-- HOME -->
+  <span onclick="location.href='index.html'" style="font-size:22px;cursor:pointer">🏠</span>
+
 </header>
 
-<div class="container card">
-  <input id="name" placeholder="Name">
-  <input id="mobile" placeholder="Mobile">
-  <textarea id="address" placeholder="Address"></textarea>
-  <button onclick="save()">Save</button>
+<!-- ================= PROFILE FORM ================= -->
+<div class="container">
+
+  <div class="card">
+    <h3>Delivery Address</h3>
+
+    <input id="name" placeholder="Full Name">
+    <input id="mobile" placeholder="Mobile Number">
+
+    <input id="house" placeholder="House / Flat / Shop No">
+    <input id="street" placeholder="Street / Locality">
+    <input id="nearby" placeholder="Near By / Landmark">
+
+    <input id="village" placeholder="Village / Area">
+    <input id="district" placeholder="District">
+    <input id="state" placeholder="State">
+    <input id="pincode" placeholder="Pin Code">
+
+    <textarea id="address" placeholder="Complete Address"></textarea>
+
+    <button onclick="saveProfile()">Save Address</button>
+  </div>
+
 </div>
 
+<!-- ================= SCRIPT ================= -->
 <script>
-function save(){
-  localStorage.setItem("profile",JSON.stringify({
-    name:name.value,
-    mobile:mobile.value,
-    address:address.value
-  }));
-  alert("Saved");
+/* LOAD SAVED PROFILE */
+const saved = JSON.parse(localStorage.getItem("profile")) || {};
+
+name.value     = saved.name     || "";
+mobile.value   = saved.mobile   || "";
+house.value    = saved.house    || "";
+street.value   = saved.street   || "";
+nearby.value   = saved.nearby   || "";
+village.value  = saved.village  || "";
+district.value = saved.district || "";
+state.value    = saved.state    || "";
+pincode.value  = saved.pincode  || "";
+address.value  = saved.address  || "";
+
+/* SAVE PROFILE */
+function saveProfile(){
+  const profile = {
+    name: name.value,
+    mobile: mobile.value,
+    house: house.value,
+    street: street.value,
+    nearby: nearby.value,
+    village: village.value,
+    district: district.value,
+    state: state.value,
+    pincode: pincode.value,
+    address: address.value
+  };
+
+  localStorage.setItem("profile", JSON.stringify(profile));
+  alert("Address saved successfully");
+  history.back();
 }
 </script>
 
