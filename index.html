@@ -1,7 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
   <title>ISI – Online Store</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="css/style.css">
@@ -9,7 +8,7 @@
 
 <body>
 
-<!-- ================= SIDE MENU ================= -->
+<!-- SIDE MENU -->
 <div id="menu" class="side-menu">
   <a href="profile.html">My Profile</a>
   <a href="cart.html">My Cart</a>
@@ -17,102 +16,85 @@
   <a href="admin.html"><b>Admin</b></a>
 </div>
 
-<!-- ================= HEADER ================= -->
-<header>
-  <span id="menuBtn" style="font-size:22px;cursor:pointer;">☰</span>
+<!-- HEADER -->
+<header style="display:flex;align-items:center;justify-content:space-between">
+  <span id="menuBtn" style="font-size:22px;cursor:pointer">☰</span>
   <b>ISI</b>
-  <a href="cart.html">🛒 <span id="cartCount">0</span></a>
+  <span onclick="location.href='index.html'" style="font-size:22px;cursor:pointer">🏠</span>
 </header>
 
-<!-- ================= PRODUCT LIST ================= -->
+<!-- PRODUCTS -->
 <div class="products" id="productList"></div>
 
-<!-- ================= JS FILES ================= -->
 <script src="js/main.js"></script>
 <script src="js/cart.js"></script>
 
-<!-- ================= PAGE SCRIPT ================= -->
 <script>
 const products = JSON.parse(localStorage.getItem("products")) || [];
 const box = document.getElementById("productList");
 
-/* NO PRODUCTS */
 if (products.length === 0) {
-  box.innerHTML = `
-    <div class="card">
-      No products available.<br>
-      Merchant please publish products.
-    </div>
-  `;
+  box.innerHTML = `<div class="card">No products available</div>`;
 }
 
-/* SHOW PRODUCTS */
-products.forEach(p => {
+products.forEach((p, idx) => {
   box.innerHTML += `
-    <div class="card-product">
+  <div class="card-product">
 
-      <!-- IMAGE 1 -->
-      <img src="${p.images?.[0] || 'assets/placeholder.png'}"
-           onclick="zoomImage('${p.images?.[0] || 'assets/placeholder.png'}')">
-
-      <!-- IMAGE 2 -->
-      <img src="${p.images?.[1] || 'assets/placeholder.png'}"
-           style="margin-top:6px"
-           onclick="zoomImage('${p.images?.[1] || 'assets/placeholder.png'}')">
-
-      <b>${p.name}</b>
-
-      <p style="font-size:13px;color:#555">
-        ${p.desc || ""}
-      </p>
-
-      <div class="price">
-        ₹${p.price}
-        <del style="color:#888">₹${p.mrp}</del>
-        <span style="color:green;font-size:13px">
-          ${p.discount}% OFF
-        </span>
-      </div>
-
-      <button onclick="addToCart('${p.name}', ${p.price}, '${p.merchant}')">
-        Add to Cart
-      </button>
-
-      <small style="display:block;margin-top:6px">
-        Sold by ${p.merchant}
-      </small>
-
+    <!-- SLIDER -->
+    <div class="slider" id="slider-${idx}">
+      <img src="${p.images[0]}" class="slide active" onclick="zoom('${p.images[0]}')">
+      <img src="${p.images[1]}" class="slide" onclick="zoom('${p.images[1]}')">
     </div>
+
+    <b>${p.name}</b>
+    <p style="font-size:13px;color:#555">${p.desc}</p>
+
+    <div class="price">
+      ₹${p.price}
+      <del>₹${p.mrp}</del>
+      <span style="color:green">${p.discount}% OFF</span>
+    </div>
+
+    <button onclick="addToCart('${p.name}',${p.price},'${p.merchant}')">
+      Add to Cart
+    </button>
+
+    <small>Sold by ${p.merchant}</small>
+  </div>
   `;
 });
 
-/* UPDATE CART COUNT */
-if (typeof updateCartCount === "function") {
-  updateCartCount();
-}
+/* CART COUNT */
+updateCartCount();
 
-/* IMAGE ZOOM (FULL SCREEN) */
-function zoomImage(src) {
-  const overlay = document.createElement("div");
-  overlay.style = `
-    position:fixed;
-    top:0;left:0;
-    width:100%;height:100%;
-    background:rgba(0,0,0,0.9);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    z-index:9999;
-  `;
+/* IMAGE SLIDER AUTO */
+document.querySelectorAll(".slider").forEach(slider=>{
+  let i=0;
+  const slides = slider.querySelectorAll(".slide");
+  setInterval(()=>{
+    slides[i].classList.remove("active");
+    i=(i+1)%slides.length;
+    slides[i].classList.add("active");
+  },3000);
+});
 
-  overlay.innerHTML = `
-    <img src="${src}" style="max-width:95%;max-height:95%">
-  `;
-
-  overlay.onclick = () => document.body.removeChild(overlay);
-  document.body.appendChild(overlay);
+/* ZOOM */
+function zoom(src){
+  const o=document.createElement("div");
+  o.style=`position:fixed;top:0;left:0;width:100%;height:100%;
+  background:black;display:flex;align-items:center;justify-content:center;z-index:9999`;
+  o.innerHTML=`<img src="${src}" style="max-width:95%;max-height:95%">`;
+  o.onclick=()=>document.body.removeChild(o);
+  document.body.appendChild(o);
 }
 </script>
+
+<style>
+.slider{position:relative;height:160px;overflow:hidden}
+.slide{position:absolute;width:100%;height:160px;object-fit:cover;display:none}
+.slide.active{display:block}
+</style>
 
 </body>
 </html>
