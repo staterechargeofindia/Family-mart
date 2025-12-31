@@ -1,78 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>ISI – My Profile</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="css/style.css">
+<meta charset="UTF-8">
+<title>My Profile</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
-<body>
+<body style="margin:0;font-family:Arial;background:#f1f3f6">
 
 <!-- ================= HEADER ================= -->
-<header style="display:flex;align-items:center;justify-content:space-between;
+<header style="
+display:flex;align-items:center;justify-content:space-between;
 padding:12px;background:#2874f0;color:white">
-
-  <!-- BACK -->
   <span onclick="history.back()" style="font-size:22px;cursor:pointer">⬅️</span>
-
-  <!-- TITLE -->
   <b>My Profile</b>
-
-  <!-- HOME -->
   <span onclick="location.href='index.html'" style="font-size:22px;cursor:pointer">🏠</span>
-
 </header>
 
-<!-- ================= PROFILE FORM ================= -->
-<div class="container">
+<div style="padding:10px">
 
-  <div class="card">
-    <h3>Delivery Address</h3>
+<div class="card">
+  <h3>Customer Details</h3>
 
-    <input id="name" placeholder="Full Name">
-    <input id="mobile" placeholder="Mobile Number">
+  <label>Name</label>
+  <input id="name" placeholder="Full Name">
 
-    <input id="house" placeholder="House / Flat / Shop No">
-    <input id="street" placeholder="Street / Locality">
-    <input id="nearby" placeholder="Near By / Landmark">
+  <label>Mobile Number</label>
+  <input id="mobile" placeholder="Mobile Number">
 
-    <input id="village" placeholder="Village / Area">
-    <input id="district" placeholder="District">
-    <input id="state" placeholder="State">
-    <input id="pincode" placeholder="Pin Code">
+  <label>House / Flat</label>
+  <input id="house" placeholder="House / Flat No.">
 
-    <textarea id="address" placeholder="Complete Address"></textarea>
+  <label>Street / Area</label>
+  <input id="street" placeholder="Street / Area">
 
-    <button onclick="saveProfile()">Save Address</button>
-  </div>
+  <label>Village / City</label>
+  <input id="village" placeholder="Village / City">
+
+  <label>District</label>
+  <input id="district" placeholder="District">
+
+  <label>State</label>
+  <input id="state" placeholder="State">
+
+  <label>Pincode</label>
+  <input id="pincode" placeholder="Pincode">
+
+  <label>Landmark (optional)</label>
+  <input id="address" placeholder="Landmark / Near by">
+
+  <button onclick="saveProfile()">Save Address</button>
+</div>
 
 </div>
 
-<!-- ================= SCRIPT ================= -->
 <script>
-/* LOAD SAVED PROFILE */
-const saved = JSON.parse(localStorage.getItem("profile")) || {};
+/* LOAD PROFILE */
+const profile = JSON.parse(localStorage.getItem("profile")) || {};
 
-name.value     = saved.name     || "";
-mobile.value   = saved.mobile   || "";
-house.value    = saved.house    || "";
-street.value   = saved.street   || "";
-nearby.value   = saved.nearby   || "";
-village.value  = saved.village  || "";
-district.value = saved.district || "";
-state.value    = saved.state    || "";
-pincode.value  = saved.pincode  || "";
-address.value  = saved.address  || "";
+name.value = profile.name || "";
+mobile.value = profile.mobile || "";
+house.value = profile.house || "";
+street.value = profile.street || "";
+village.value = profile.village || "";
+district.value = profile.district || "";
+state.value = profile.state || "";
+pincode.value = profile.pincode || "";
+address.value = profile.address || "";
 
 /* SAVE PROFILE */
 function saveProfile(){
-  const profile = {
+  const data = {
     name: name.value,
     mobile: mobile.value,
     house: house.value,
     street: street.value,
-    nearby: nearby.value,
     village: village.value,
     district: district.value,
     state: state.value,
@@ -80,11 +82,38 @@ function saveProfile(){
     address: address.value
   };
 
-  localStorage.setItem("profile", JSON.stringify(profile));
+  localStorage.setItem("profile", JSON.stringify(data));
   alert("Address saved successfully");
   history.back();
 }
 </script>
+
+<style>
+.card{
+  background:#fff;
+  padding:15px;
+  border-radius:10px;
+}
+input{
+  width:100%;
+  padding:8px;
+  margin:6px 0 10px 0;
+  border-radius:6px;
+  border:1px solid #ccc;
+}
+label{
+  font-size:13px;
+  color:#333;
+}
+button{
+  width:100%;
+  padding:10px;
+  background:#2874f0;
+  color:white;
+  border:none;
+  border-radius:6px;
+}
+</style>
 
 </body>
 </html>
