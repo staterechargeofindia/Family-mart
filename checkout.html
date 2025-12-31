@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>ISI – Checkout</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="css/style.css">
+<meta charset="UTF-8">
+<title>Checkout</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
-<body>
+<body style="margin:0;font-family:Arial;background:#f1f3f6">
 
 <!-- ================= HEADER ================= -->
 <header style="display:flex;align-items:center;justify-content:space-between;
@@ -17,212 +16,140 @@ padding:12px;background:#2874f0;color:white">
   <span onclick="location.href='index.html'" style="font-size:22px;cursor:pointer">🏠</span>
 </header>
 
-<div class="container">
+<div style="padding:10px">
 
-  <!-- ADDRESS -->
-  <div class="card">
-    <h3>Delivery Address</h3>
-    <p id="addressBox"></p>
-    <button onclick="location.href='profile.html'"
-      style="background:#ddd;color:#000">
-      Edit Address
-    </button>
-  </div>
+<!-- ================= ADDRESS ================= -->
+<div class="card">
+  <h3>Delivery Address</h3>
+  <div id="addressBox"></div>
+  <button onclick="location.href='profile.html'"
+    style="background:#eee;color:#000">Edit Address</button>
+</div>
 
-  <!-- PAYMENT METHODS -->
-  <div class="card">
-    <h3>Select Payment Method</h3>
+<!-- ================= PAYMENT ================= -->
+<div class="card">
+  <h3>Payment Method</h3>
+  <button onclick="selectPay('COD')">Cash on Delivery</button>
+  <button onclick="selectPay('UPI')">UPI (QR / App)</button>
+</div>
 
-    <button onclick="selectPayment('COD')">Cash on Delivery</button><br><br>
+<!-- ================= PAYMENT DETAILS ================= -->
+<div class="card" id="payBox" style="display:none"></div>
 
-    <button onclick="selectPayment('UPI')">UPI (QR / App)</button><br><br>
-
-    <button onclick="selectPayment('CARD')">Card</button>
-  </div>
-
-  <!-- PAYMENT DETAILS -->
-  <div class="card" id="paymentBox" style="display:none"></div>
-
-  <button onclick="placeOrder()">Confirm Order</button>
+<button onclick="placeOrder()">Confirm Order</button>
 
 </div>
 
 <!-- ================= SUCCESS POPUP ================= -->
 <div id="successPopup" style="
-display:none;
-position:fixed;
-top:0;left:0;
-width:100%;height:100%;
-background:rgba(0,0,0,0.6);
-z-index:9999;
-align-items:center;
-justify-content:center;
-">
+display:none;position:fixed;top:0;left:0;width:100%;height:100%;
+background:rgba(0,0,0,0.6);z-index:9999;
+align-items:center;justify-content:center">
 
-  <div style="
-  background:white;
-  padding:25px;
-  border-radius:16px;
-  text-align:center;
-  width:80%;
-  max-width:300px;
-  animation:pop 0.4s ease-out;
-  ">
-
+  <div style="background:white;padding:25px;border-radius:16px;
+  text-align:center;width:80%;max-width:300px;animation:pop .4s ease">
     <div style="font-size:42px">🎁</div>
-    <h2 style="margin:10px 0;color:#2e7d32">
-      Order Successful!
-    </h2>
-    <p style="color:#555">
-      Amazing 🎉<br>
-      Your order has been placed
-    </p>
-
+    <h2 style="color:#2e7d32">Order Successful!</h2>
+    <p>Amazing 🎉<br>Your order has been placed</p>
   </div>
 
   <div id="confetti"></div>
 </div>
 
-<!-- ================= QR LIBRARY ================= -->
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 
-<!-- ================= SCRIPT ================= -->
 <script>
 const profile = JSON.parse(localStorage.getItem("profile")) || {};
 const cart = JSON.parse(localStorage.getItem("cart")) || [];
 let orders = JSON.parse(localStorage.getItem("orders")) || [];
-
 const UPI_ID = "paytmgr5m9yhroptys";
-let selectedPayment = "COD";
+let payment = "COD";
 
 /* ADDRESS */
 addressBox.innerHTML = `
 <b>${profile.name || ""}</b><br>
 ${profile.mobile || ""}<br>
-${profile.house || ""} ${profile.street || ""}<br>
-${profile.village || ""}, ${profile.district || ""}<br>
-${profile.state || ""} - ${profile.pincode || ""}<br>
-${profile.address || ""}
+${profile.address || ""}<br>
+${profile.district || ""}, ${profile.state || ""} - ${profile.pincode || ""}
 `;
 
-/* TOTAL AMOUNT */
-const totalAmount = cart.reduce((sum, i) => sum + Number(i.price), 0);
+/* TOTAL */
+const total = cart.reduce((s,i)=>s+Number(i.price),0);
 
 /* PAYMENT SELECT */
-function selectPayment(type){
-  selectedPayment = type;
-  const box = document.getElementById("paymentBox");
-  box.style.display = "block";
-  box.innerHTML = "";
+function selectPay(type){
+  payment = type;
+  payBox.style.display = "block";
+  payBox.innerHTML = "";
 
-  if(type === "COD"){
-    box.innerHTML = "<p>Pay when product is delivered.</p>";
+  if(type==="COD"){
+    payBox.innerHTML="<p>Pay cash at delivery.</p>";
   }
 
-  if(type === "UPI"){
-    const upiString =
-      `upi://pay?pa=${UPI_ID}&pn=ISI&am=${totalAmount}&cu=INR`;
-
-    box.innerHTML = `
-      <p><b>Total Amount:</b> ₹${totalAmount}</p>
+  if(type==="UPI"){
+    const upi = `upi://pay?pa=${UPI_ID}&pn=ISI&am=${total}&cu=INR`;
+    payBox.innerHTML = `
+      <p><b>Total:</b> ₹${total}</p>
       <p><b>UPI ID:</b> ${UPI_ID}</p>
-
-      <div id="qrcode" style="margin:12px 0"></div>
-
-      <a href="${upiString}">
+      <div id="qrcode"></div>
+      <a href="${upi}">
         <button>Pay via PhonePe / GPay / Paytm</button>
       </a>
-
-      <p style="font-size:12px;color:#666">
-        After payment, click Confirm Order
-      </p>
+      <p style="font-size:12px">After payment, click Confirm Order</p>
     `;
-
-    new QRCode(document.getElementById("qrcode"), {
-      text: upiString,
-      width: 180,
-      height: 180
+    new QRCode(document.getElementById("qrcode"),{
+      text:upi,width:180,height:180
     });
-  }
-
-  if(type === "CARD"){
-    box.innerHTML = `
-      <input placeholder="Card Number">
-      <input placeholder="Name on Card">
-      <input placeholder="Expiry MM/YY">
-      <input placeholder="CVV">
-      <p style="font-size:12px;color:#777">Demo card payment</p>
-    `;
   }
 }
 
 /* PLACE ORDER */
 function placeOrder(){
-  if(cart.length === 0){
-    alert("Cart is empty");
+  if(cart.length===0){
+    alert("Cart empty");
     return;
   }
 
   orders.push({
-    id: "ORD-" + Date.now(),
-    customer: profile,
-    address: profile,
-    items: cart,
-    payment: selectedPayment,
-    amount: totalAmount,
-    status: "New",
-    createdAt: new Date().toLocaleString()
+    id:"ORD-"+Date.now(),
+    customer:profile,
+    items:cart,
+    amount:total,
+    payment:payment,
+    status:"New",
+    created:new Date().toLocaleString()
   });
 
-  localStorage.setItem("orders", JSON.stringify(orders));
+  localStorage.setItem("orders",JSON.stringify(orders));
   localStorage.removeItem("cart");
 
-  showSuccessPopup();
+  showSuccess();
 }
 
 /* SUCCESS POPUP */
-function showSuccessPopup(){
-  const popup = document.getElementById("successPopup");
-  popup.style.display = "flex";
-
-  const confetti = document.getElementById("confetti");
-  confetti.innerHTML = "";
-
+function showSuccess(){
+  successPopup.style.display="flex";
+  confetti.innerHTML="";
   for(let i=0;i<40;i++){
-    const p = document.createElement("div");
-    p.innerText = "🎊";
-    p.style.position = "fixed";
-    p.style.left = Math.random()*100 + "vw";
-    p.style.top = "-20px";
-    p.style.fontSize = "20px";
-    p.style.animation = `fall ${2 + Math.random()*2}s linear`;
+    const p=document.createElement("div");
+    p.innerText="🎊";
+    p.style=`position:fixed;left:${Math.random()*100}vw;
+    top:-20px;font-size:20px;animation:fall ${2+Math.random()*2}s linear`;
     confetti.appendChild(p);
   }
-
   setTimeout(()=>{
-    popup.style.display = "none";
-    location.href = "index.html";
-  }, 2500);
+    successPopup.style.display="none";
+    location.href="index.html";
+  },2500);
 }
 </script>
 
 <style>
-@keyframes fall {
-  to {
-    transform: translateY(110vh);
-    opacity: 0;
-  }
-}
-@keyframes pop {
-  from {
-    transform: scale(0.6);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
+.card{background:#fff;padding:15px;margin-bottom:15px;border-radius:10px}
+button{width:100%;padding:10px;margin-top:8px;
+background:#2874f0;color:white;border:none;border-radius:6px}
+@keyframes fall{to{transform:translateY(110vh);opacity:0}}
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1)}}
 </style>
 
 </body>
