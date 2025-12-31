@@ -1,126 +1,164 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>ISI – Publish Product</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="css/style.css">
+<meta charset="UTF-8">
+<title>Publish Product</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
-<body>
+<body style="margin:0;font-family:Arial;background:#f1f3f6">
 
 <!-- ================= HEADER ================= -->
 <header style="display:flex;align-items:center;justify-content:space-between;
-padding:12px;background:#2874f0;color:white">
-
+padding:12px;background:#222;color:white">
   <span onclick="history.back()" style="font-size:22px;cursor:pointer">⬅️</span>
   <b>Publish Product</b>
   <span onclick="location.href='index.html'" style="font-size:22px;cursor:pointer">🏠</span>
-
 </header>
 
-<!-- ================= FORM ================= -->
-<div class="container">
+<div style="padding:12px">
 
-  <div class="card">
-    <h3>Product Details</h3>
+<div class="card">
 
-    <input id="pname" placeholder="Product Name">
-    <textarea id="pdesc" placeholder="Product Description"></textarea>
+  <h3>Product Details</h3>
 
-    <input id="mrp" type="number" placeholder="Original Price (MRP)">
-    <input id="price" type="number" placeholder="Selling Price">
+  <!-- CATEGORY -->
+  <label>Category</label>
+  <select id="pcategory" style="width:100%;padding:8px;margin-bottom:8px">
+    <option value="">Select Category</option>
+  </select>
 
-    <p style="font-size:13px;color:#555">
-      Discount: <b><span id="discountText">0</span>% OFF</b>
-    </p>
+  <!-- NAME -->
+  <label>Product Name</label>
+  <input id="pname" placeholder="Product name"
+    style="width:100%;padding:8px;margin-bottom:8px">
 
-    <label>Product Image 1</label>
-    <input type="file" id="img1" accept="image/*">
+  <!-- DESCRIPTION -->
+  <label>Description</label>
+  <textarea id="pdesc" placeholder="Product description"
+    style="width:100%;padding:8px;margin-bottom:8px"></textarea>
 
-    <label>Product Image 2</label>
-    <input type="file" id="img2" accept="image/*">
+  <!-- PRICE -->
+  <label>Price (Selling)</label>
+  <input id="pprice" type="number" placeholder="Selling price"
+    oninput="calcDiscount()"
+    style="width:100%;padding:8px;margin-bottom:8px">
 
-    <button onclick="publishProduct()">Publish Product</button>
-  </div>
+  <!-- MRP -->
+  <label>MRP</label>
+  <input id="pmrp" type="number" placeholder="MRP"
+    oninput="calcDiscount()"
+    style="width:100%;padding:8px;margin-bottom:8px">
+
+  <!-- DISCOUNT -->
+  <label>Discount (%)</label>
+  <input id="pdiscount" readonly
+    style="width:100%;padding:8px;margin-bottom:8px;background:#eee">
+
+  <!-- IMAGES -->
+  <label>Product Images (2 required)</label>
+  <input type="file" id="img1" accept="image/*"><br><br>
+  <input type="file" id="img2" accept="image/*"><br><br>
+
+  <button onclick="publishProduct()">Publish Product</button>
 
 </div>
 
-<!-- ================= SCRIPT ================= -->
+</div>
+
 <script>
-const merchant = JSON.parse(localStorage.getItem("merchant"));
-if(!merchant){
-  alert("Merchant not logged in");
-  location.href = "merchant.html";
+/* LOAD CATEGORIES (ADMIN CONTROLLED) */
+const categories = JSON.parse(localStorage.getItem("categories")) || [];
+const catSelect = document.getElementById("pcategory");
+
+categories.forEach(c=>{
+  const opt=document.createElement("option");
+  opt.value=c;
+  opt.textContent=c.charAt(0).toUpperCase()+c.slice(1);
+  catSelect.appendChild(opt);
+});
+
+/* DISCOUNT AUTO CALC */
+function calcDiscount(){
+  const price = Number(pprice.value);
+  const mrp = Number(pmrp.value);
+  if(price && mrp && mrp > price){
+    const d = Math.round(((mrp - price) / mrp) * 100);
+    pdiscount.value = d;
+  }else{
+    pdiscount.value = 0;
+  }
 }
 
-let image1 = "";
-let image2 = "";
-
-/* LOAD IMAGE */
-function loadImage(input, callback){
-  if(!input.files[0]) return;
-  const reader = new FileReader();
-  reader.onload = () => callback(reader.result);
-  reader.readAsDataURL(input.files[0]);
+/* IMAGE TO BASE64 */
+function toBase64(file){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=()=>resolve(reader.result);
+    reader.onerror=reject;
+    reader.readAsDataURL(file);
+  });
 }
 
-img1.onchange = () => loadImage(img1, data => image1 = data);
-img2.onchange = () => loadImage(img2, data => image2 = data);
+/* PUBLISH PRODUCT */
+async function publishProduct(){
 
-/* AUTO DISCOUNT */
-mrp.oninput = price.oninput = () => {
-  const m = Number(mrp.value);
-  const s = Number(price.value);
-  if(m > 0 && s > 0 && s <= m){
-    discountText.innerText = Math.round(((m - s) / m) * 100);
-  } else {
-    discountText.innerText = 0;
-  }
-};
-
-/* PUBLISH */
-function publishProduct(){
-
-  if(!pname.value || !pdesc.value){
-    alert("Please fill product name and description");
+  if(!pcategory.value){
+    alert("Select category");
     return;
   }
-
-  if(!image1 || !image2){
-    alert("Please select at least 2 images");
+  if(!pname.value || !pprice.value || !pmrp.value){
+    alert("Fill all required fields");
     return;
   }
-
-  const m = Number(mrp.value);
-  const s = Number(price.value);
-
-  if(!m || !s || s > m){
-    alert("Check price details");
+  if(!img1.files[0] || !img2.files[0]){
+    alert("Upload 2 images");
     return;
   }
-
-  const discount = Math.round(((m - s) / m) * 100);
-
-  const product = {
-    id: Date.now(),
-    name: pname.value,
-    desc: pdesc.value,
-    mrp: m,
-    price: s,
-    discount: discount,
-    images: [image1, image2],
-    merchant: merchant.shopName
-  };
 
   const products = JSON.parse(localStorage.getItem("products")) || [];
-  products.push(product);
+  const merchant = localStorage.getItem("merchantName") || "Merchant Shop";
+
+  const image1 = await toBase64(img1.files[0]);
+  const image2 = await toBase64(img2.files[0]);
+
+  products.push({
+    name: pname.value,
+    desc: pdesc.value,
+    price: Number(pprice.value),
+    mrp: Number(pmrp.value),
+    discount: Number(pdiscount.value),
+    category: pcategory.value,
+    merchant: merchant,
+    images: [image1, image2]
+  });
+
   localStorage.setItem("products", JSON.stringify(products));
 
   alert("Product published successfully");
-  location.href = "merchant-dashboard.html";
+  location.href = "merchant.html";
 }
 </script>
+
+<style>
+.card{
+  background:#fff;
+  padding:15px;
+  border-radius:10px;
+}
+button{
+  width:100%;
+  padding:10px;
+  background:#2874f0;
+  color:white;
+  border:none;
+  border-radius:6px;
+}
+label{
+  font-size:13px;
+  color:#333;
+}
+</style>
 
 </body>
 </html>
