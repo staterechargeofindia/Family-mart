@@ -1,88 +1,123 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Admin Panel</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <title>ISI – Admin Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
-<!-- HEADER -->
+<!-- ================= HEADER ================= -->
 <header style="display:flex;align-items:center;justify-content:space-between;
 padding:12px;background:#2874f0;color:white">
-  <span onclick="history.back()" style="font-size:22px">⬅️</span>
+
+  <span onclick="history.back()" style="font-size:22px;cursor:pointer">⬅️</span>
   <b>Admin Panel</b>
-  <span onclick="location.href='index.html'" style="font-size:22px">🏠</span>
+  <span onclick="location.href='index.html'" style="font-size:22px;cursor:pointer">🏠</span>
+
 </header>
 
-<!-- ADMIN SETTINGS -->
-<div class="container card">
-  <h3>Payment Settings</h3>
-  <input id="upi" placeholder="Admin UPI ID">
-  <button onclick="saveUPI()">Save UPI</button>
-</div>
-
-<!-- ORDERS -->
+<!-- ================= ADMIN SETTINGS ================= -->
 <div class="container">
-  <h3>All Orders</h3>
-  <div id="ordersBox"></div>
+
+  <!-- UPI SETTINGS -->
+  <div class="card">
+    <h3>Payment Settings</h3>
+    <p style="font-size:13px;color:#555">
+      Change UPI ID (used for all online payments)
+    </p>
+    <input id="upiInput" placeholder="Enter Admin UPI ID">
+    <button onclick="saveUPI()">Save UPI ID</button>
+  </div>
+
+  <!-- ORDERS -->
+  <div class="card">
+    <h3>All Orders</h3>
+    <div id="ordersBox"></div>
+  </div>
+
 </div>
 
+<!-- ================= SCRIPT ================= -->
 <script>
-/* SAVE UPI */
-const admin = JSON.parse(localStorage.getItem("admin")) || {};
-upi.value = admin.upi || "paytmgr5m9yhroptys";
+/* ================= ADMIN SETTINGS ================= */
+const adminData = JSON.parse(localStorage.getItem("admin")) || {};
+const upiField = document.getElementById("upiInput");
+
+upiField.value = adminData.upi || "paytmgr5m9yhroptys";
 
 function saveUPI(){
-  localStorage.setItem("admin", JSON.stringify({ upi: upi.value }));
-  alert("UPI Updated");
+  localStorage.setItem("admin", JSON.stringify({
+    upi: upiField.value
+  }));
+  alert("UPI ID updated successfully");
 }
 
-/* LOAD ORDERS */
+/* ================= ORDERS ================= */
 let orders = JSON.parse(localStorage.getItem("orders")) || [];
 const box = document.getElementById("ordersBox");
 
-function render(){
+function renderOrders(){
   box.innerHTML = "";
-  orders.forEach((o, index) => {
+
+  if(orders.length === 0){
+    box.innerHTML = "<p>No orders found</p>";
+    return;
+  }
+
+  orders.forEach((order, index) => {
+
     box.innerHTML += `
-      <div class="card ${o.status==='Delivered'?'delivered':''}">
-        <b>Order ID:</b> ${o.id}<br><br>
+      <div class="card ${order.status === 'Delivered' ? 'delivered' : ''}">
+        
+        <b>Order ID:</b> ${order.id}<br><br>
 
-        <b>Customer:</b><br>
-        ${o.customer?.name || ""}<br>
-        ${o.customer?.mobile || ""}<br>
-        ${o.address || ""}<br><br>
+        <b>Customer Details</b><br>
+        Name: ${order.customer?.name || ""}<br>
+        Mobile: ${order.customer?.mobile || ""}<br><br>
 
-        <b>Payment:</b> ${o.payment}<br>
-        <b>Status:</b> ${o.status}<br><br>
+        <b>Delivery Address</b><br>
+        ${order.address?.house || ""} ${order.address?.street || ""}<br>
+        ${order.address?.village || ""}, ${order.address?.district || ""}<br>
+        ${order.address?.state || ""} - ${order.address?.pincode || ""}<br>
+        ${order.address?.address || ""}<br><br>
 
-        <b>Products:</b><br>
-        ${o.items.map(i=>`
+        <b>Payment Method:</b> ${order.payment}<br>
+        <b>Status:</b> ${order.status}<br><br>
+
+        <b>Ordered Products</b><br>
+        ${order.items.map(i => `
           ${i.name} – ₹${i.price}
           <small>(Merchant: ${i.merchant})</small>
         `).join("<br>")}
         <br><br>
 
         ${
-          o.status !== "Delivered"
-          ? `<button onclick="confirm(${index})">Confirm Delivered</button>`
-          : `<span style="color:green">✔ Delivered</span>`
+          order.status !== "Delivered"
+          ? `<button onclick="confirmDelivered(${index})">
+               Confirm Delivered
+             </button>`
+          : `<span style="color:green;font-weight:bold">
+               ✔ Order Delivered
+             </span>`
         }
+
       </div>
     `;
   });
 }
 
-function confirm(i){
-  if(confirm("Mark order as Delivered?")){
-    orders[i].status = "Delivered";
-    localStorage.setItem("orders", JSON.stringify(orders));
-    render();
-  }
+function confirmDelivered(i){
+  if(!confirm("Confirm this order as Delivered?")) return;
+
+  orders[i].status = "Delivered";
+  localStorage.setItem("orders", JSON.stringify(orders));
+  renderOrders();
 }
 
-render();
+renderOrders();
 </script>
 
 </body>
