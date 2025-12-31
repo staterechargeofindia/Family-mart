@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ISI – My Orders</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<!-- ================= HEADER ================= -->
+<header style="display:flex;align-items:center;justify-content:space-between;
+padding:12px;background:#2874f0;color:white">
+  <span onclick="history.back()" style="font-size:22px;cursor:pointer">⬅️</span>
+  <b>My Orders</b>
+  <span onclick="location.href='index.html'" style="font-size:22px;cursor:pointer">🏠</span>
+</header>
+
+<!-- ================= ORDERS ================= -->
+<div class="container">
+
+  <div class="card">
+    <h3>My Orders</h3>
+    <div id="ordersBox"></div>
+  </div>
+
+</div>
+
+<script>
+const profile = JSON.parse(localStorage.getItem("profile")) || {};
+const orders = JSON.parse(localStorage.getItem("orders")) || [];
+const box = document.getElementById("ordersBox");
+
+/* FILTER USER ORDERS (by mobile number) */
+const myOrders = orders.filter(o =>
+  o.customer?.mobile && o.customer.mobile === profile.mobile
+);
+
+if(myOrders.length === 0){
+  box.innerHTML = "<p>No orders found</p>";
+}
+
+/* RENDER */
+myOrders.forEach(order => {
+  box.innerHTML += `
+    <div class="card ${order.status === 'Delivered' ? 'delivered' : ''}">
+      <b>Order ID:</b> ${order.id}<br><br>
+
+      <b>Status:</b> ${order.status}<br>
+      <b>Payment:</b> ${order.payment}<br>
+      <b>Amount:</b> ₹${order.amount}<br><br>
+
+      <b>Products:</b><br>
+      ${order.items.map(i => `
+        ${i.name} – ₹${i.price}
+      `).join("<br>")}
+    </div>
+  `;
+});
+</script>
+
+</body>
+</html>
