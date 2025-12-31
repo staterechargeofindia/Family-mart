@@ -2,7 +2,7 @@
 <html>
 <head>
   <title>Publish Product</title>
-  <meta name="viewport" content="width=device-width">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -10,10 +10,10 @@
 <header>Publish Product</header>
 
 <div class="container card">
-  <input id="name" placeholder="Product Name">
+  <input id="pname" placeholder="Product Name">
   <input id="price" placeholder="Price">
 
-  <!-- GALLERY IMAGE -->
+  <!-- Gallery Upload -->
   <input type="file" id="image" accept="image/*">
 
   <button onclick="publish()">Publish</button>
@@ -25,23 +25,20 @@ let imageData = "";
 
 document.getElementById("image").addEventListener("change", function(e){
   const file = e.target.files[0];
+  if (!file) return;
+
   const reader = new FileReader();
-  reader.onload = () => {
-    imageData = reader.result; // base64 demo
+  reader.onload = function(){
+    imageData = reader.result;
   };
   reader.readAsDataURL(file);
 });
 
 function publish(){
-  if(!name.value || !price.value || !imageData){
-    alert("Fill all fields");
-    return;
-  }
-
   const product = {
-    name: name.value,
-    price: price.value,
-    image: imageData,
+    name: pname.value || "No Name",
+    price: price.value || "0",
+    image: imageData || "assets/placeholder.png",
     merchant: merchant.shopName
   };
 
@@ -49,8 +46,8 @@ function publish(){
   products.push(product);
   localStorage.setItem("products", JSON.stringify(products));
 
-  alert("Product Published");
-  location.href="merchant-dashboard.html";
+  alert("Product Published Successfully");
+  location.href = "merchant-dashboard.html";
 }
 </script>
 
