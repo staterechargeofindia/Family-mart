@@ -7,8 +7,23 @@
 </head>
 <body>
 
-<header>Publish Product</header>
+<header style="display:flex;align-items:center;justify-content:space-between;
+padding:12px;background:#2874f0;color:white">
 
+  <!-- BACK BUTTON -->
+  <span onclick="history.back()" style="font-size:22px;cursor:pointer">
+    ⬅️
+  </span>
+
+  <!-- PAGE TITLE -->
+  <b>Publish Product</b>
+
+  <!-- HOME BUTTON -->
+  <span onclick="location.href='index.html'" style="font-size:22px;cursor:pointer">
+    🏠
+  </span>
+
+</header>
 <div class="container card">
   <input id="pname" placeholder="Product Name">
   <textarea id="desc" placeholder="Product Description"></textarea>
