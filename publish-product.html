@@ -11,34 +11,50 @@
 
 <div class="container card">
   <input id="pname" placeholder="Product Name">
-  <input id="price" placeholder="Price">
+  <textarea id="desc" placeholder="Product Description"></textarea>
 
-  <!-- Gallery Upload -->
-  <input type="file" id="image" accept="image/*">
+  <input id="mrp" placeholder="Original Price (MRP)">
+  <input id="price" placeholder="Selling Price">
+
+  <label>Product Image 1</label>
+  <input type="file" id="img1" accept="image/*">
+
+  <label>Product Image 2</label>
+  <input type="file" id="img2" accept="image/*">
 
   <button onclick="publish()">Publish</button>
 </div>
 
 <script>
 const merchant = JSON.parse(localStorage.getItem("merchant"));
-let imageData = "";
+let imgData1 = "", imgData2 = "";
 
-document.getElementById("image").addEventListener("change", function(e){
-  const file = e.target.files[0];
-  if (!file) return;
+function loadImage(input, cb){
+  if(!input.files[0]) return;
+  const r = new FileReader();
+  r.onload = ()=>cb(r.result);
+  r.readAsDataURL(input.files[0]);
+}
 
-  const reader = new FileReader();
-  reader.onload = function(){
-    imageData = reader.result;
-  };
-  reader.readAsDataURL(file);
-});
+img1.onchange = ()=>loadImage(img1, d=>imgData1=d);
+img2.onchange = ()=>loadImage(img2, d=>imgData2=d);
 
 function publish(){
+  const MRP = Number(mrp.value);
+  const SELL = Number(price.value);
+  const discount = MRP > 0 ? Math.round(((MRP - SELL)/MRP)*100) : 0;
+
   const product = {
-    name: pname.value || "No Name",
-    price: price.value || "0",
-    image: imageData || "assets/placeholder.png",
+    id: Date.now(),
+    name: pname.value,
+    desc: desc.value,
+    mrp: MRP,
+    price: SELL,
+    discount: discount,
+    images: [
+      imgData1 || "assets/placeholder.png",
+      imgData2 || "assets/placeholder.png"
+    ],
     merchant: merchant.shopName
   };
 
@@ -46,8 +62,8 @@ function publish(){
   products.push(product);
   localStorage.setItem("products", JSON.stringify(products));
 
-  alert("Product Published Successfully");
-  location.href = "merchant-dashboard.html";
+  alert("Product Published");
+  location.href="merchant-dashboard.html";
 }
 </script>
 
