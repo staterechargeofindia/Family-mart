@@ -1,23 +1,50 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Merchant Dashboard</title>
-<link rel="stylesheet" href="css/style.css">
+  <title>Merchant Dashboard</title>
+  <meta name="viewport" content="width=device-width">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
 <header>Merchant Dashboard</header>
-<div class="container card" id="dash"></div>
+
+<div class="container">
+  <button onclick="location.href='publish-product.html'">+ Publish Product</button>
+  <div id="myProducts"></div>
+</div>
+
 <script>
-const m=JSON.parse(localStorage.getItem("merchant"));
-dash.innerHTML=`
-<b>${m.shopName}</b><br><br>
-<button onclick="location.href='publish-product.html'">Publish Product</button>
-<button onclick="location.href='merchant-orders.html'">My Orders</button>
-<button onclick="logout()">Logout</button>`;
-function logout(){
- localStorage.removeItem("merchant");
- location.href="merchant.html";
+const merchant = JSON.parse(localStorage.getItem("merchant"));
+let products = JSON.parse(localStorage.getItem("products")) || [];
+const box = document.getElementById("myProducts");
+
+function render(){
+  box.innerHTML="";
+  products.forEach((p,i)=>{
+    if(p.merchant===merchant.shopName){
+      box.innerHTML+=`
+      <div class="card">
+        <b>${p.name}</b><br>
+        ₹${p.price} <del>₹${p.mrp}</del> (${p.discount}% OFF)
+        <button onclick="del(${i})" style="background:red;color:white">
+          Delete
+        </button>
+      </div>`;
+    }
+  });
 }
+
+function del(i){
+  if(confirm("Delete product?")){
+    products.splice(i,1);
+    localStorage.setItem("products",JSON.stringify(products));
+    render();
+  }
+}
+
+render();
 </script>
+
 </body>
 </html>
