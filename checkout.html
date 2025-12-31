@@ -12,54 +12,91 @@
 <!-- ================= HEADER ================= -->
 <header style="display:flex;align-items:center;justify-content:space-between;
 padding:12px;background:#2874f0;color:white">
-
   <span onclick="history.back()" style="font-size:22px;cursor:pointer">⬅️</span>
   <b>Checkout</b>
   <span onclick="location.href='index.html'" style="font-size:22px;cursor:pointer">🏠</span>
-
 </header>
 
-<!-- ================= CONTENT ================= -->
 <div class="container">
 
   <!-- ADDRESS -->
   <div class="card">
     <h3>Delivery Address</h3>
     <p id="addressBox"></p>
-    <button onclick="editAddress()" style="background:#ddd;color:#000">
+    <button onclick="location.href='profile.html'"
+      style="background:#ddd;color:#000">
       Edit Address
     </button>
   </div>
 
-  <!-- PAYMENT -->
+  <!-- PAYMENT METHODS -->
   <div class="card">
     <h3>Select Payment Method</h3>
 
     <button onclick="selectPayment('COD')">Cash on Delivery</button><br><br>
-    <button onclick="selectPayment('UPI')">UPI</button><br><br>
-    <button onclick="selectPayment('DEBIT')">Debit Card</button><br><br>
-    <button onclick="selectPayment('CREDIT')">Credit Card</button>
+
+    <button onclick="selectPayment('UPI')">UPI (QR / App)</button><br><br>
+
+    <button onclick="selectPayment('CARD')">Card</button>
   </div>
 
   <!-- PAYMENT DETAILS -->
   <div class="card" id="paymentBox" style="display:none"></div>
 
-  <!-- PLACE ORDER -->
   <button onclick="placeOrder()">Confirm Order</button>
 
 </div>
+
+<!-- ================= SUCCESS POPUP ================= -->
+<div id="successPopup" style="
+display:none;
+position:fixed;
+top:0;left:0;
+width:100%;height:100%;
+background:rgba(0,0,0,0.6);
+z-index:9999;
+align-items:center;
+justify-content:center;
+">
+
+  <div style="
+  background:white;
+  padding:25px;
+  border-radius:16px;
+  text-align:center;
+  width:80%;
+  max-width:300px;
+  animation:pop 0.4s ease-out;
+  ">
+
+    <div style="font-size:42px">🎁</div>
+    <h2 style="margin:10px 0;color:#2e7d32">
+      Order Successful!
+    </h2>
+    <p style="color:#555">
+      Amazing 🎉<br>
+      Your order has been placed
+    </p>
+
+  </div>
+
+  <div id="confetti"></div>
+</div>
+
+<!-- ================= QR LIBRARY ================= -->
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 
 <!-- ================= SCRIPT ================= -->
 <script>
 const profile = JSON.parse(localStorage.getItem("profile")) || {};
 const cart = JSON.parse(localStorage.getItem("cart")) || [];
-const orders = JSON.parse(localStorage.getItem("orders")) || [];
+let orders = JSON.parse(localStorage.getItem("orders")) || [];
 
+const UPI_ID = "paytmgr5m9yhroptys";
 let selectedPayment = "COD";
-const upiId = "paytmgr5m9yhroptys";
 
-/* SHOW ADDRESS */
-document.getElementById("addressBox").innerHTML = `
+/* ADDRESS */
+addressBox.innerHTML = `
 <b>${profile.name || ""}</b><br>
 ${profile.mobile || ""}<br>
 ${profile.house || ""} ${profile.street || ""}<br>
@@ -68,37 +105,53 @@ ${profile.state || ""} - ${profile.pincode || ""}<br>
 ${profile.address || ""}
 `;
 
-function editAddress(){
-  location.href = "profile.html";
-}
+/* TOTAL AMOUNT */
+const totalAmount = cart.reduce((sum, i) => sum + Number(i.price), 0);
 
 /* PAYMENT SELECT */
 function selectPayment(type){
   selectedPayment = type;
   const box = document.getElementById("paymentBox");
   box.style.display = "block";
+  box.innerHTML = "";
 
   if(type === "COD"){
     box.innerHTML = "<p>Pay when product is delivered.</p>";
   }
 
   if(type === "UPI"){
+    const upiString =
+      `upi://pay?pa=${UPI_ID}&pn=ISI&am=${totalAmount}&cu=INR`;
+
     box.innerHTML = `
-      <p>Pay via UPI</p>
-      <b>${upiId}</b><br><br>
-      <a href="upi://pay?pa=${upiId}&pn=ISI&cu=INR">
-        <button>Pay with PhonePe / GPay / Paytm</button>
+      <p><b>Total Amount:</b> ₹${totalAmount}</p>
+      <p><b>UPI ID:</b> ${UPI_ID}</p>
+
+      <div id="qrcode" style="margin:12px 0"></div>
+
+      <a href="${upiString}">
+        <button>Pay via PhonePe / GPay / Paytm</button>
       </a>
+
+      <p style="font-size:12px;color:#666">
+        After payment, click Confirm Order
+      </p>
     `;
+
+    new QRCode(document.getElementById("qrcode"), {
+      text: upiString,
+      width: 180,
+      height: 180
+    });
   }
 
-  if(type === "DEBIT" || type === "CREDIT"){
+  if(type === "CARD"){
     box.innerHTML = `
       <input placeholder="Card Number">
       <input placeholder="Name on Card">
       <input placeholder="Expiry MM/YY">
       <input placeholder="CVV">
-      <p style="font-size:12px;color:#777">Demo only</p>
+      <p style="font-size:12px;color:#777">Demo card payment</p>
     `;
   }
 }
@@ -116,6 +169,7 @@ function placeOrder(){
     address: profile,
     items: cart,
     payment: selectedPayment,
+    amount: totalAmount,
     status: "New",
     createdAt: new Date().toLocaleString()
   });
@@ -123,10 +177,53 @@ function placeOrder(){
   localStorage.setItem("orders", JSON.stringify(orders));
   localStorage.removeItem("cart");
 
-  alert("Order placed successfully");
-  location.href = "index.html";
+  showSuccessPopup();
+}
+
+/* SUCCESS POPUP */
+function showSuccessPopup(){
+  const popup = document.getElementById("successPopup");
+  popup.style.display = "flex";
+
+  const confetti = document.getElementById("confetti");
+  confetti.innerHTML = "";
+
+  for(let i=0;i<40;i++){
+    const p = document.createElement("div");
+    p.innerText = "🎊";
+    p.style.position = "fixed";
+    p.style.left = Math.random()*100 + "vw";
+    p.style.top = "-20px";
+    p.style.fontSize = "20px";
+    p.style.animation = `fall ${2 + Math.random()*2}s linear`;
+    confetti.appendChild(p);
+  }
+
+  setTimeout(()=>{
+    popup.style.display = "none";
+    location.href = "index.html";
+  }, 2500);
 }
 </script>
+
+<style>
+@keyframes fall {
+  to {
+    transform: translateY(110vh);
+    opacity: 0;
+  }
+}
+@keyframes pop {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+</style>
 
 </body>
 </html>
