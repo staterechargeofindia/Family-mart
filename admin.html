@@ -1,124 +1,149 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>ISI – Admin Panel</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="css/style.css">
+<meta charset="UTF-8">
+<title>ISI – Admin Panel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
-<body>
+<body style="margin:0;font-family:Arial;background:#f1f3f6">
 
 <!-- ================= HEADER ================= -->
-<header style="display:flex;align-items:center;justify-content:space-between;
-padding:12px;background:#2874f0;color:white">
-
+<header style="
+display:flex;align-items:center;justify-content:space-between;
+padding:12px;background:#000;color:white">
   <span onclick="history.back()" style="font-size:22px;cursor:pointer">⬅️</span>
   <b>Admin Panel</b>
   <span onclick="location.href='index.html'" style="font-size:22px;cursor:pointer">🏠</span>
-
 </header>
 
-<!-- ================= ADMIN SETTINGS ================= -->
-<div class="container">
+<div style="padding:10px">
 
-  <!-- UPI SETTINGS -->
-  <div class="card">
-    <h3>Payment Settings</h3>
-    <p style="font-size:13px;color:#555">
-      Change UPI ID (used for all online payments)
-    </p>
-    <input id="upiInput" placeholder="Enter Admin UPI ID">
-    <button onclick="saveUPI()">Save UPI ID</button>
-  </div>
+<!-- ================= CATEGORY MANAGEMENT ================= -->
+<div class="card">
+  <h3>Manage Categories</h3>
 
-  <!-- ORDERS -->
-  <div class="card">
-    <h3>All Orders</h3>
-    <div id="ordersBox"></div>
-  </div>
+  <input id="newCategory" placeholder="Add new category (e.g. Kurti)"
+    style="width:100%;padding:8px;margin-bottom:6px">
+
+  <button onclick="addCategory()">Add Category</button>
+
+  <div id="categoryList" style="margin-top:10px"></div>
+</div>
+
+<!-- ================= ORDERS ================= -->
+<div class="card">
+  <h3>All Orders</h3>
+  <div id="ordersBox"></div>
+</div>
 
 </div>
 
-<!-- ================= SCRIPT ================= -->
 <script>
-/* ================= ADMIN SETTINGS ================= */
-const adminData = JSON.parse(localStorage.getItem("admin")) || {};
-const upiField = document.getElementById("upiInput");
+/* ================= CATEGORY SYSTEM ================= */
+let categories = JSON.parse(localStorage.getItem("categories")) || [
+  "beauty","trouser","jeans","jacket","kurti","lehenga","saree"
+];
 
-upiField.value = adminData.upi || "paytmgr5m9yhroptys";
-
-function saveUPI(){
-  localStorage.setItem("admin", JSON.stringify({
-    upi: upiField.value
-  }));
-  alert("UPI ID updated successfully");
-}
-
-/* ================= ORDERS ================= */
-let orders = JSON.parse(localStorage.getItem("orders")) || [];
-const box = document.getElementById("ordersBox");
-
-function renderOrders(){
+function renderCategories(){
+  const box = document.getElementById("categoryList");
   box.innerHTML = "";
 
-  if(orders.length === 0){
-    box.innerHTML = "<p>No orders found</p>";
-    return;
-  }
-
-  orders.forEach((order, index) => {
-
+  categories.forEach((c,i)=>{
     box.innerHTML += `
-      <div class="card ${order.status === 'Delivered' ? 'delivered' : ''}">
-        
-        <b>Order ID:</b> ${order.id}<br><br>
-
-        <b>Customer Details</b><br>
-        Name: ${order.customer?.name || ""}<br>
-        Mobile: ${order.customer?.mobile || ""}<br><br>
-
-        <b>Delivery Address</b><br>
-        ${order.address?.house || ""} ${order.address?.street || ""}<br>
-        ${order.address?.village || ""}, ${order.address?.district || ""}<br>
-        ${order.address?.state || ""} - ${order.address?.pincode || ""}<br>
-        ${order.address?.address || ""}<br><br>
-
-        <b>Payment Method:</b> ${order.payment}<br>
-        <b>Status:</b> ${order.status}<br><br>
-
-        <b>Ordered Products</b><br>
-        ${order.items.map(i => `
-          ${i.name} – ₹${i.price}
-          <small>(Merchant: ${i.merchant})</small>
-        `).join("<br>")}
-        <br><br>
-
-        ${
-          order.status !== "Delivered"
-          ? `<button onclick="confirmDelivered(${index})">
-               Confirm Delivered
-             </button>`
-          : `<span style="color:green;font-weight:bold">
-               ✔ Order Delivered
-             </span>`
-        }
-
+      <div style="
+        display:flex;justify-content:space-between;
+        padding:6px 0;border-bottom:1px solid #eee">
+        <span>${c}</span>
+        <button onclick="deleteCategory(${i})"
+          style="background:red;color:white;border:none;border-radius:4px">
+          Delete
+        </button>
       </div>
     `;
   });
+
+  localStorage.setItem("categories", JSON.stringify(categories));
 }
 
-function confirmDelivered(i){
-  if(!confirm("Confirm this order as Delivered?")) return;
+function addCategory(){
+  const val = newCategory.value.trim().toLowerCase();
+  if(!val){
+    alert("Enter category name");
+    return;
+  }
+  if(categories.includes(val)){
+    alert("Category already exists");
+    return;
+  }
+  categories.push(val);
+  newCategory.value="";
+  renderCategories();
+}
 
+function deleteCategory(i){
+  if(confirm("Delete this category?")){
+    categories.splice(i,1);
+    renderCategories();
+  }
+}
+
+renderCategories();
+
+/* ================= ORDERS ================= */
+const orders = JSON.parse(localStorage.getItem("orders")) || [];
+const box = document.getElementById("ordersBox");
+
+if(orders.length === 0){
+  box.innerHTML = "<p>No orders yet</p>";
+}
+
+orders.forEach((o, i)=>{
+  box.innerHTML += `
+    <div style="
+      background:#fafafa;padding:10px;
+      margin-bottom:10px;border-radius:8px;
+      ${o.status==='Delivered'?'opacity:0.6':''}
+    ">
+      <b>Order ID:</b> ${o.id}<br>
+      <b>Amount:</b> ₹${o.amount}<br>
+      <b>Payment:</b> ${o.payment}<br>
+      <b>Status:</b> ${o.status}<br><br>
+
+      <button onclick="confirmOrder(${i})"
+        style="background:green;color:white;border:none;
+        padding:6px;border-radius:6px">
+        Confirm Delivered
+      </button>
+    </div>
+  `;
+});
+
+function confirmOrder(i){
   orders[i].status = "Delivered";
   localStorage.setItem("orders", JSON.stringify(orders));
-  renderOrders();
+  alert("Order marked as Delivered");
+  location.reload();
 }
-
-renderOrders();
 </script>
+
+<style>
+.card{
+  background:#fff;
+  padding:15px;
+  margin-bottom:15px;
+  border-radius:10px;
+}
+button{
+  width:100%;
+  padding:8px;
+  background:#2874f0;
+  color:white;
+  border:none;
+  border-radius:6px;
+  margin-top:6px;
+}
+</style>
 
 </body>
 </html>
