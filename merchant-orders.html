@@ -1,22 +1,111 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Merchant Orders</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <title>ISI – Merchant Orders</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
+<!-- ================= HEADER ================= -->
 <header style="display:flex;align-items:center;justify-content:space-between;
 padding:12px;background:#2874f0;color:white">
-  <span onclick="history.back()">⬅️</span>
-  <b>Orders</b>
-  <span onclick="location.href='index.html'">🏠</span>
+
+  <span onclick="history.back()" style="font-size:22px;cursor:pointer">⬅️</span>
+  <b>My Orders</b>
+  <span onclick="location.href='index.html'" style="font-size:22px;cursor:pointer">🏠</span>
+
 </header>
 
-<div class="container card">
-  Orders will appear here
+<!-- ================= ORDERS ================= -->
+<div class="container">
+
+  <div class="card">
+    <h3>Current Orders</h3>
+    <div id="currentOrders"></div>
+  </div>
+
+  <div class="card">
+    <h3>Order History</h3>
+    <div id="historyOrders"></div>
+  </div>
+
 </div>
+
+<!-- ================= SCRIPT ================= -->
+<script>
+const merchant = JSON.parse(localStorage.getItem("merchant"));
+if(!merchant){
+  alert("Merchant not logged in");
+  location.href = "merchant.html";
+}
+
+const orders = JSON.parse(localStorage.getItem("orders")) || [];
+const currentBox = document.getElementById("currentOrders");
+const historyBox = document.getElementById("historyOrders");
+
+/* RENDER ORDERS */
+function renderOrders(){
+  currentBox.innerHTML = "";
+  historyBox.innerHTML = "";
+
+  let hasCurrent = false;
+  let hasHistory = false;
+
+  orders.forEach(order => {
+
+    /* FILTER ITEMS FOR THIS MERCHANT */
+    const myItems = order.items.filter(
+      i => i.merchant === merchant.shopName
+    );
+
+    if(myItems.length === 0) return;
+
+    const orderHTML = `
+      <div class="card ${order.status === 'Delivered' ? 'delivered' : ''}">
+        <b>Order ID:</b> ${order.id}<br><br>
+
+        <b>Customer:</b><br>
+        ${order.customer?.name || ""}<br>
+        ${order.customer?.mobile || ""}<br><br>
+
+        <b>Delivery Address:</b><br>
+        ${order.address?.house || ""} ${order.address?.street || ""}<br>
+        ${order.address?.village || ""}, ${order.address?.district || ""}<br>
+        ${order.address?.state || ""} - ${order.address?.pincode || ""}<br>
+        ${order.address?.address || ""}<br><br>
+
+        <b>Payment:</b> ${order.payment}<br>
+        <b>Status:</b> ${order.status}<br><br>
+
+        <b>Products:</b><br>
+        ${myItems.map(i => `
+          ${i.name} – ₹${i.price}
+        `).join("<br>")}
+      </div>
+    `;
+
+    if(order.status === "Delivered"){
+      historyBox.innerHTML += orderHTML;
+      hasHistory = true;
+    } else {
+      currentBox.innerHTML += orderHTML;
+      hasCurrent = true;
+    }
+  });
+
+  if(!hasCurrent){
+    currentBox.innerHTML = "<p>No current orders</p>";
+  }
+  if(!hasHistory){
+    historyBox.innerHTML = "<p>No order history</p>";
+  }
+}
+
+renderOrders();
+</script>
 
 </body>
 </html>
