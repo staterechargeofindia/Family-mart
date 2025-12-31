@@ -2,84 +2,99 @@
 <html>
 <head>
   <title>Checkout</title>
-  <meta name="viewport" content="width=device-width">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-<header>Payment</header>
+<header>Checkout</header>
 
-<div class="container card">
+<div class="container">
 
-  <h3>Select Payment Method</h3>
-
-  <label>
-    <input type="radio" name="pay" checked onclick="show('cod')">
-    Cash on Delivery
-  </label><br><br>
-
-  <label>
-    <input type="radio" name="pay" onclick="show('upi')">
-    UPI
-  </label><br><br>
-
-  <label>
-    <input type="radio" name="pay" onclick="show('card')">
-    Debit / Credit Card
-  </label>
-
-  <!-- COD -->
-  <div id="cod" class="card">
-    <p>Pay on delivery</p>
+  <!-- ADDRESS CARD -->
+  <div class="card">
+    <h3>Delivery Address</h3>
+    <p id="addrText"></p>
+    <button onclick="editAddress()" style="background:#ddd">Edit Address</button>
   </div>
 
-  <!-- UPI -->
-  <div id="upi" class="card" style="display:none">
-    <p>Pay to UPI ID:</p>
-    <b id="upiId"></b>
+  <!-- PAYMENT METHODS -->
+  <div class="card">
+    <h3>Select Payment</h3>
+
+    <button onclick="selectPay('COD')">Cash on Delivery</button><br><br>
+
+    <button onclick="selectPay('UPI')">UPI</button><br><br>
+
+    <button onclick="selectPay('DEBIT')">Debit Card</button><br><br>
+
+    <button onclick="selectPay('CREDIT')">Credit Card</button>
   </div>
 
-  <!-- DEBIT CARD -->
-  <div id="card" class="card" style="display:none">
-    <input placeholder="Card Number">
-    <input placeholder="Name on Card">
-    <input placeholder="Expiry">
-    <input placeholder="CVV">
-  </div>
- 
-  <!-- CREDIT CARD -->
-  <div id="card" class="card" style="display:none">
-    <input placeholder="Card Number">
-    <input placeholder="Name on Card">
-    <input placeholder="Expiry">
-    <input placeholder="CVV">
-  </div>
+  <!-- PAYMENT DETAILS -->
+  <div class="card" id="payBox" style="display:none"></div>
 
-  <button onclick="placeOrder()">Place Order</button>
+  <button onclick="placeOrder()">Confirm Order</button>
 </div>
 
 <script>
+const profile = JSON.parse(localStorage.getItem("profile")) || {};
+const cart = JSON.parse(localStorage.getItem("cart")) || [];
 const admin = JSON.parse(localStorage.getItem("admin")) || {};
-document.getElementById("upiId").innerText =
-  admin.upi || "upi@demo";
 
-function show(id){
-  cod.style.display="none";
-  upi.style.display="none";
-  card.style.display="none";
-  document.getElementById(id).style.display="block";
+const upiId = "paytmgr5m9yhroptys";
+
+let paymentType = "COD";
+
+document.getElementById("addrText").innerHTML = `
+${profile.name || ""}<br>
+${profile.mobile || ""}<br>
+${profile.address || ""}
+`;
+
+function editAddress(){
+  location.href = "profile.html";
+}
+
+function selectPay(type){
+  paymentType = type;
+  const box = document.getElementById("payBox");
+  box.style.display = "block";
+
+  if(type === "COD"){
+    box.innerHTML = "<p>Pay on delivery</p>";
+  }
+
+  if(type === "UPI"){
+    box.innerHTML = `
+      <p>Pay via UPI</p>
+      <b>${upiId}</b><br><br>
+      <a href="upi://pay?pa=${upiId}&pn=ISI&cu=INR">
+        <button>Pay with PhonePe / GPay / Paytm</button>
+      </a>
+    `;
+  }
+
+  if(type === "DEBIT" || type === "CREDIT"){
+    box.innerHTML = `
+      <input placeholder="Card Number">
+      <input placeholder="Name on Card">
+      <input placeholder="Expiry MM/YY">
+      <input placeholder="CVV">
+      <p>Demo Only</p>
+    `;
+  }
 }
 
 function placeOrder(){
-  const cart = JSON.parse(localStorage.getItem("cart")) || [];
-  const profile = JSON.parse(localStorage.getItem("profile")) || {};
   const orders = JSON.parse(localStorage.getItem("orders")) || [];
 
   orders.push({
-    id: "ORD-"+Date.now(),
+    id: "ORD-" + Date.now(),
     customer: profile,
     items: cart,
-    payment: document.querySelector('input[name=pay]:checked').parentNode.innerText.trim(),
+    payment: paymentType,
+    address: profile.address,
     status: "New",
     createdAt: new Date().toLocaleString()
   });
@@ -87,8 +102,8 @@ function placeOrder(){
   localStorage.setItem("orders", JSON.stringify(orders));
   localStorage.removeItem("cart");
 
-  alert("Order placed (Demo)");
-  location.href="index.html";
+  alert("Order Placed Successfully");
+  location.href = "index.html";
 }
 </script>
 
