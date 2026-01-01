@@ -3,23 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Merchant Dashboard</title>
+<title>Merchant Dashboard – ISI</title>
 
 <style>
-*{box-sizing:border-box;font-family:Arial}
-body{margin:0;background:#f4f6f8}
+*{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
+body{margin:0;background:#f5f6f8}
 
 /* HEADER */
 header{
-  background:#1b3c8b;
-  color:#fff;
+  background:#2874f0;color:#fff;
   padding:12px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+  display:flex;align-items:center;justify-content:space-between;
 }
-header b{font-size:18px}
-header span{cursor:pointer}
+header span{font-size:20px;cursor:pointer}
 
 /* TABS */
 .tabs{
@@ -28,64 +24,76 @@ header span{cursor:pointer}
 }
 .tab{
   flex:1;
-  text-align:center;
   padding:12px;
+  text-align:center;
   cursor:pointer;
-  font-weight:bold;
+  border-bottom:3px solid transparent;
 }
 .tab.active{
-  border-bottom:3px solid #2874f0;
-  color:#2874f0;
+  border-color:#2874f0;
+  font-weight:bold;
 }
 
 /* CONTENT */
 .container{padding:12px}
-.products{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:12px;
-}
+
+/* CARD */
 .card{
   background:#fff;
-  border-radius:14px;
-  overflow:hidden;
+  border-radius:12px;
+  padding:12px;
+  margin-bottom:12px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.1);
 }
-.card img{
+
+/* PRODUCT */
+.product{
+  border:1px solid #ddd;
+  border-radius:10px;
+  padding:10px;
+  margin-bottom:10px;
+}
+.product img{
   width:100%;
-  height:150px;
+  max-height:160px;
   object-fit:cover;
+  border-radius:8px;
 }
-.card-body{padding:10px}
-.price{font-weight:bold}
-.btn{
+
+/* ORDER */
+.order{
+  border:1px solid #ddd;
+  border-radius:10px;
+  padding:10px;
+  margin-bottom:10px;
+}
+.order.grey{
+  background:#eee;
+  opacity:0.7;
+}
+
+/* BUTTON */
+button{
   width:100%;
-  padding:8px;
-  margin-top:6px;
+  padding:10px;
+  margin-top:8px;
   border:none;
   border-radius:8px;
   cursor:pointer;
 }
-.delete{background:#e53935;color:#fff}
-.order{
-  background:#fff;
-  border-radius:14px;
-  padding:10px;
-  margin-bottom:10px;
-}
-.grey{opacity:.6}
-.empty{text-align:center;padding:30px;color:#666}
+.del{background:#e53935;color:#fff}
+.pub{background:#2874f0;color:#fff}
 </style>
 </head>
 
 <body>
 
 <header>
-  <span onclick="location.href='index.html'">🏠</span>
+  <span onclick="history.back()">←</span>
   <b>Merchant Dashboard</b>
   <span onclick="location.href='publish-product.html'">➕</span>
 </header>
 
-<!-- TABS -->
 <div class="tabs">
   <div class="tab active" onclick="showTab('products')">My Products</div>
   <div class="tab" onclick="showTab('orders')">My Orders</div>
@@ -93,22 +101,23 @@ header span{cursor:pointer}
 
 <div class="container">
 
-<!-- MY PRODUCTS -->
-<div id="productsTab">
-  <div class="products" id="productList"></div>
-</div>
+  <!-- MY PRODUCTS -->
+  <div id="productsTab">
+    <div id="productList"></div>
+  </div>
 
-<!-- MY ORDERS -->
-<div id="ordersTab" style="display:none">
-  <div id="orderList"></div>
-</div>
+  <!-- MY ORDERS -->
+  <div id="ordersTab" style="display:none">
+    <div id="orderList"></div>
+  </div>
 
 </div>
 
 <script>
-/* ===== LOGIN CHECK ===== */
-const merchantName = localStorage.getItem("merchantName");
-if(!merchantName){
+/* LOGIN CHECK */
+const merchantShop = localStorage.getItem("merchantShop");
+if(!merchantShop){
+  alert("Merchant not logged in");
   location.href="merchant-login.html";
 }
 
@@ -117,9 +126,9 @@ let products = JSON.parse(localStorage.getItem("products")) || [];
 let orders = JSON.parse(localStorage.getItem("orders")) || [];
 
 /* TAB SWITCH */
-function showTab(t){
-  document.querySelectorAll(".tab").forEach(e=>e.classList.remove("active"));
-  if(t==="products"){
+function showTab(tab){
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  if(tab==="products"){
     productsTab.style.display="block";
     ordersTab.style.display="none";
     document.querySelectorAll(".tab")[0].classList.add("active");
@@ -130,59 +139,61 @@ function showTab(t){
   }
 }
 
-/* ===== MY PRODUCTS ===== */
+/* MY PRODUCTS */
 function renderProducts(){
-  const box = productList;
+  const box=document.getElementById("productList");
   box.innerHTML="";
+  const mine=products.filter(p=>p.merchantShop===merchantShop);
 
-  const my = products.filter(p=>p.merchantShop===merchantName);
-  if(my.length===0){
-    box.innerHTML=`<div class="empty">No product published yet</div>`;
+  if(mine.length===0){
+    box.innerHTML="<p>No products published yet</p>";
     return;
   }
 
-  my.forEach(p=>{
-    box.innerHTML+=`
-      <div class="card">
-        <img src="${p.images[0]}">
-        <div class="card-body">
-          <b>${p.name}</b>
-          <div class="price">₹${p.price}</div>
-          <button class="btn delete" onclick="deleteProduct(${p.id})">
-            Delete Product
-          </button>
-        </div>
-      </div>`;
+  mine.forEach(p=>{
+    const d=document.createElement("div");
+    d.className="product";
+    d.innerHTML=`
+      <img src="${p.images[0]}">
+      <b>${p.name}</b><br>
+      ₹${p.price} <del>₹${p.mrp}</del> (${p.discount}% OFF)
+      <button class="del" onclick="deleteProduct(${p.id})">Delete Product</button>
+    `;
+    box.appendChild(d);
   });
 }
 
 /* DELETE PRODUCT */
 function deleteProduct(id){
-  if(!confirm("Delete this product?")) return;
-  products = products.filter(p=>p.id!==id);
+  if(!confirm("Delete this product?"))return;
+  products=products.filter(p=>p.id!==id);
   localStorage.setItem("products",JSON.stringify(products));
   renderProducts();
 }
 
-/* ===== MY ORDERS ===== */
+/* MY ORDERS */
 function renderOrders(){
-  const box = orderList;
+  const box=document.getElementById("orderList");
   box.innerHTML="";
+  const mine=orders.filter(o=>o.cart.some(i=>i.merchantShop===merchantShop));
 
-  const myOrders = orders.filter(o=>o.merchant===merchantName);
-  if(myOrders.length===0){
-    box.innerHTML=`<div class="empty">No orders yet</div>`;
+  if(mine.length===0){
+    box.innerHTML="<p>No orders yet</p>";
     return;
   }
 
-  myOrders.forEach(o=>{
-    box.innerHTML+=`
-      <div class="order ${o.status==='Delivered'?'grey':''}">
-        <b>${o.productName}</b><br>
-        ₹${o.amount} | ${o.payment}<br>
-        Status: ${o.status}<br>
-        <small>${o.customer.address}</small>
-      </div>`;
+  mine.forEach(o=>{
+    const d=document.createElement("div");
+    d.className="order"+(o.status==="Confirmed"?" grey":"");
+    d.innerHTML=`
+      <b>Order ID:</b> ${o.id}<br>
+      <b>Total:</b> ₹${o.total}<br>
+      <b>Payment:</b> ${o.payment}<br>
+      <b>Customer:</b> ${o.address.name}<br>
+      <b>Address:</b> ${o.address.address}<br>
+      <b>Status:</b> ${o.status}
+    `;
+    box.appendChild(d);
   });
 }
 
