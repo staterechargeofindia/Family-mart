@@ -2,52 +2,58 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>My Orders</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Orders – ISI</title>
 
 <style>
-body{
-  margin:0;
-  font-family:Arial,Helvetica,sans-serif;
-  background:#f1f3f6;
-}
+*{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
+body{margin:0;background:#f5f6f8}
+
+/* HEADER */
 header{
   background:#2874f0;
   color:#fff;
   padding:12px;
   display:flex;
-  justify-content:space-between;
   align-items:center;
+  justify-content:space-between;
 }
-header b{font-size:18px}
-.container{padding:12px}
+header span{font-size:20px;cursor:pointer}
 
-.order-card{
+/* CONTENT */
+.container{padding:12px}
+.order{
   background:#fff;
-  border-radius:14px;
+  border-radius:12px;
   padding:12px;
   margin-bottom:12px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.1);
 }
-.order-card.grey{
-  opacity:0.6;
+.order.grey{
+  background:#eee;
+  opacity:0.7;
 }
-.order-card b{
-  font-size:15px;
+.order h3{
+  margin:0 0 6px;
+  font-size:16px;
 }
-.small{
+.order p{
+  margin:4px 0;
+  font-size:14px;
+}
+.badge{
+  display:inline-block;
+  padding:4px 10px;
+  border-radius:20px;
   font-size:12px;
-  color:#666;
-}
-.status{
   margin-top:6px;
-  font-weight:bold;
 }
-.status.pending{color:#e67e22}
-.status.delivered{color:#2ecc71}
+.placed{background:#fff3cd;color:#856404}
+.confirmed{background:#d4edda;color:#155724}
 .empty{
   text-align:center;
   padding:40px;
-  color:#666;
+  color:#777;
 }
 </style>
 </head>
@@ -55,42 +61,44 @@ header b{font-size:18px}
 <body>
 
 <header>
-  <span onclick="history.back()" style="cursor:pointer">⬅</span>
+  <span onclick="history.back()">←</span>
   <b>My Orders</b>
-  <span onclick="location.href='index.html'" style="cursor:pointer">🏠</span>
+  <span onclick="location.href='index.html'">🏠</span>
 </header>
 
 <div class="container" id="orderList"></div>
 
 <script>
-let orders = JSON.parse(localStorage.getItem("orders")) || [];
+/* LOAD ORDERS */
+const orders = JSON.parse(localStorage.getItem("orders")) || [];
 const box = document.getElementById("orderList");
 
-/*
-  NOTE:
-  Ye demo system hai,
-  isliye sabhi orders user ko dikh rahe hain.
-  Future me user-login add karne par
-  yahin filter lagaya ja sakta hai.
-*/
+function renderOrders(){
+  box.innerHTML="";
 
-if(orders.length === 0){
-  box.innerHTML = '<div class="empty">No orders found</div>';
-}else{
-  orders.forEach(o=>{
-    box.innerHTML += `
-      <div class="order-card ${o.status==='Delivered'?'grey':''}">
-        <b>${o.productName}</b><br>
-        <span class="small">Order ID: ${o.id}</span><br>
-        <span class="small">Payment: ${o.payment}</span><br>
-        <span class="small">Amount: ₹${o.amount}</span><br>
-        <div class="status ${o.status==='Delivered'?'delivered':'pending'}">
-          ${o.status}
-        </div>
-      </div>
+  if(orders.length===0){
+    box.innerHTML='<div class="empty">No orders placed yet</div>';
+    return;
+  }
+
+  orders.slice().reverse().forEach(o=>{
+    const div=document.createElement("div");
+    div.className="order"+(o.status==="Confirmed"?" grey":"");
+
+    div.innerHTML=`
+      <h3>Order ID: ${o.id}</h3>
+      <p><b>Total:</b> ₹${o.total}</p>
+      <p><b>Payment:</b> ${o.payment}</p>
+      <p><b>Deliver To:</b> ${o.address.name}, ${o.address.address}</p>
+      <span class="badge ${o.status==="Confirmed"?"confirmed":"placed"}">
+        ${o.status}
+      </span>
     `;
+    box.appendChild(div);
   });
 }
+
+renderOrders();
 </script>
 
 </body>
