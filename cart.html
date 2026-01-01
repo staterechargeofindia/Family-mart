@@ -2,81 +2,92 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>My Cart</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cart – ISI</title>
 
 <style>
-body{
-  margin:0;
-  font-family:Arial,Helvetica,sans-serif;
-  background:#f1f3f6;
-}
+*{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
+body{margin:0;background:#f5f6f8}
+
+/* HEADER */
 header{
   background:#2874f0;
   color:#fff;
-  padding:12px;
   display:flex;
-  justify-content:space-between;
   align-items:center;
+  justify-content:space-between;
+  padding:12px;
 }
-header b{font-size:18px}
-.container{padding:12px}
+header .back{font-size:20px;cursor:pointer}
+header h1{margin:0;font-size:18px}
 
+/* CART */
+.container{padding:12px}
 .cart-item{
   background:#fff;
-  border-radius:14px;
+  border-radius:10px;
   padding:10px;
   display:flex;
   gap:10px;
-  margin-bottom:12px;
+  margin-bottom:10px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.1);
 }
 .cart-item img{
   width:90px;
   height:90px;
   object-fit:cover;
-  border-radius:10px;
+  border-radius:8px;
 }
-.cart-info{
-  flex:1;
-}
-.cart-info b{
+.cart-info{flex:1}
+.cart-info h3{
+  margin:0 0 5px;
   font-size:15px;
 }
 .price{
   font-weight:bold;
-  margin-top:4px;
 }
-.remove{
-  color:#e53935;
-  font-size:13px;
-  cursor:pointer;
+.qty{
+  display:flex;
+  align-items:center;
+  gap:8px;
   margin-top:6px;
 }
+.qty button{
+  width:28px;
+  height:28px;
+  border:none;
+  background:#2874f0;
+  color:#fff;
+  border-radius:50%;
+  cursor:pointer;
+}
+.remove{
+  color:red;
+  font-size:13px;
+  cursor:pointer;
+  margin-top:5px;
+}
 
-.summary{
+/* TOTAL */
+.total-box{
   background:#fff;
-  border-radius:14px;
-  padding:12px;
+  padding:15px;
+  border-radius:10px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.1);
 }
-.summary div{
-  display:flex;
-  justify-content:space-between;
-  margin-bottom:6px;
+.total-box h2{
+  margin:0 0 10px;
+  font-size:18px;
 }
-button{
+.total-box button{
   width:100%;
   padding:12px;
   background:#2874f0;
-  color:white;
+  color:#fff;
   border:none;
-  border-radius:10px;
+  border-radius:8px;
   font-size:16px;
   cursor:pointer;
-}
-.empty{
-  text-align:center;
-  padding:40px;
-  color:#666;
 }
 </style>
 </head>
@@ -84,75 +95,80 @@ button{
 <body>
 
 <header>
-  <span onclick="history.back()" style="cursor:pointer">⬅</span>
-  <b>My Cart</b>
-  <span onclick="location.href='index.html'" style="cursor:pointer">🏠</span>
+  <div class="back" onclick="history.back()">←</div>
+  <h1>Your Cart</h1>
+  <div></div>
 </header>
 
+<div class="container" id="cartList"></div>
+
 <div class="container">
-
-<div id="cartList"></div>
-
-<div id="summaryBox" class="summary" style="display:none">
-  <div>
-    <span>Total Items</span>
-    <span id="itemCount">0</span>
+  <div class="total-box">
+    <h2>Total: ₹<span id="total">0</span></h2>
+    <button onclick="goCheckout()">Proceed to Checkout</button>
   </div>
-  <div>
-    <span>Total Amount</span>
-    <span>₹<span id="totalAmount">0</span></span>
-  </div>
-  <button onclick="goCheckout()">Proceed to Checkout</button>
-</div>
-
 </div>
 
 <script>
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
-const box = document.getElementById("cartList");
-const summary = document.getElementById("summaryBox");
 
+/* RENDER CART */
 function renderCart(){
-  box.innerHTML="";
+  const list=document.getElementById("cartList");
+  list.innerHTML="";
+  let total=0;
 
   if(cart.length===0){
-    box.innerHTML='<div class="empty">Your cart is empty</div>';
-    summary.style.display="none";
+    list.innerHTML="<p style='text-align:center'>Your cart is empty</p>";
+    document.getElementById("total").textContent="0";
     return;
   }
 
-  let total=0;
   cart.forEach((p,i)=>{
-    total += p.price;
+    p.qty = p.qty || 1;
+    total += p.price * p.qty;
 
-    box.innerHTML += `
-      <div class="cart-item">
-        <img src="${p.images[0]}">
-        <div class="cart-info">
-          <b>${p.name}</b><br>
-          <small>${p.model || ""}</small>
-          <div class="price">₹${p.price}</div>
-          <div class="remove" onclick="removeItem(${i})">
-            Remove
-          </div>
+    const div=document.createElement("div");
+    div.className="cart-item";
+    div.innerHTML=`
+      <img src="${p.images?.[0] || ''}">
+      <div class="cart-info">
+        <h3>${p.name || "No name"}</h3>
+        <div class="price">₹${p.price}</div>
+        <div class="qty">
+          <button onclick="changeQty(${i},-1)">−</button>
+          <span>${p.qty}</span>
+          <button onclick="changeQty(${i},1)">+</button>
         </div>
+        <div class="remove" onclick="removeItem(${i})">Remove</div>
       </div>
     `;
+    list.appendChild(div);
   });
 
-  itemCount.innerText = cart.length;
-  totalAmount.innerText = total;
-  summary.style.display="block";
+  document.getElementById("total").textContent=total;
+  localStorage.setItem("cart",JSON.stringify(cart));
 }
 
-function removeItem(i){
-  if(!confirm("Remove this item from cart?")) return;
-  cart.splice(i,1);
-  localStorage.setItem("cart", JSON.stringify(cart));
+/* QTY */
+function changeQty(i,val){
+  cart[i].qty += val;
+  if(cart[i].qty<=1) cart[i].qty=1;
   renderCart();
 }
 
+/* REMOVE */
+function removeItem(i){
+  cart.splice(i,1);
+  renderCart();
+}
+
+/* CHECKOUT */
 function goCheckout(){
+  if(cart.length===0){
+    alert("Cart is empty");
+    return;
+  }
   location.href="checkout.html";
 }
 
