@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Manage Address</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{margin:0;font-family:Arial;background:#f4f6f8}
+header{
+  background:#2f78ff;
+  color:#fff;
+  padding:12px;
+  display:flex;
+  justify-content:space-between;
+}
+.container{padding:15px}
+input,textarea{
+  width:100%;
+  padding:10px;
+  margin-bottom:10px;
+  border-radius:8px;
+  border:1px solid #ccc;
+}
+button{
+  width:100%;
+  padding:12px;
+  background:#2f78ff;
+  color:#fff;
+  border:none;
+  border-radius:10px;
+  font-size:16px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <span onclick="history.back()">⬅</span>
+  <b>Manage Address</b>
+  <span onclick="location.href='index.html'">🏠</span>
+</header>
+
+<div class="container">
+  <input id="name" placeholder="Full Name">
+  <input id="mobile" placeholder="Mobile Number">
+  <textarea id="address" placeholder="Full Address"></textarea>
+  <input id="pincode" placeholder="Pincode">
+  <input id="city" placeholder="City">
+  <input id="state" placeholder="State">
+
+  <button onclick="saveAddress()">Save Address</button>
+</div>
+
+<script>
+function saveAddress(){
+  const data={
+    name:name.value,
+    mobile:mobile.value,
+    address:address.value,
+    pincode:pincode.value,
+    city:city.value,
+    state:state.value
+  };
+  localStorage.setItem("userAddress",JSON.stringify(data));
+  alert("Address saved successfully ✅");
+}
+</script>
+
+</body>
+</html>
