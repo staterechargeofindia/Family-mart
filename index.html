@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ISI</title>
+<title>ISI Marketplace</title>
 
 <style>
 *{box-sizing:border-box;font-family:Arial}
-body{margin:0;background:#f5f6f7}
+html,body{margin:0;height:100%;overflow-y:auto;background:#f5f6f7}
 
 /* HEADER */
 .header{
   display:flex;
-  align-items:center;
   justify-content:space-between;
+  align-items:center;
   padding:12px;
   background:#2874f0;
   color:#fff;
@@ -23,10 +23,7 @@ body{margin:0;background:#f5f6f7}
 .cart{font-size:20px;cursor:pointer}
 
 /* SEARCH */
-.search{
-  padding:10px;
-  background:#fff;
-}
+.search{background:#fff;padding:10px}
 .search input{
   width:100%;
   padding:10px;
@@ -34,7 +31,7 @@ body{margin:0;background:#f5f6f7}
   border:1px solid #ddd;
 }
 
-/* CATEGORY BUTTONS */
+/* CATEGORIES */
 .categories{
   display:grid;
   grid-template-columns:repeat(3,1fr);
@@ -43,7 +40,7 @@ body{margin:0;background:#f5f6f7}
 }
 .cat-btn{
   background:#fff;
-  padding:12px 8px;
+  padding:12px 6px;
   border-radius:12px;
   text-align:center;
   font-size:14px;
@@ -68,7 +65,6 @@ body{margin:0;background:#f5f6f7}
   object-fit:cover;
 }
 .p-body{padding:10px}
-.p-body h4{margin:0 0 5px;font-size:15px}
 .price{font-weight:bold}
 .old{color:#999;text-decoration:line-through;font-size:13px}
 .off{color:green;font-size:13px}
@@ -82,27 +78,30 @@ body{margin:0;background:#f5f6f7}
   margin-top:8px;
 }
 
-/* MENU */
+/* SIDE MENU */
 #menu{
   position:fixed;
   top:0;left:0;
   width:240px;height:100%;
   background:#fff;
-  z-index:9999;
+  z-index:10000;
   padding:15px;
   box-shadow:2px 0 10px rgba(0,0,0,.2);
   transform:translateX(-260px);
   transition:.3s;
 }
 #menu.open{transform:translateX(0)}
+
 #overlay{
   display:none;
   position:fixed;
   top:0;left:0;
   width:100%;height:100%;
   background:rgba(0,0,0,.4);
-  z-index:9998;
+  z-index:9999;
 }
+
+/* MENU ITEM */
 .menu-item{
   padding:10px;
   border-bottom:1px solid #eee;
@@ -140,7 +139,6 @@ body{margin:0;background:#f5f6f7}
 
 <!-- CATEGORIES (FULL LIST) -->
 <div class="categories">
-  <!-- OLD CATEGORIES (SAME) -->
   <div class="cat-btn" onclick="filterCategory('fashion')">👕 Fashion</div>
   <div class="cat-btn" onclick="filterCategory('beauty')">💄 Beauty</div>
   <div class="cat-btn" onclick="filterCategory('kids')">🧸 Kids</div>
@@ -150,8 +148,6 @@ body{margin:0;background:#f5f6f7}
   <div class="cat-btn" onclick="filterCategory('new-phone')">📱 New Phone</div>
   <div class="cat-btn" onclick="filterCategory('old-phone')">♻️ Old Phone</div>
   <div class="cat-btn" onclick="filterCategory('cover')">📱 Cover</div>
-
-  <!-- NEW CATEGORIES (ADDED) -->
   <div class="cat-btn" onclick="filterCategory('vegetable')">🥦 Vegetable</div>
   <div class="cat-btn" onclick="filterCategory('fruits')">🍎 Fruits</div>
   <div class="cat-btn" onclick="filterCategory('grocery')">🛒 Grocery</div>
@@ -166,29 +162,28 @@ body{margin:0;background:#f5f6f7}
 
 <script>
 const products = JSON.parse(localStorage.getItem("products")) || [];
-const cart = JSON.parse(localStorage.getItem("cart")) || [];
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
 cartCount.innerText = cart.length;
 
 /* MENU */
 function toggleMenu(){
-  menu.classList.toggle("open");
-  overlay.style.display = menu.classList.contains("open") ? "block" : "none";
+  const open = menu.classList.toggle("open");
+  overlay.style.display = open ? "block" : "none";
 }
 
-/* LOAD PRODUCTS (DEFAULT = ALL) */
+/* LOAD PRODUCTS */
 function loadProducts(list=null){
-  const data = list ? list : products;
-  productList.innerHTML = "";
+  const data = list || products;
+  productList.innerHTML="";
 
-  if(data.length === 0){
-    productList.innerHTML =
-      "<div style='padding:20px;color:#666'>No products available</div>";
+  if(data.length===0){
+    productList.innerHTML="<div style='padding:20px;color:#666'>No products available</div>";
     return;
   }
 
   data.forEach(p=>{
     const off = p.mrp ? Math.round(((p.mrp-p.price)/p.mrp)*100) : 0;
-    productList.innerHTML += `
+    productList.innerHTML+=`
       <div class="product">
         <img src="${p.images[0]}">
         <div class="p-body">
@@ -198,9 +193,7 @@ function loadProducts(list=null){
             ${p.mrp?`<span class="old">₹${p.mrp}</span>`:""}
             ${off?`<span class="off">${off}% OFF</span>`:""}
           </div>
-          <button class="btn" onclick='addToCart(${JSON.stringify(p)})'>
-            Add to Cart
-          </button>
+          <button class="btn" onclick='addToCart(${JSON.stringify(p)})'>Add to Cart</button>
         </div>
       </div>`;
   });
@@ -212,16 +205,16 @@ function searchProduct(){
   loadProducts(products.filter(p=>p.name.toLowerCase().includes(v)));
 }
 
-/* CATEGORY FILTER */
+/* FILTER */
 function filterCategory(cat){
-  loadProducts(products.filter(p=>p.category === cat));
+  loadProducts(products.filter(p=>p.category===cat));
 }
 
 /* CART */
 function addToCart(p){
   cart.push(p);
   localStorage.setItem("cart",JSON.stringify(cart));
-  cartCount.innerText = cart.length;
+  cartCount.innerText=cart.length;
 }
 
 /* INIT */
