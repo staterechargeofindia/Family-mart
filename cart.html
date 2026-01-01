@@ -4,114 +4,160 @@
 <meta charset="UTF-8">
 <title>My Cart</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#f1f3f6;
+}
+header{
+  background:#2874f0;
+  color:#fff;
+  padding:12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+header b{font-size:18px}
+.container{padding:12px}
+
+.cart-item{
+  background:#fff;
+  border-radius:14px;
+  padding:10px;
+  display:flex;
+  gap:10px;
+  margin-bottom:12px;
+}
+.cart-item img{
+  width:90px;
+  height:90px;
+  object-fit:cover;
+  border-radius:10px;
+}
+.cart-info{
+  flex:1;
+}
+.cart-info b{
+  font-size:15px;
+}
+.price{
+  font-weight:bold;
+  margin-top:4px;
+}
+.remove{
+  color:#e53935;
+  font-size:13px;
+  cursor:pointer;
+  margin-top:6px;
+}
+
+.summary{
+  background:#fff;
+  border-radius:14px;
+  padding:12px;
+}
+.summary div{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:6px;
+}
+button{
+  width:100%;
+  padding:12px;
+  background:#2874f0;
+  color:white;
+  border:none;
+  border-radius:10px;
+  font-size:16px;
+  cursor:pointer;
+}
+.empty{
+  text-align:center;
+  padding:40px;
+  color:#666;
+}
+</style>
 </head>
 
-<body style="margin:0;font-family:Arial;background:#f1f3f6">
+<body>
 
-<!-- ================= HEADER ================= -->
-<header style="
-display:flex;align-items:center;justify-content:space-between;
-padding:12px;background:#2874f0;color:white">
-  <span onclick="history.back()" style="font-size:22px;cursor:pointer">⬅️</span>
+<header>
+  <span onclick="history.back()" style="cursor:pointer">⬅</span>
   <b>My Cart</b>
-  <span onclick="location.href='index.html'" style="font-size:22px;cursor:pointer">🏠</span>
+  <span onclick="location.href='index.html'" style="cursor:pointer">🏠</span>
 </header>
 
-<div style="padding:10px">
+<div class="container">
 
-<!-- ================= CART ITEMS ================= -->
-<div class="card">
-  <h3>Cart Items</h3>
-  <div id="cartItems"></div>
+<div id="cartList"></div>
+
+<div id="summaryBox" class="summary" style="display:none">
+  <div>
+    <span>Total Items</span>
+    <span id="itemCount">0</span>
+  </div>
+  <div>
+    <span>Total Amount</span>
+    <span>₹<span id="totalAmount">0</span></span>
+  </div>
+  <button onclick="goCheckout()">Proceed to Checkout</button>
 </div>
-
-<!-- ================= TOTAL ================= -->
-<div class="card">
-  <h3>Total Amount</h3>
-  <b id="totalPrice">₹0</b>
-</div>
-
-<button onclick="goCheckout()">Proceed to Checkout</button>
 
 </div>
 
 <script>
-const cart = JSON.parse(localStorage.getItem("cart")) || [];
-const box = document.getElementById("cartItems");
-const totalBox = document.getElementById("totalPrice");
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+const box = document.getElementById("cartList");
+const summary = document.getElementById("summaryBox");
 
-/* EMPTY CART */
-if(cart.length === 0){
-  box.innerHTML = "<p>Your cart is empty</p>";
-}
+function renderCart(){
+  box.innerHTML="";
 
-/* RENDER CART */
-let total = 0;
-cart.forEach((item, i)=>{
-  total += Number(item.price);
-
-  box.innerHTML += `
-    <div style="
-      background:#fafafa;
-      padding:10px;
-      margin-bottom:10px;
-      border-radius:8px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center
-    ">
-      <div>
-        <b>${item.name}</b><br>
-        ₹${item.price}<br>
-        <small>Seller: ${item.merchant}</small>
-      </div>
-      <button onclick="removeItem(${i})"
-        style="background:red;color:white;border:none;
-        padding:6px 10px;border-radius:6px">
-        Remove
-      </button>
-    </div>
-  `;
-});
-
-totalBox.innerText = "₹" + total;
-
-/* REMOVE ITEM */
-function removeItem(i){
-  if(confirm("Remove this item from cart?")){
-    cart.splice(i,1);
-    localStorage.setItem("cart", JSON.stringify(cart));
-    location.reload();
-  }
-}
-
-/* CHECKOUT */
-function goCheckout(){
-  if(cart.length === 0){
-    alert("Cart is empty");
+  if(cart.length===0){
+    box.innerHTML='<div class="empty">Your cart is empty</div>';
+    summary.style.display="none";
     return;
   }
-  location.href = "checkout.html";
-}
-</script>
 
-<style>
-.card{
-  background:#fff;
-  padding:15px;
-  margin-bottom:15px;
-  border-radius:10px;
+  let total=0;
+  cart.forEach((p,i)=>{
+    total += p.price;
+
+    box.innerHTML += `
+      <div class="cart-item">
+        <img src="${p.images[0]}">
+        <div class="cart-info">
+          <b>${p.name}</b><br>
+          <small>${p.model || ""}</small>
+          <div class="price">₹${p.price}</div>
+          <div class="remove" onclick="removeItem(${i})">
+            Remove
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  itemCount.innerText = cart.length;
+  totalAmount.innerText = total;
+  summary.style.display="block";
 }
-button{
-  width:100%;
-  padding:10px;
-  background:#2874f0;
-  color:white;
-  border:none;
-  border-radius:6px;
-  margin-top:10px;
+
+function removeItem(i){
+  if(!confirm("Remove this item from cart?")) return;
+  cart.splice(i,1);
+  localStorage.setItem("cart", JSON.stringify(cart));
+  renderCart();
 }
-</style>
+
+function goCheckout(){
+  location.href="checkout.html";
+}
+
+renderCart();
+</script>
 
 </body>
 </html>
