@@ -6,48 +6,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body{
-  margin:0;
-  font-family:Arial,Helvetica,sans-serif;
-  background:#f1f3f6;
-}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f1f3f6}
 header{
-  background:#2874f0;
-  color:#fff;
-  padding:12px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+  background:#2874f0;color:#fff;padding:12px;
+  display:flex;justify-content:space-between;align-items:center
 }
 header b{font-size:18px}
 .container{padding:15px}
-.card{
-  background:#fff;
-  padding:15px;
-  border-radius:14px;
-}
+.card{background:#fff;padding:15px;border-radius:14px}
 input,select,textarea{
-  width:100%;
-  padding:10px;
-  margin-bottom:12px;
-  border-radius:8px;
-  border:1px solid #ccc;
+  width:100%;padding:10px;margin-bottom:12px;
+  border-radius:8px;border:1px solid #ccc
 }
 button{
-  width:100%;
-  padding:12px;
-  background:#2874f0;
-  color:white;
-  border:none;
-  border-radius:10px;
-  font-size:16px;
+  width:100%;padding:12px;background:#2874f0;
+  color:white;border:none;border-radius:10px;font-size:16px
 }
 small{color:#555}
-.note{
-  font-size:12px;
-  color:#777;
-  margin-bottom:10px;
-}
+.note{font-size:12px;color:#777;margin-bottom:10px}
 </style>
 </head>
 
@@ -62,8 +38,10 @@ small{color:#555}
 <div class="container">
 <div class="card">
 
-<!-- CATEGORY -->
-<select id="category"></select>
+<!-- CATEGORY (FIXED) -->
+<select id="category">
+  <option value="">Select Category</option>
+</select>
 
 <!-- PHONE TYPE -->
 <select id="phoneType">
@@ -85,13 +63,9 @@ small{color:#555}
   <option value="motorola">Motorola</option>
 </select>
 
-<!-- PRODUCT NAME -->
+<!-- PRODUCT INFO -->
 <input id="name" placeholder="Product Name">
-
-<!-- MODEL -->
 <input id="model" placeholder="Model Name">
-
-<!-- DESCRIPTION -->
 <textarea id="desc" placeholder="Product Description"></textarea>
 
 <!-- PRICE -->
@@ -100,7 +74,7 @@ small{color:#555}
 <small id="discountText"></small>
 
 <!-- IMAGES -->
-<div class="note">Upload up to 4 images (minimum 1 is enough)</div>
+<div class="note">Upload up to 4 images (minimum 1 required)</div>
 <input type="file" id="img1" accept="image/*">
 <input type="file" id="img2" accept="image/*">
 <input type="file" id="img3" accept="image/*">
@@ -112,31 +86,33 @@ small{color:#555}
 </div>
 
 <script>
-/* LOAD CATEGORIES */
-const catSelect=document.getElementById("category");
-const categories=JSON.parse(localStorage.getItem("categories"))||[];
+/* ===== LOAD CATEGORIES (INDEX / ADMIN SAME SOURCE) ===== */
+const categorySelect = document.getElementById("category");
+const categories = JSON.parse(localStorage.getItem("categories")) || [];
 
-catSelect.innerHTML='<option value="">Select Category</option>';
 categories.forEach(c=>{
-  const opt=document.createElement("option");
-  opt.value=c.id;
-  opt.textContent=c.name;
-  catSelect.appendChild(opt);
+  // SAFETY CHECK (object format)
+  if(c.id && c.name){
+    const opt = document.createElement("option");
+    opt.value = c.id;     // system use
+    opt.textContent = c.name; // display name
+    categorySelect.appendChild(opt);
+  }
 });
 
-/* DISCOUNT */
+/* ===== DISCOUNT ===== */
 function calcDiscount(){
   const m=+mrp.value;
   const p=+price.value;
   if(m>0 && p>0){
-    const d=Math.round(((m-p)/m)*100);
-    discountText.innerText="Discount: "+d+"%";
+    discountText.innerText =
+      "Discount: " + Math.round(((m-p)/m)*100) + "%";
   }else{
     discountText.innerText="";
   }
 }
 
-/* IMAGE TO BASE64 */
+/* ===== IMAGE TO BASE64 ===== */
 function toBase64(file){
   return new Promise(res=>{
     const r=new FileReader();
@@ -145,45 +121,45 @@ function toBase64(file){
   });
 }
 
-/* PUBLISH */
+/* ===== PUBLISH PRODUCT ===== */
 async function publish(){
   if(!category.value || !name.value || !price.value || !mrp.value){
     alert("Please fill required fields");
     return;
   }
 
-  const products=JSON.parse(localStorage.getItem("products"))||[];
-  const images=[];
+  const products = JSON.parse(localStorage.getItem("products")) || [];
+  const images = [];
 
   if(img1.files[0]) images.push(await toBase64(img1.files[0]));
   if(img2.files[0]) images.push(await toBase64(img2.files[0]));
   if(img3.files[0]) images.push(await toBase64(img3.files[0]));
   if(img4.files[0]) images.push(await toBase64(img4.files[0]));
 
-  if(images.length===0){
+  if(images.length === 0){
     alert("Please upload at least one image");
     return;
   }
 
-  const product={
-    id:Date.now(),
-    category:category.value,
-    phoneType:phoneType.value,
-    brand:brand.value,
-    name:name.value,
-    model:model.value,
-    description:desc.value,
-    mrp:+mrp.value,
-    price:+price.value,
-    images:images,
-    merchant:localStorage.getItem("merchantName")||"Merchant"
+  const product = {
+    id: Date.now(),
+    category: category.value,
+    phoneType: phoneType.value,
+    brand: brand.value,
+    name: name.value,
+    model: model.value,
+    description: desc.value,
+    mrp: +mrp.value,
+    price: +price.value,
+    images: images,
+    merchant: localStorage.getItem("merchantName") || "Merchant"
   };
 
   products.push(product);
-  localStorage.setItem("products",JSON.stringify(products));
+  localStorage.setItem("products", JSON.stringify(products));
 
   alert("Product published successfully");
-  location.href="merchant-dashboard.html";
+  location.href = "merchant-dashboard.html";
 }
 </script>
 
