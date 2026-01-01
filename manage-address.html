@@ -1,34 +1,67 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Manage Address</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manage Address – ISI</title>
+
 <style>
-body{margin:0;font-family:Arial;background:#f4f6f8}
+*{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
+body{margin:0;background:#f5f6f8}
+
+/* HEADER */
 header{
-  background:#2f78ff;
+  background:#2874f0;
   color:#fff;
   padding:12px;
   display:flex;
+  align-items:center;
   justify-content:space-between;
 }
-.container{padding:15px}
+header span{font-size:20px;cursor:pointer}
+
+/* FORM */
+.container{
+  padding:15px;
+}
+.card{
+  background:#fff;
+  border-radius:14px;
+  padding:15px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.1);
+}
+.card h2{
+  margin-top:0;
+  font-size:18px;
+}
+
+/* INPUT */
 input,textarea{
   width:100%;
-  padding:10px;
+  padding:12px;
   margin-bottom:10px;
-  border-radius:8px;
+  border-radius:10px;
   border:1px solid #ccc;
+  font-size:15px;
 }
+textarea{resize:none;height:80px}
+
+/* BUTTON */
 button{
   width:100%;
-  padding:12px;
-  background:#2f78ff;
+  padding:14px;
+  background:#2874f0;
   color:#fff;
   border:none;
-  border-radius:10px;
+  border-radius:12px;
   font-size:16px;
+  cursor:pointer;
+}
+.note{
+  margin-top:10px;
+  font-size:13px;
+  color:#555;
+  text-align:center;
 }
 </style>
 </head>
@@ -36,33 +69,55 @@ button{
 <body>
 
 <header>
-  <span onclick="history.back()">⬅</span>
+  <span onclick="history.back()">←</span>
   <b>Manage Address</b>
   <span onclick="location.href='index.html'">🏠</span>
 </header>
 
 <div class="container">
-  <input id="name" placeholder="Full Name">
-  <input id="mobile" placeholder="Mobile Number">
-  <textarea id="address" placeholder="Full Address"></textarea>
-  <input id="pincode" placeholder="Pincode">
-  <input id="city" placeholder="City">
-  <input id="state" placeholder="State">
+  <div class="card">
+    <h2>Delivery Address</h2>
 
-  <button onclick="saveAddress()">Save Address</button>
+    <input id="name" placeholder="Full Name">
+    <input id="mobile" placeholder="Mobile Number">
+    <textarea id="address" placeholder="House / Village / Area"></textarea>
+    <input id="district" placeholder="District">
+    <input id="state" placeholder="State">
+    <input id="pincode" placeholder="Pincode">
+
+    <button onclick="saveAddress()">Save Address</button>
+
+    <div class="note">
+      Address ek baar save karne ke baad<br>
+      order ke time automatically use hoga.
+    </div>
+  </div>
 </div>
 
 <script>
+/* LOAD SAVED ADDRESS */
+const saved = JSON.parse(localStorage.getItem("address"));
+if(saved){
+  name.value = saved.name || "";
+  mobile.value = saved.mobile || "";
+  address.value = saved.address || "";
+  district.value = saved.district || "";
+  state.value = saved.state || "";
+  pincode.value = saved.pincode || "";
+}
+
+/* SAVE ADDRESS */
 function saveAddress(){
-  const data={
-    name:name.value,
-    mobile:mobile.value,
-    address:address.value,
-    pincode:pincode.value,
-    city:city.value,
-    state:state.value
+  const addr = {
+    name: name.value.trim(),
+    mobile: mobile.value.trim(),
+    address: address.value.trim(),
+    district: district.value.trim(),
+    state: state.value.trim(),
+    pincode: pincode.value.trim()
   };
-  localStorage.setItem("userAddress",JSON.stringify(data));
+
+  localStorage.setItem("address", JSON.stringify(addr));
   alert("Address saved successfully ✅");
 }
 </script>
