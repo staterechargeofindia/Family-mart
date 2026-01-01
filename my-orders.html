@@ -4,72 +4,94 @@
 <meta charset="UTF-8">
 <title>My Orders</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-
-<body style="margin:0;font-family:Arial;background:#f1f3f6">
-
-<!-- ================= HEADER ================= -->
-<header style="
-display:flex;align-items:center;justify-content:space-between;
-padding:12px;background:#2874f0;color:white">
-  <span onclick="history.back()" style="font-size:22px;cursor:pointer">⬅️</span>
-  <b>My Orders</b>
-  <span onclick="location.href='index.html'" style="font-size:22px;cursor:pointer">🏠</span>
-</header>
-
-<div style="padding:10px">
-
-<div class="card">
-  <h3>Your Orders</h3>
-  <div id="ordersBox"></div>
-</div>
-
-</div>
-
-<script>
-const profile = JSON.parse(localStorage.getItem("profile")) || {};
-const orders = JSON.parse(localStorage.getItem("orders")) || [];
-const box = document.getElementById("ordersBox");
-
-/* FILTER ORDERS BY USER (MOBILE NUMBER) */
-const myOrders = orders.filter(o =>
-  o.customer && o.customer.mobile === profile.mobile
-);
-
-if(myOrders.length === 0){
-  box.innerHTML = "<p>No orders found</p>";
-}
-
-/* RENDER ORDERS */
-myOrders.forEach(o=>{
-  box.innerHTML += `
-    <div style="
-      background:#fafafa;
-      padding:10px;
-      margin-bottom:10px;
-      border-radius:8px;
-      ${o.status==='Delivered'?'opacity:0.6':''}
-    ">
-      <b>Order ID:</b> ${o.id}<br>
-      <b>Date:</b> ${o.created}<br>
-      <b>Status:</b> ${o.status}<br>
-      <b>Payment:</b> ${o.payment}<br>
-      <b>Total:</b> ₹${o.amount}<br><br>
-
-      <b>Items:</b><br>
-      ${o.items.map(i=>`${i.name} – ₹${i.price}`).join("<br>")}
-    </div>
-  `;
-});
-</script>
 
 <style>
-.card{
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#f1f3f6;
+}
+header{
+  background:#2874f0;
+  color:#fff;
+  padding:12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+header b{font-size:18px}
+.container{padding:12px}
+
+.order-card{
   background:#fff;
-  padding:15px;
-  border-radius:10px;
+  border-radius:14px;
+  padding:12px;
+  margin-bottom:12px;
+}
+.order-card.grey{
+  opacity:0.6;
+}
+.order-card b{
+  font-size:15px;
+}
+.small{
+  font-size:12px;
+  color:#666;
+}
+.status{
+  margin-top:6px;
+  font-weight:bold;
+}
+.status.pending{color:#e67e22}
+.status.delivered{color:#2ecc71}
+.empty{
+  text-align:center;
+  padding:40px;
+  color:#666;
 }
 </style>
+</head>
+
+<body>
+
+<header>
+  <span onclick="history.back()" style="cursor:pointer">⬅</span>
+  <b>My Orders</b>
+  <span onclick="location.href='index.html'" style="cursor:pointer">🏠</span>
+</header>
+
+<div class="container" id="orderList"></div>
+
+<script>
+let orders = JSON.parse(localStorage.getItem("orders")) || [];
+const box = document.getElementById("orderList");
+
+/*
+  NOTE:
+  Ye demo system hai,
+  isliye sabhi orders user ko dikh rahe hain.
+  Future me user-login add karne par
+  yahin filter lagaya ja sakta hai.
+*/
+
+if(orders.length === 0){
+  box.innerHTML = '<div class="empty">No orders found</div>';
+}else{
+  orders.forEach(o=>{
+    box.innerHTML += `
+      <div class="order-card ${o.status==='Delivered'?'grey':''}">
+        <b>${o.productName}</b><br>
+        <span class="small">Order ID: ${o.id}</span><br>
+        <span class="small">Payment: ${o.payment}</span><br>
+        <span class="small">Amount: ₹${o.amount}</span><br>
+        <div class="status ${o.status==='Delivered'?'delivered':'pending'}">
+          ${o.status}
+        </div>
+      </div>
+    `;
+  });
+}
+</script>
 
 </body>
 </html>
