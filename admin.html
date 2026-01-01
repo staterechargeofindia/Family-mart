@@ -6,30 +6,73 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body{margin:0;font-family:Arial;background:#f1f3f6}
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#f1f3f6;
+}
 header{
-  background:#2874f0;color:#fff;padding:12px;
-  display:flex;justify-content:space-between;align-items:center
+  background:#2874f0;
+  color:#fff;
+  padding:12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
 header b{font-size:18px}
 .container{padding:12px}
+
 .section{
-  background:#fff;padding:12px;border-radius:14px;margin-bottom:15px
+  background:#fff;
+  border-radius:14px;
+  padding:12px;
+  margin-bottom:15px;
 }
-input{width:100%;padding:10px;margin-bottom:10px;border-radius:8px;border:1px solid #ccc}
-button{padding:8px 12px;border:none;border-radius:8px;cursor:pointer}
-.btn{background:#2874f0;color:#fff}
+
+input{
+  width:100%;
+  padding:10px;
+  margin-bottom:10px;
+  border-radius:8px;
+  border:1px solid #ccc;
+}
+button{
+  padding:8px 12px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+}
+.btn{
+  background:#2874f0;
+  color:#fff;
+}
 .btn.red{background:#e53935}
-.order.grey{opacity:.6}
+.btn.grey{background:#999}
+
+.row{
+  border:1px solid #eee;
+  border-radius:10px;
+  padding:10px;
+  margin-bottom:8px;
+}
+.grey{opacity:0.6}
+small{color:#666}
 </style>
 </head>
 
 <body>
 
+<script>
+/* ===== ADMIN LOGIN PROTECTION ===== */
+if(localStorage.getItem("adminLoggedIn") !== "yes"){
+  location.href = "admin-login.html";
+}
+</script>
+
 <header>
-  <span onclick="location.href='index.html'">🏠</span>
+  <span onclick="location.href='index.html'" style="cursor:pointer">🏠</span>
   <b>Admin Panel</b>
-  <span></span>
+  <span onclick="logout()" style="cursor:pointer">🚪</span>
 </header>
 
 <div class="container">
@@ -37,23 +80,27 @@ button{padding:8px 12px;border:none;border-radius:8px;cursor:pointer}
 <!-- ===== MERCHANT CREATE ===== -->
 <div class="section">
   <h3>Create Merchant</h3>
+
   <input id="shopName" placeholder="Shop Name">
   <input id="userId" placeholder="User ID">
   <input id="password" placeholder="Password">
-  <button class="btn" onclick="createMerchant()">Create Merchant</button>
+
+  <button class="btn" onclick="createMerchant()">➕ Create Merchant</button>
 
   <div id="merchantList" style="margin-top:10px"></div>
 </div>
 
-<!-- ===== CATEGORY ===== -->
+<!-- ===== CATEGORY MANAGEMENT ===== -->
 <div class="section">
-  <h3>Categories</h3>
+  <h3>Manage Categories</h3>
+
   <input id="newCategory" placeholder="New Category Name">
-  <button class="btn" onclick="addCategory()">Add Category</button>
+  <button class="btn" onclick="addCategory()">➕ Add Category</button>
+
   <div id="categoryList" style="margin-top:10px"></div>
 </div>
 
-<!-- ===== ORDERS ===== -->
+<!-- ===== ORDER MANAGEMENT ===== -->
 <div class="section">
   <h3>All Orders</h3>
   <div id="orderList"></div>
@@ -62,7 +109,7 @@ button{padding:8px 12px;border:none;border-radius:8px;cursor:pointer}
 </div>
 
 <script>
-/* ===== DATA ===== */
+/* ===== DATA LOAD ===== */
 let merchants = JSON.parse(localStorage.getItem("merchants")) || [];
 let categories = JSON.parse(localStorage.getItem("categories")) || [];
 let orders = JSON.parse(localStorage.getItem("orders")) || [];
@@ -70,75 +117,112 @@ let orders = JSON.parse(localStorage.getItem("orders")) || [];
 /* ===== MERCHANT CREATE ===== */
 function createMerchant(){
   if(!shopName.value || !userId.value || !password.value){
-    alert("Fill all fields"); return;
+    alert("Fill all fields");
+    return;
   }
+
   merchants.push({
     shopName: shopName.value,
     userId: userId.value,
     password: password.value
   });
+
   localStorage.setItem("merchants", JSON.stringify(merchants));
-  shopName.value=userId.value=password.value="";
+  shopName.value = userId.value = password.value = "";
   renderMerchants();
 }
+
 function renderMerchants(){
   merchantList.innerHTML="";
+  if(merchants.length===0){
+    merchantList.innerHTML="<small>No merchants created</small>";
+  }
   merchants.forEach((m,i)=>{
-    merchantList.innerHTML+=`
-      <div>
-        <b>${m.shopName}</b> ( ${m.userId} )
+    merchantList.innerHTML += `
+      <div class="row">
+        <b>${m.shopName}</b><br>
+        <small>User ID: ${m.userId}</small><br>
         <button class="btn red" onclick="deleteMerchant(${i})">Delete</button>
-      </div>`;
+      </div>
+    `;
   });
 }
+
 function deleteMerchant(i){
+  if(!confirm("Delete this merchant?")) return;
   merchants.splice(i,1);
-  localStorage.setItem("merchants",JSON.stringify(merchants));
+  localStorage.setItem("merchants", JSON.stringify(merchants));
   renderMerchants();
 }
 
 /* ===== CATEGORY ===== */
 function addCategory(){
-  if(!newCategory.value) return;
-  const id=newCategory.value.toLowerCase().replace(/\s+/g,"-");
+  if(!newCategory.value){
+    alert("Enter category name");
+    return;
+  }
+  const id = newCategory.value.toLowerCase().replace(/\s+/g,"-");
   categories.push({id:id,name:newCategory.value});
-  localStorage.setItem("categories",JSON.stringify(categories));
+  localStorage.setItem("categories", JSON.stringify(categories));
   newCategory.value="";
   renderCategories();
 }
+
 function renderCategories(){
   categoryList.innerHTML="";
+  if(categories.length===0){
+    categoryList.innerHTML="<small>No categories</small>";
+  }
   categories.forEach((c,i)=>{
-    categoryList.innerHTML+=`
-      <div>${c.name}
-      <button class="btn red" onclick="deleteCategory(${i})">Delete</button>
-      </div>`;
+    categoryList.innerHTML += `
+      <div class="row">
+        <b>${c.name}</b> <small>(${c.id})</small><br>
+        <button class="btn red" onclick="deleteCategory(${i})">Delete</button>
+      </div>
+    `;
   });
 }
+
 function deleteCategory(i){
+  if(!confirm("Delete this category?")) return;
   categories.splice(i,1);
-  localStorage.setItem("categories",JSON.stringify(categories));
+  localStorage.setItem("categories", JSON.stringify(categories));
   renderCategories();
 }
 
 /* ===== ORDERS ===== */
 function renderOrders(){
   orderList.innerHTML="";
+  if(orders.length===0){
+    orderList.innerHTML="<small>No orders yet</small>";
+  }
   orders.forEach((o,i)=>{
-    orderList.innerHTML+=`
-      <div class="order ${o.status==='Delivered'?'grey':''}">
+    orderList.innerHTML += `
+      <div class="row ${o.status==='Delivered'?'grey':''}">
         <b>${o.productName}</b><br>
-        Merchant: ${o.merchant}<br>
-        ₹${o.amount} | ${o.payment}<br>
-        Status: ${o.status}<br>
-        <button class="btn" onclick="confirmOrder(${i})">Confirm Delivered</button>
-      </div>`;
+        <small>Merchant: ${o.merchant}</small><br>
+        <small>₹${o.amount} | ${o.payment}</small><br>
+        <small>Status: ${o.status}</small><br>
+        ${o.status!=="Delivered"
+          ? `<button class="btn" onclick="confirmOrder(${i})">Confirm Delivered</button>`
+          : `<button class="btn grey" disabled>Delivered</button>`
+        }
+      </div>
+    `;
   });
 }
+
 function confirmOrder(i){
+  if(!confirm("Mark order as Delivered?")) return;
   orders[i].status="Delivered";
-  localStorage.setItem("orders",JSON.stringify(orders));
+  localStorage.setItem("orders", JSON.stringify(orders));
   renderOrders();
+}
+
+/* ===== LOGOUT ===== */
+function logout(){
+  localStorage.removeItem("adminLoggedIn");
+  location.href="index.html";
 }
 
 /* INIT */
