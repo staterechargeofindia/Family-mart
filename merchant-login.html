@@ -6,51 +6,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body{
-  margin:0;
-  font-family:Arial,Helvetica,sans-serif;
-  background:#f1f3f6;
-}
+body{margin:0;font-family:Arial;background:#f1f3f6}
 header{
-  background:#2874f0;
-  color:#fff;
-  padding:12px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+  background:#2874f0;color:#fff;padding:12px;
+  display:flex;justify-content:space-between;align-items:center
 }
-header b{font-size:18px}
-.container{
-  padding:20px;
-}
-.card{
-  background:#fff;
-  padding:20px;
-  border-radius:14px;
-}
-input{
-  width:100%;
-  padding:12px;
-  margin-bottom:15px;
-  border-radius:8px;
-  border:1px solid #ccc;
-  font-size:15px;
-}
+.container{padding:20px}
+.card{background:#fff;padding:20px;border-radius:14px}
+input{width:100%;padding:12px;margin-bottom:15px;border-radius:8px;border:1px solid #ccc}
 button{
-  width:100%;
-  padding:12px;
-  background:#2874f0;
-  color:white;
-  border:none;
-  border-radius:10px;
-  font-size:16px;
-  cursor:pointer;
-}
-.note{
-  font-size:13px;
-  color:#666;
-  margin-top:10px;
-  text-align:center;
+  width:100%;padding:12px;background:#2874f0;
+  color:white;border:none;border-radius:10px;font-size:16px
 }
 </style>
 </head>
@@ -58,47 +24,33 @@ button{
 <body>
 
 <header>
-  <span onclick="location.href='index.html'" style="cursor:pointer">🏠</span>
+  <span onclick="location.href='index.html'">🏠</span>
   <b>Merchant Login</b>
   <span></span>
 </header>
 
 <div class="container">
-  <div class="card">
+<div class="card">
 
-    <input id="shopName" placeholder="Shop Name">
-    <input id="mobile" placeholder="Mobile Number">
-    <input id="password" type="password" placeholder="Password">
+<input id="userId" placeholder="User ID">
+<input id="password" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
 
-    <button onclick="login()">Login</button>
-
-    <div class="note">
-      * Demo login – shop name & password required
-    </div>
-
-  </div>
+</div>
 </div>
 
 <script>
-/*
-  SIMPLE DEMO LOGIN SYSTEM
-  (Future me Firebase / backend add ho sakta hai)
-*/
-
 function login(){
-  const shop = shopName.value.trim();
-  const pass = password.value.trim();
+  const merchants = JSON.parse(localStorage.getItem("merchants")) || [];
+  const u=userId.value, p=password.value;
 
-  if(!shop || !pass){
-    alert("Please enter shop name and password");
-    return;
+  const found = merchants.find(m=>m.userId===u && m.password===p);
+  if(!found){
+    alert("Invalid ID or Password"); return;
   }
 
-  // Save merchant session
-  localStorage.setItem("merchantName", shop);
-
-  // Redirect to dashboard
-  location.href = "merchant-dashboard.html";
+  localStorage.setItem("merchantName", found.shopName);
+  location.href="merchant-dashboard.html";
 }
 </script>
 
