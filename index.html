@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ISI Marketplace</title>
+<title>ISI</title>
 
 <style>
-*{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
-body{margin:0;background:#f4f6f8}
+*{box-sizing:border-box;font-family:Arial}
+body{margin:0;background:#f5f6f7}
 
 /* HEADER */
 .header{
@@ -18,50 +18,36 @@ body{margin:0;background:#f4f6f8}
   background:#2874f0;
   color:#fff;
 }
-.header .menu{font-size:22px;cursor:pointer}
-.header .title{font-size:18px;font-weight:bold}
-.header .cart{font-size:20px;cursor:pointer}
+.menu{font-size:22px;cursor:pointer}
+.title{font-size:18px;font-weight:bold}
+.cart{font-size:20px;cursor:pointer}
 
 /* SEARCH */
-.search-box{padding:10px;background:#fff}
-.search-box input{
+.search{
+  padding:10px;
+  background:#fff;
+}
+.search input{
   width:100%;
   padding:10px;
   border-radius:8px;
   border:1px solid #ddd;
 }
 
-/* DEAL ICONS */
-.deal-icons{
+/* CATEGORY BUTTONS */
+.categories{
   display:grid;
-  grid-template-columns:repeat(4,1fr);
+  grid-template-columns:repeat(3,1fr);
   gap:10px;
   padding:10px;
 }
-.deal{
+.cat-btn{
   background:#fff;
-  padding:10px;
+  padding:12px 8px;
   border-radius:12px;
   text-align:center;
-  font-size:13px;
+  font-size:14px;
   cursor:pointer;
-}
-
-/* CATEGORY STRIP */
-.cat-strip{
-  display:flex;
-  gap:12px;
-  overflow-x:auto;
-  padding:10px;
-}
-.cat{
-  min-width:80px;
-  background:#fff;
-  padding:8px;
-  border-radius:10px;
-  text-align:center;
-  cursor:pointer;
-  font-size:13px;
 }
 
 /* PRODUCTS */
@@ -71,20 +57,20 @@ body{margin:0;background:#f4f6f8}
   gap:12px;
   padding:10px;
 }
-.card-product{
+.product{
   background:#fff;
   border-radius:14px;
   overflow:hidden;
 }
-.card-product img{
+.product img{
   width:100%;
   height:160px;
   object-fit:cover;
 }
-.card-body{padding:10px}
-.card-body h4{margin:0 0 5px;font-size:15px}
+.p-body{padding:10px}
+.p-body h4{margin:0 0 5px;font-size:15px}
 .price{font-weight:bold}
-.old{text-decoration:line-through;color:#999;font-size:13px}
+.old{color:#999;text-decoration:line-through;font-size:13px}
 .off{color:green;font-size:13px}
 .btn{
   width:100%;
@@ -100,11 +86,11 @@ body{margin:0;background:#f4f6f8}
 #menu{
   position:fixed;
   top:0;left:0;
-  width:250px;height:100%;
+  width:240px;height:100%;
   background:#fff;
   z-index:9999;
   padding:15px;
-  box-shadow:2px 0 12px rgba(0,0,0,.2);
+  box-shadow:2px 0 10px rgba(0,0,0,.2);
   transform:translateX(-260px);
   transition:.3s;
 }
@@ -122,20 +108,6 @@ body{margin:0;background:#f4f6f8}
   border-bottom:1px solid #eee;
   cursor:pointer;
 }
-
-/* BRAND BOX */
-#brandBox{
-  display:none;
-  position:fixed;
-  bottom:0;left:0;
-  width:100%;
-  background:#fff;
-  border-radius:16px 16px 0 0;
-  z-index:9999;
-  padding:15px;
-  max-height:60%;
-  overflow:auto;
-}
 </style>
 </head>
 
@@ -146,11 +118,10 @@ body{margin:0;background:#f4f6f8}
 <!-- SIDE MENU -->
 <div id="menu">
   <div style="text-align:right;font-size:20px;cursor:pointer" onclick="toggleMenu()">❌</div>
-
   <div class="menu-item" onclick="location.href='index.html'">🏠 Home</div>
   <div class="menu-item" onclick="location.href='my-orders.html'">📦 My Orders</div>
-  <div class="menu-item" onclick="location.href='merchant-login.html'">🏪 Merchant Panel</div>
-  <div class="menu-item" onclick="location.href='admin-login.html'">🛠 Admin Panel</div>
+  <div class="menu-item" onclick="location.href='merchant-login.html'">🏪 Merchant</div>
+  <div class="menu-item" onclick="location.href='admin-login.html'">🛠 Admin</div>
 </div>
 
 <!-- HEADER -->
@@ -163,125 +134,98 @@ body{margin:0;background:#f4f6f8}
 </div>
 
 <!-- SEARCH -->
-<div class="search-box">
+<div class="search">
   <input id="search" placeholder="Search products..." onkeyup="searchProduct()">
 </div>
 
-<!-- DEALS -->
-<div class="deal-icons">
-  <div class="deal" onclick="filterCategory('fashion')">👕 Fashion</div>
-  <div class="deal" onclick="filterCategory('beauty')">💄 Beauty</div>
-  <div class="deal" onclick="filterCategory('kids')">🧸 Kids</div>
-  <div class="deal" onclick="filterCategory('home')">🏠 Home</div>
-  <div class="deal" onclick="filterCategory('electronics')">⚡ Electronics</div>
-  <div class="deal" onclick="filterCategory('top-deals')">🔥 Top Deals</div>
+<!-- CATEGORIES (FULL LIST) -->
+<div class="categories">
+  <!-- OLD CATEGORIES (SAME) -->
+  <div class="cat-btn" onclick="filterCategory('fashion')">👕 Fashion</div>
+  <div class="cat-btn" onclick="filterCategory('beauty')">💄 Beauty</div>
+  <div class="cat-btn" onclick="filterCategory('kids')">🧸 Kids</div>
+  <div class="cat-btn" onclick="filterCategory('home')">🏠 Home</div>
+  <div class="cat-btn" onclick="filterCategory('electronics')">⚡ Electronics</div>
+  <div class="cat-btn" onclick="filterCategory('top-deals')">🔥 Top Deals</div>
+  <div class="cat-btn" onclick="filterCategory('new-phone')">📱 New Phone</div>
+  <div class="cat-btn" onclick="filterCategory('old-phone')">♻️ Old Phone</div>
+  <div class="cat-btn" onclick="filterCategory('cover')">📱 Cover</div>
 
-  <div class="deal" onclick="openPhoneType('new')">📱 New Phone</div>
-  <div class="deal" onclick="openPhoneType('old')">♻️ Old Phone</div>
-  <div class="deal" onclick="filterCategory('mobile-cover')">📱 Cover</div>
+  <!-- NEW CATEGORIES (ADDED) -->
+  <div class="cat-btn" onclick="filterCategory('vegetable')">🥦 Vegetable</div>
+  <div class="cat-btn" onclick="filterCategory('fruits')">🍎 Fruits</div>
+  <div class="cat-btn" onclick="filterCategory('grocery')">🛒 Grocery</div>
+  <div class="cat-btn" onclick="filterCategory('cooked')">🍳 Cooked</div>
+  <div class="cat-btn" onclick="filterCategory('meat')">🍖 Meat</div>
+  <div class="cat-btn" onclick="filterCategory('mithai')">🍬 Mithai</div>
+  <div class="cat-btn" onclick="filterCategory('biryani')">🍗 Biryani</div>
 </div>
-
-<!-- CATEGORY STRIP -->
-<div class="cat-strip" id="categoryStrip"></div>
 
 <!-- PRODUCTS -->
 <div class="products" id="productList"></div>
 
-<!-- BRAND SELECT -->
-<div id="brandBox">
-  <h3 id="brandTitle">Select Brand</h3>
-  <div id="brandList" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px"></div>
-  <button class="btn" onclick="closeBrandBox()">Close</button>
-</div>
-
 <script>
-let products = JSON.parse(localStorage.getItem("products")) || [];
-let categories = JSON.parse(localStorage.getItem("categories")) || [];
-let currentPhoneType="";
+const products = JSON.parse(localStorage.getItem("products")) || [];
+const cart = JSON.parse(localStorage.getItem("cart")) || [];
+cartCount.innerText = cart.length;
 
 /* MENU */
 function toggleMenu(){
   menu.classList.toggle("open");
-  overlay.style.display = menu.classList.contains("open")?"block":"none";
+  overlay.style.display = menu.classList.contains("open") ? "block" : "none";
 }
 
-/* LOAD CATEGORIES */
-function loadCategories(){
-  categoryStrip.innerHTML="";
-  categories.forEach(c=>{
-    categoryStrip.innerHTML+=`
-      <div class="cat" onclick="filterCategory('${c.id}')">
-        ${c.name}
-      </div>`;
-  });
-}
+/* LOAD PRODUCTS (DEFAULT = ALL) */
+function loadProducts(list=null){
+  const data = list ? list : products;
+  productList.innerHTML = "";
 
-/* LOAD PRODUCTS */
-function loadProducts(list=products){
-  productList.innerHTML="";
-  if(list.length===0){
-    productList.innerHTML="<p>No products available</p>";
+  if(data.length === 0){
+    productList.innerHTML =
+      "<div style='padding:20px;color:#666'>No products available</div>";
     return;
   }
-  list.forEach(p=>{
+
+  data.forEach(p=>{
     const off = p.mrp ? Math.round(((p.mrp-p.price)/p.mrp)*100) : 0;
-    productList.innerHTML+=`
-    <div class="card-product" data-category="${p.category}" data-brand="${p.brand}" data-phonetype="${p.phoneType}">
-      <img src="${p.images[0]}">
-      <div class="card-body">
-        <h4>${p.name}</h4>
-        <div class="price">
-          ₹${p.price}
-          ${p.mrp?`<span class="old">₹${p.mrp}</span>`:""}
-          ${off?`<span class="off">${off}% OFF</span>`:""}
+    productList.innerHTML += `
+      <div class="product">
+        <img src="${p.images[0]}">
+        <div class="p-body">
+          <h4>${p.name}</h4>
+          <div class="price">
+            ₹${p.price}
+            ${p.mrp?`<span class="old">₹${p.mrp}</span>`:""}
+            ${off?`<span class="off">${off}% OFF</span>`:""}
+          </div>
+          <button class="btn" onclick='addToCart(${JSON.stringify(p)})'>
+            Add to Cart
+          </button>
         </div>
-        <button class="btn" onclick='addToCart(${JSON.stringify(p)})'>Add to Cart</button>
-      </div>
-    </div>`;
+      </div>`;
   });
 }
 
 /* SEARCH */
 function searchProduct(){
-  const v=search.value.toLowerCase();
+  const v = search.value.toLowerCase();
   loadProducts(products.filter(p=>p.name.toLowerCase().includes(v)));
 }
 
-/* FILTER */
-function filterCategory(id){
-  loadProducts(products.filter(p=>p.category===id));
+/* CATEGORY FILTER */
+function filterCategory(cat){
+  loadProducts(products.filter(p=>p.category === cat));
 }
-
-/* PHONE BRAND */
-function openPhoneType(type){
-  currentPhoneType=type;
-  brandBox.style.display="block";
-  brandTitle.innerText = type==="new"?"Select New Phone Brand":"Select Old Phone Brand";
-  const brands=["Samsung","Vivo","Oppo","Xiaomi","Realme","OnePlus","Apple","Motorola"];
-  brandList.innerHTML="";
-  brands.forEach(b=>{
-    brandList.innerHTML+=`
-      <div class="cat" onclick="filterPhoneBrand('${b.toLowerCase()}')">${b}</div>`;
-  });
-}
-function filterPhoneBrand(b){
-  closeBrandBox();
-  loadProducts(products.filter(p=>p.brand===b && p.phoneType===currentPhoneType));
-}
-function closeBrandBox(){brandBox.style.display="none"}
 
 /* CART */
 function addToCart(p){
-  let c=JSON.parse(localStorage.getItem("cart"))||[];
-  c.push(p);
-  localStorage.setItem("cart",JSON.stringify(c));
-  cartCount.innerText=c.length;
+  cart.push(p);
+  localStorage.setItem("cart",JSON.stringify(cart));
+  cartCount.innerText = cart.length;
 }
 
 /* INIT */
-loadCategories();
 loadProducts();
-cartCount.innerText=(JSON.parse(localStorage.getItem("cart"))||[]).length;
 </script>
 
 </body>
