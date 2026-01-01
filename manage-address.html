@@ -3,13 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Manage Address – ISI</title>
+<title>Manage Address</title>
 
 <style>
-*{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
-body{margin:0;background:#f5f6f8}
-
-/* HEADER */
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#f5f6f8;
+}
 header{
   background:#2874f0;
   color:#fff;
@@ -18,42 +19,30 @@ header{
   align-items:center;
   justify-content:space-between;
 }
-header span{font-size:20px;cursor:pointer}
-
-/* FORM */
+header h2{margin:0;font-size:18px}
 .container{
   padding:15px;
 }
 .card{
   background:#fff;
-  border-radius:14px;
+  border-radius:12px;
   padding:15px;
-  box-shadow:0 2px 6px rgba(0,0,0,0.1);
 }
-.card h2{
-  margin-top:0;
-  font-size:18px;
-}
-
-/* INPUT */
+.card h3{margin-top:0}
 input,textarea{
   width:100%;
   padding:12px;
   margin-bottom:10px;
-  border-radius:10px;
+  border-radius:8px;
   border:1px solid #ccc;
-  font-size:15px;
 }
-textarea{resize:none;height:80px}
-
-/* BUTTON */
 button{
   width:100%;
-  padding:14px;
+  padding:12px;
   background:#2874f0;
   color:#fff;
   border:none;
-  border-radius:12px;
+  border-radius:8px;
   font-size:16px;
   cursor:pointer;
 }
@@ -69,34 +58,33 @@ button{
 <body>
 
 <header>
-  <span onclick="history.back()">←</span>
-  <b>Manage Address</b>
-  <span onclick="location.href='index.html'">🏠</span>
+  <span onclick="history.back()" style="cursor:pointer">←</span>
+  <h2>Manage Address</h2>
+  <span onclick="location.href='index.html'" style="cursor:pointer">🏠</span>
 </header>
 
 <div class="container">
   <div class="card">
-    <h2>Delivery Address</h2>
+    <h3>Delivery Address</h3>
 
     <input id="name" placeholder="Full Name">
     <input id="mobile" placeholder="Mobile Number">
-    <textarea id="address" placeholder="House / Village / Area"></textarea>
+    <textarea id="address" placeholder="Full Address (Village, Area)"></textarea>
     <input id="district" placeholder="District">
     <input id="state" placeholder="State">
-    <input id="pincode" placeholder="Pincode">
+    <input id="pincode" placeholder="Pin Code">
 
     <button onclick="saveAddress()">Save Address</button>
 
     <div class="note">
-      Address ek baar save karne ke baad<br>
-      order ke time automatically use hoga.
+      Address ek baar save karne ke baad order ke time automatically use hoga.
     </div>
   </div>
 </div>
 
 <script>
 /* LOAD SAVED ADDRESS */
-const saved = JSON.parse(localStorage.getItem("address"));
+const saved = JSON.parse(localStorage.getItem("savedAddress"));
 if(saved){
   name.value = saved.name || "";
   mobile.value = saved.mobile || "";
@@ -108,7 +96,7 @@ if(saved){
 
 /* SAVE ADDRESS */
 function saveAddress(){
-  const addr = {
+  const data = {
     name: name.value.trim(),
     mobile: mobile.value.trim(),
     address: address.value.trim(),
@@ -117,8 +105,14 @@ function saveAddress(){
     pincode: pincode.value.trim()
   };
 
-  localStorage.setItem("address", JSON.stringify(addr));
-  alert("Address saved successfully ✅");
+  // minimum validation (hard required nahi)
+  if(!data.name || !data.mobile || !data.address){
+    alert("Please fill name, mobile and address");
+    return;
+  }
+
+  localStorage.setItem("savedAddress", JSON.stringify(data));
+  alert("✅ Address saved successfully");
 }
 </script>
 
