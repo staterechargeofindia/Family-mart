@@ -17,10 +17,30 @@ header{
   align-items:center;
   justify-content:space-between;
   padding:12px;
+  position:sticky;
+  top:0;
+  z-index:50;
 }
 header .menu{font-size:22px;cursor:pointer}
 header h1{margin:0;font-size:18px}
-header .cart{font-size:20px;cursor:pointer}
+
+/* CART BADGE */
+.cart{
+  font-size:22px;
+  cursor:pointer;
+  position:relative;
+}
+#cartCount{
+  position:absolute;
+  top:-6px;
+  right:-8px;
+  background:red;
+  color:white;
+  font-size:12px;
+  padding:2px 6px;
+  border-radius:50%;
+  display:none;
+}
 
 /* SEARCH */
 .search-box{
@@ -40,6 +60,7 @@ header .cart{font-size:20px;cursor:pointer}
   padding:10px;
   gap:10px;
 }
+.categories::-webkit-scrollbar{display:none}
 .categories button{
   white-space:nowrap;
   border:none;
@@ -116,7 +137,7 @@ header .cart{font-size:20px;cursor:pointer}
   box-shadow:2px 0 6px rgba(0,0,0,0.2);
   transition:0.3s;
   padding:15px;
-  z-index:10;
+  z-index:100;
 }
 .drawer.active{left:0}
 .drawer h3{margin-top:0}
@@ -128,7 +149,7 @@ header .cart{font-size:20px;cursor:pointer}
   border-bottom:1px solid #eee;
 }
 
-/* IMAGE ZOOM MODAL */
+/* IMAGE ZOOM */
 .modal{
   display:none;
   position:fixed;
@@ -137,7 +158,7 @@ header .cart{font-size:20px;cursor:pointer}
   background:rgba(0,0,0,0.8);
   align-items:center;
   justify-content:center;
-  z-index:20;
+  z-index:200;
 }
 .modal img{
   max-width:90%;
@@ -151,20 +172,18 @@ header .cart{font-size:20px;cursor:pointer}
 <header>
   <div class="menu" onclick="toggleMenu()">☰</div>
   <h1>ISI</h1>
-  <div class="cart" onclick="location.href='cart.html'">🛒</div>
+  <div class="cart" onclick="location.href='cart.html'">
+    🛒 <span id="cartCount">0</span>
+  </div>
 </header>
 
 <div class="search-box">
   <input type="text" id="search" placeholder="Search products..." oninput="renderProducts()">
 </div>
 
-<div class="categories" id="categoryBar">
-  <!-- buttons injected -->
-</div>
+<div class="categories" id="categoryBar"></div>
 
-<div class="products" id="productList">
-  <!-- products injected -->
-</div>
+<div class="products" id="productList"></div>
 
 <!-- DRAWER -->
 <div class="drawer" id="drawer">
@@ -173,8 +192,8 @@ header .cart{font-size:20px;cursor:pointer}
   <a href="cart.html">Cart</a>
   <a href="my-orders.html">My Orders</a>
   <a href="manage-address.html">Manage Address</a>
-  <a href="merchant-login.html">Merchant Login</a>
-  <a href="admin-login.html">Admin</a>
+  <a href="merchant-login.html">Merchant</a>
+  <a href="admin-panel.html">Admin</a>
 </div>
 
 <!-- IMAGE MODAL -->
@@ -183,14 +202,15 @@ header .cart{font-size:20px;cursor:pointer}
 </div>
 
 <script>
-/* DEFAULT CATEGORIES */
+/* CATEGORIES */
 const categories=[
  "All","Fashion","Beauty","Electronics","New Phone","Old Phone",
- "Cover","Kids","Home","Vegetables","Fruits","Grocery","Cooked","Meat","Mithai","Biryani","Top Deals"
+ "Cover","Kids","Home","Vegetables","Fruits","Grocery",
+ "Cooked","Meat","Mithai","Biryani","Top Deals"
 ];
 
-/* LOAD PRODUCTS */
-let products=JSON.parse(localStorage.getItem("products"))||[];
+let products = JSON.parse(localStorage.getItem("products")) || [];
+let currentCategory="All";
 
 /* CATEGORY BAR */
 const catBar=document.getElementById("categoryBar");
@@ -202,8 +222,7 @@ categories.forEach((c,i)=>{
   catBar.appendChild(btn);
 });
 
-let currentCategory="All";
-
+/* SELECT CATEGORY */
 function selectCategory(cat,btn){
   currentCategory=cat;
   document.querySelectorAll(".categories button").forEach(b=>b.classList.remove("active"));
@@ -215,13 +234,12 @@ function selectCategory(cat,btn){
 function renderProducts(){
   const list=document.getElementById("productList");
   list.innerHTML="";
-  const search=document.getElementById("search").value.toLowerCase();
+  const q=document.getElementById("search").value.toLowerCase();
 
   const filtered=products.filter(p=>{
     const name=(p.name||"").toLowerCase();
     const cat=p.category||"";
-    return (currentCategory==="All"||cat===currentCategory)
-      && name.includes(search);
+    return (currentCategory==="All"||cat===currentCategory) && name.includes(q);
   });
 
   if(filtered.length===0){
@@ -230,16 +248,17 @@ function renderProducts(){
   }
 
   filtered.forEach(p=>{
+    const off = p.mrp ? Math.round(((p.mrp-p.price)/p.mrp)*100) : 0;
     const card=document.createElement("div");
     card.className="card";
-    const off=Math.round(((p.mrp-p.price)/p.mrp)*100);
     card.innerHTML=`
       <img src="${p.images?.[0]||''}" onclick="zoomImg('${p.images?.[0]||''}')">
       <div class="info">
         <h3>${p.name || "No name"}</h3>
-        <div class="price">₹${p.price}
-          <span class="mrp">₹${p.mrp}</span>
-          <span class="off">${off}% OFF</span>
+        <div class="price">
+          ₹${p.price}
+          ${p.mrp?`<span class="mrp">₹${p.mrp}</span>`:""}
+          ${off?`<span class="off">${off}% OFF</span>`:""}
         </div>
         <button onclick='addToCart(${JSON.stringify(p)})'>Add to Cart</button>
       </div>
@@ -248,12 +267,28 @@ function renderProducts(){
   });
 }
 
-/* CART */
+/* ADD TO CART */
 function addToCart(p){
   let cart=JSON.parse(localStorage.getItem("cart"))||[];
+  p.qty = p.qty || 1;
   cart.push(p);
   localStorage.setItem("cart",JSON.stringify(cart));
+  updateCartCount();
   alert("Added to cart");
+}
+
+/* CART COUNT */
+function updateCartCount(){
+  const cart=JSON.parse(localStorage.getItem("cart"))||[];
+  const count=cart.reduce((s,p)=>s+(p.qty||1),0);
+  const badge=document.getElementById("cartCount");
+
+  if(count>0){
+    badge.style.display="inline-block";
+    badge.innerText=count;
+  }else{
+    badge.style.display="none";
+  }
 }
 
 /* MENU */
@@ -264,15 +299,16 @@ function toggleMenu(){
 /* IMAGE ZOOM */
 function zoomImg(src){
   if(!src)return;
-  document.getElementById("modalImg").src=src;
-  document.getElementById("imgModal").style.display="flex";
+  modalImg.src=src;
+  imgModal.style.display="flex";
 }
 function closeImg(){
-  document.getElementById("imgModal").style.display="none";
+  imgModal.style.display="none";
 }
 
 /* INIT */
 renderProducts();
+updateCartCount();
 </script>
 
 </body>
