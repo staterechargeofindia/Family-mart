@@ -4,161 +4,188 @@
 <meta charset="UTF-8">
 <title>Publish Product</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#f1f3f6;
+}
+header{
+  background:#2874f0;
+  color:#fff;
+  padding:12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+header b{font-size:18px}
+.container{padding:15px}
+.card{
+  background:#fff;
+  padding:15px;
+  border-radius:14px;
+}
+input,select,textarea{
+  width:100%;
+  padding:10px;
+  margin-bottom:12px;
+  border-radius:8px;
+  border:1px solid #ccc;
+}
+button{
+  width:100%;
+  padding:12px;
+  background:#2874f0;
+  color:white;
+  border:none;
+  border-radius:10px;
+  font-size:16px;
+}
+small{color:#555}
+.note{
+  font-size:12px;
+  color:#777;
+  margin-bottom:10px;
+}
+</style>
 </head>
 
-<body style="margin:0;font-family:Arial;background:#f1f3f6">
+<body>
 
-<!-- ================= HEADER ================= -->
-<header style="display:flex;align-items:center;justify-content:space-between;
-padding:12px;background:#222;color:white">
-  <span onclick="history.back()" style="font-size:22px;cursor:pointer">⬅️</span>
+<header>
+  <span onclick="history.back()" style="cursor:pointer">⬅</span>
   <b>Publish Product</b>
-  <span onclick="location.href='index.html'" style="font-size:22px;cursor:pointer">🏠</span>
+  <span onclick="location.href='index.html'" style="cursor:pointer">🏠</span>
 </header>
 
-<div style="padding:12px">
-
+<div class="container">
 <div class="card">
 
-  <h3>Product Details</h3>
+<!-- CATEGORY -->
+<select id="category"></select>
 
-  <!-- CATEGORY -->
-  <label>Category</label>
-  <select id="pcategory" style="width:100%;padding:8px;margin-bottom:8px">
-    <option value="">Select Category</option>
-  </select>
+<!-- PHONE TYPE -->
+<select id="phoneType">
+  <option value="">Select Phone Type</option>
+  <option value="new">New Phone</option>
+  <option value="old">Old Phone</option>
+</select>
 
-  <!-- NAME -->
-  <label>Product Name</label>
-  <input id="pname" placeholder="Product name"
-    style="width:100%;padding:8px;margin-bottom:8px">
+<!-- BRAND -->
+<select id="brand">
+  <option value="">Select Brand</option>
+  <option value="samsung">Samsung</option>
+  <option value="vivo">Vivo</option>
+  <option value="oppo">Oppo</option>
+  <option value="xiaomi">Xiaomi</option>
+  <option value="realme">Realme</option>
+  <option value="oneplus">OnePlus</option>
+  <option value="apple">Apple (iPhone)</option>
+  <option value="motorola">Motorola</option>
+</select>
 
-  <!-- DESCRIPTION -->
-  <label>Description</label>
-  <textarea id="pdesc" placeholder="Product description"
-    style="width:100%;padding:8px;margin-bottom:8px"></textarea>
+<!-- PRODUCT NAME -->
+<input id="name" placeholder="Product Name">
 
-  <!-- PRICE -->
-  <label>Price (Selling)</label>
-  <input id="pprice" type="number" placeholder="Selling price"
-    oninput="calcDiscount()"
-    style="width:100%;padding:8px;margin-bottom:8px">
+<!-- MODEL -->
+<input id="model" placeholder="Model Name">
 
-  <!-- MRP -->
-  <label>MRP</label>
-  <input id="pmrp" type="number" placeholder="MRP"
-    oninput="calcDiscount()"
-    style="width:100%;padding:8px;margin-bottom:8px">
+<!-- DESCRIPTION -->
+<textarea id="desc" placeholder="Product Description"></textarea>
 
-  <!-- DISCOUNT -->
-  <label>Discount (%)</label>
-  <input id="pdiscount" readonly
-    style="width:100%;padding:8px;margin-bottom:8px;background:#eee">
+<!-- PRICE -->
+<input id="mrp" type="number" placeholder="MRP">
+<input id="price" type="number" placeholder="Selling Price" onkeyup="calcDiscount()">
+<small id="discountText"></small>
 
-  <!-- IMAGES -->
-  <label>Product Images (2 required)</label>
-  <input type="file" id="img1" accept="image/*"><br><br>
-  <input type="file" id="img2" accept="image/*"><br><br>
+<!-- IMAGES -->
+<div class="note">Upload up to 4 images (minimum 1 is enough)</div>
+<input type="file" id="img1" accept="image/*">
+<input type="file" id="img2" accept="image/*">
+<input type="file" id="img3" accept="image/*">
+<input type="file" id="img4" accept="image/*">
 
-  <button onclick="publishProduct()">Publish Product</button>
+<button onclick="publish()">Publish Product</button>
 
 </div>
-
 </div>
 
 <script>
-/* LOAD CATEGORIES (ADMIN CONTROLLED) */
-const categories = JSON.parse(localStorage.getItem("categories")) || [];
-const catSelect = document.getElementById("pcategory");
+/* LOAD CATEGORIES */
+const catSelect=document.getElementById("category");
+const categories=JSON.parse(localStorage.getItem("categories"))||[];
 
+catSelect.innerHTML='<option value="">Select Category</option>';
 categories.forEach(c=>{
   const opt=document.createElement("option");
-  opt.value=c;
-  opt.textContent=c.charAt(0).toUpperCase()+c.slice(1);
+  opt.value=c.id;
+  opt.textContent=c.name;
   catSelect.appendChild(opt);
 });
 
-/* DISCOUNT AUTO CALC */
+/* DISCOUNT */
 function calcDiscount(){
-  const price = Number(pprice.value);
-  const mrp = Number(pmrp.value);
-  if(price && mrp && mrp > price){
-    const d = Math.round(((mrp - price) / mrp) * 100);
-    pdiscount.value = d;
+  const m=+mrp.value;
+  const p=+price.value;
+  if(m>0 && p>0){
+    const d=Math.round(((m-p)/m)*100);
+    discountText.innerText="Discount: "+d+"%";
   }else{
-    pdiscount.value = 0;
+    discountText.innerText="";
   }
 }
 
 /* IMAGE TO BASE64 */
 function toBase64(file){
-  return new Promise((resolve,reject)=>{
-    const reader=new FileReader();
-    reader.onload=()=>resolve(reader.result);
-    reader.onerror=reject;
-    reader.readAsDataURL(file);
+  return new Promise(res=>{
+    const r=new FileReader();
+    r.onload=()=>res(r.result);
+    r.readAsDataURL(file);
   });
 }
 
-/* PUBLISH PRODUCT */
-async function publishProduct(){
-
-  if(!pcategory.value){
-    alert("Select category");
-    return;
-  }
-  if(!pname.value || !pprice.value || !pmrp.value){
-    alert("Fill all required fields");
-    return;
-  }
-  if(!img1.files[0] || !img2.files[0]){
-    alert("Upload 2 images");
+/* PUBLISH */
+async function publish(){
+  if(!category.value || !name.value || !price.value || !mrp.value){
+    alert("Please fill required fields");
     return;
   }
 
-  const products = JSON.parse(localStorage.getItem("products")) || [];
-  const merchant = localStorage.getItem("merchantName") || "Merchant Shop";
+  const products=JSON.parse(localStorage.getItem("products"))||[];
+  const images=[];
 
-  const image1 = await toBase64(img1.files[0]);
-  const image2 = await toBase64(img2.files[0]);
+  if(img1.files[0]) images.push(await toBase64(img1.files[0]));
+  if(img2.files[0]) images.push(await toBase64(img2.files[0]));
+  if(img3.files[0]) images.push(await toBase64(img3.files[0]));
+  if(img4.files[0]) images.push(await toBase64(img4.files[0]));
 
-  products.push({
-    name: pname.value,
-    desc: pdesc.value,
-    price: Number(pprice.value),
-    mrp: Number(pmrp.value),
-    discount: Number(pdiscount.value),
-    category: pcategory.value,
-    merchant: merchant,
-    images: [image1, image2]
-  });
+  if(images.length===0){
+    alert("Please upload at least one image");
+    return;
+  }
 
-  localStorage.setItem("products", JSON.stringify(products));
+  const product={
+    id:Date.now(),
+    category:category.value,
+    phoneType:phoneType.value,
+    brand:brand.value,
+    name:name.value,
+    model:model.value,
+    description:desc.value,
+    mrp:+mrp.value,
+    price:+price.value,
+    images:images,
+    merchant:localStorage.getItem("merchantName")||"Merchant"
+  };
+
+  products.push(product);
+  localStorage.setItem("products",JSON.stringify(products));
 
   alert("Product published successfully");
-  location.href = "merchant.html";
+  location.href="merchant-dashboard.html";
 }
 </script>
-
-<style>
-.card{
-  background:#fff;
-  padding:15px;
-  border-radius:10px;
-}
-button{
-  width:100%;
-  padding:10px;
-  background:#2874f0;
-  color:white;
-  border:none;
-  border-radius:6px;
-}
-label{
-  font-size:13px;
-  color:#333;
-}
-</style>
 
 </body>
 </html>
