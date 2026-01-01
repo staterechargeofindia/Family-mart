@@ -3,175 +3,216 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Publish Product</title>
+<title>Publish Product – Merchant</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#f4f6f8}
+*{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
+body{margin:0;background:#f5f6f8}
+
+/* HEADER */
 header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
+  background:#2874f0;color:#fff;
   padding:12px;
-  background:#1b3c8b;
-  color:#fff;
+  display:flex;align-items:center;justify-content:space-between;
 }
+header span{font-size:20px;cursor:pointer}
+
+/* FORM */
 .container{padding:12px}
 .card{
-  background:#fff;
-  padding:12px;
-  border-radius:14px;
+  background:#fff;border-radius:14px;padding:15px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.1);
+  margin-bottom:12px;
 }
+.card h2{margin-top:0}
+
+/* INPUT */
 input,textarea,select{
-  width:100%;
+  width:100%;padding:12px;margin-bottom:10px;
+  border-radius:10px;border:1px solid #ccc;font-size:15px;
+}
+textarea{resize:none;height:70px}
+
+/* BUTTON */
+button{
+  width:100%;padding:14px;
+  background:#2874f0;color:#fff;
+  border:none;border-radius:12px;
+  font-size:16px;cursor:pointer;
+}
+
+/* PRODUCT LIST */
+.product{
+  border:1px solid #ddd;
+  border-radius:10px;
   padding:10px;
   margin-bottom:10px;
-  border-radius:8px;
-  border:1px solid #ccc;
 }
-button{
-  width:100%;
-  padding:12px;
-  background:#2874f0;
-  color:#fff;
-  border:none;
-  border-radius:10px;
-  font-size:16px;
+.product img{
+  width:100%;max-height:150px;
+  object-fit:cover;border-radius:8px;
 }
-small{color:#666}
+.del{
+  background:#e53935;margin-top:8px;
+}
 </style>
 </head>
 
 <body>
 
 <header>
-  <span onclick="history.back()" style="cursor:pointer">⬅</span>
+  <span onclick="history.back()">←</span>
   <b>Publish Product</b>
-  <span onclick="location.href='index.html'" style="cursor:pointer">🏠</span>
+  <span onclick="location.href='merchant-dashboard.html'">🏪</span>
 </header>
 
 <div class="container">
-<div class="card">
 
-<!-- CATEGORY -->
-<select id="category">
-  <option value="">Select Category</option>
+  <!-- ADD PRODUCT -->
+  <div class="card">
+    <h2>Add New Product</h2>
 
-  <!-- OLD -->
-  <option value="fashion">Fashion</option>
-  <option value="beauty">Beauty</option>
-  <option value="kids">Kids</option>
-  <option value="home">Home</option>
-  <option value="electronics">Electronics</option>
-  <option value="top-deals">Top Deals</option>
-  <option value="new-phone">New Phone</option>
-  <option value="old-phone">Old Phone</option>
-  <option value="cover">Mobile Cover</option>
+    <input id="pname" placeholder="Product Name">
+    <textarea id="pdesc" placeholder="Product Description"></textarea>
 
-  <!-- NEW -->
-  <option value="vegetable">Vegetable</option>
-  <option value="fruits">Fruits</option>
-  <option value="grocery">Grocery</option>
-  <option value="cooked">Cooked Food</option>
-  <option value="meat">Meat</option>
-  <option value="mithai">Mithai</option>
-  <option value="biryani">Biryani</option>
-</select>
+    <select id="pcat">
+      <option value="">Select Category</option>
+      <option>Fashion</option>
+      <option>Beauty</option>
+      <option>Electronics</option>
+      <option>Kids</option>
+      <option>Home</option>
+      <option>Top Deals</option>
+      <option>New Phone</option>
+      <option>Old Phone</option>
+      <option>Cover</option>
+      <option>Grocery</option>
+      <option>Vegetable</option>
+      <option>Fruits</option>
+      <option>Cooked</option>
+      <option>Meat</option>
+      <option>Mithai</option>
+      <option>Biryani</option>
+    </select>
 
-<!-- PHONE TYPE -->
-<select id="phoneType">
-  <option value="">Phone Type (optional)</option>
-  <option value="new">New Phone</option>
-  <option value="old">Old Phone</option>
-</select>
+    <input id="pmrp" type="number" placeholder="MRP">
+    <input id="pprice" type="number" placeholder="Selling Price">
 
-<!-- BRAND -->
-<select id="brand">
-  <option value="">Select Brand (optional)</option>
-  <option>Samsung</option>
-  <option>Vivo</option>
-  <option>Oppo</option>
-  <option>Realme</option>
-  <option>Xiaomi</option>
-  <option>Apple</option>
-  <option>Motorola</option>
-  <option>OnePlus</option>
-</select>
+    <input id="pimg" type="file" multiple accept="image/*">
 
-<input id="model" placeholder="Model Name (optional)">
-<input id="name" placeholder="Product Name">
-<textarea id="desc" placeholder="Product Description"></textarea>
+    <button onclick="publish()">Publish Product</button>
+  </div>
 
-<input id="mrp" type="number" placeholder="Original Price (MRP)">
-<input id="price" type="number" placeholder="Selling Price" oninput="calcDiscount()">
+  <!-- MY PRODUCTS -->
+  <div class="card">
+    <h2>My Products</h2>
+    <div id="myProducts"></div>
+  </div>
 
-<p><b>Discount:</b> <span id="discount">0%</span></p>
-
-<small>Upload up to 4 images (minimum 1)</small>
-<input type="file" id="img1" accept="image/*">
-<input type="file" id="img2" accept="image/*">
-<input type="file" id="img3" accept="image/*">
-<input type="file" id="img4" accept="image/*">
-
-<button onclick="publish()">Publish Product</button>
-
-</div>
 </div>
 
 <script>
-const merchant = JSON.parse(localStorage.getItem("merchant")) || {};
-
-function calcDiscount(){
-  const mrp = Number(document.getElementById("mrp").value);
-  const price = Number(document.getElementById("price").value);
-  if(mrp && price && mrp > price){
-    discount.innerText = Math.round(((mrp-price)/mrp)*100) + "%";
-  }else{
-    discount.innerText = "0%";
-  }
+/* SESSION */
+const merchantShop = localStorage.getItem("merchantShop");
+if(!merchantShop){
+  alert("Merchant not logged in");
+  location.href="merchant-login.html";
 }
 
-function getBase64(file){
-  return new Promise(res=>{
-    if(!file) return res(null);
-    const r = new FileReader();
-    r.onload = () => res(r.result);
-    r.readAsDataURL(file);
-  });
-}
+/* DATA */
+let products = JSON.parse(localStorage.getItem("products")) || [];
 
-async function publish(){
-  const files = [img1.files[0], img2.files[0], img3.files[0], img4.files[0]];
-  if(!files[0]){
-    alert("Please upload at least 1 image");
+/* PUBLISH */
+function publish(){
+  const name=pname.value.trim();
+  const desc=pdesc.value.trim();
+  const cat=pcat.value;
+  const mrp=Number(pmrp.value);
+  const price=Number(pprice.value);
+  const files=pimg.files;
+
+  if(!name || !cat || !price || files.length===0){
+    alert("Fill product details & add image");
     return;
   }
 
   const images=[];
-  for(const f of files){
-    if(f) images.push(await getBase64(f));
-  }
+  let loaded=0;
 
-  const product = {
-    id: Date.now(),
-    name: name.value || "No name",
-    desc: desc.value || "",
-    category: category.value || "other",
-    phoneType: phoneType.value || "",
-    brand: brand.value.toLowerCase() || "",
-    model: model.value || "",
-    mrp: Number(mrp.value)||0,
-    price: Number(price.value)||0,
+  for(let f of files){
+    const r=new FileReader();
+    r.onload=e=>{
+      images.push(e.target.result);
+      loaded++;
+      if(loaded===files.length) saveProduct(images);
+    };
+    r.readAsDataURL(f);
+  }
+}
+
+function saveProduct(images){
+  const mrp=Number(pmrp.value)||Number(pprice.value);
+  const price=Number(pprice.value);
+  const discount=Math.round(((mrp-price)/mrp)*100);
+
+  const product={
+    id:Date.now(),
+    name:pname.value,
+    description:pdesc.value,
+    category:pcat.value,
+    mrp,price,discount,
     images,
-    merchantShop: merchant.shop || "Merchant Shop"
+    merchantShop
   };
 
-  const list = JSON.parse(localStorage.getItem("products")) || [];
-  list.push(product);
-  localStorage.setItem("products", JSON.stringify(list));
-
-  alert("✅ Product Published Successfully");
-  location.href="merchant-dashboard.html";
+  products.push(product);
+  localStorage.setItem("products",JSON.stringify(products));
+  clearForm();
+  renderMyProducts();
 }
+
+function clearForm(){
+  pname.value="";
+  pdesc.value="";
+  pcat.value="";
+  pmrp.value="";
+  pprice.value="";
+  pimg.value="";
+}
+
+/* MY PRODUCTS LIST */
+function renderMyProducts(){
+  const box=document.getElementById("myProducts");
+  box.innerHTML="";
+  const mine=products.filter(p=>p.merchantShop===merchantShop);
+
+  if(mine.length===0){
+    box.innerHTML="<p>No products added yet</p>";
+    return;
+  }
+
+  mine.forEach(p=>{
+    const d=document.createElement("div");
+    d.className="product";
+    d.innerHTML=`
+      <img src="${p.images[0]}">
+      <b>${p.name}</b><br>
+      ₹${p.price} <del>₹${p.mrp}</del> (${p.discount}% OFF)
+      <button class="del" onclick="deleteProduct(${p.id})">Delete</button>
+    `;
+    box.appendChild(d);
+  });
+}
+
+/* DELETE */
+function deleteProduct(id){
+  if(!confirm("Delete this product?"))return;
+  products=products.filter(p=>p.id!==id);
+  localStorage.setItem("products",JSON.stringify(products));
+  renderMyProducts();
+}
+
+renderMyProducts();
 </script>
 
 </body>
