@@ -2,72 +2,108 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Checkout</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout – ISI</title>
 
 <style>
-body{
-  margin:0;
-  font-family:Arial,Helvetica,sans-serif;
-  background:#f1f3f6;
-}
+*{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
+body{margin:0;background:#f5f6f8}
+
+/* HEADER */
 header{
   background:#2874f0;
   color:#fff;
   padding:12px;
   display:flex;
-  justify-content:space-between;
   align-items:center;
+  justify-content:space-between;
 }
-header b{font-size:18px}
+header span{font-size:20px;cursor:pointer}
+
+/* CARD */
 .container{padding:12px}
-
-.section{
+.card{
   background:#fff;
-  border-radius:14px;
-  padding:12px;
-  margin-bottom:15px;
+  border-radius:12px;
+  padding:15px;
+  margin-bottom:12px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.1);
+}
+.card h2{
+  margin:0 0 10px;
+  font-size:18px;
 }
 
+/* INPUT */
 input,textarea{
   width:100%;
-  padding:10px;
-  margin-bottom:10px;
-  border-radius:8px;
+  padding:12px;
   border:1px solid #ccc;
+  border-radius:8px;
+  margin-bottom:10px;
+  font-size:15px;
 }
 
-.pay-option{
-  border:1px solid #ddd;
-  border-radius:10px;
-  padding:10px;
-  margin-bottom:8px;
-  cursor:pointer;
-}
-.pay-option.active{
-  border-color:#2874f0;
-  background:#f0f6ff;
-}
-
+/* BUTTON */
 button{
   width:100%;
-  padding:12px;
+  padding:14px;
   background:#2874f0;
-  color:white;
+  color:#fff;
   border:none;
   border-radius:10px;
   font-size:16px;
   cursor:pointer;
 }
-
-.total{
-  font-weight:bold;
-  font-size:16px;
+.secondary{
+  background:#eee;
+  color:#000;
+  margin-bottom:10px;
 }
-.small{font-size:12px;color:#666}
-.qr{
+
+/* PAYMENT */
+.payment-option{
+  padding:12px;
+  border:1px solid #ccc;
+  border-radius:10px;
+  margin-bottom:8px;
+  cursor:pointer;
+}
+.payment-option.active{
+  border-color:#2874f0;
+  background:#eef4ff;
+}
+
+/* POPUP */
+#successBox{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.6);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:999;
+}
+#successContent{
+  background:#fff;
+  padding:25px;
+  border-radius:15px;
   text-align:center;
-  margin-top:10px;
+  animation:pop 0.4s ease;
+}
+@keyframes pop{
+  from{transform:scale(0.6);opacity:0}
+  to{transform:scale(1);opacity:1}
+}
+.confetti{
+  position:absolute;
+  top:-10px;
+  width:10px;
+  height:10px;
+  animation:fall 3s linear infinite;
+}
+@keyframes fall{
+  to{transform:translateY(120vh) rotate(360deg)}
 }
 </style>
 </head>
@@ -75,119 +111,144 @@ button{
 <body>
 
 <header>
-  <span onclick="history.back()" style="cursor:pointer">⬅</span>
+  <span onclick="history.back()">←</span>
   <b>Checkout</b>
-  <span onclick="location.href='index.html'" style="cursor:pointer">🏠</span>
+  <span onclick="location.href='index.html'">🏠</span>
 </header>
 
 <div class="container">
 
-<!-- ===== ADDRESS ===== -->
-<div class="section">
-  <h3>Delivery Address</h3>
-  <input id="name" placeholder="Full Name">
-  <input id="mobile" placeholder="Mobile Number">
-  <textarea id="address" placeholder="Full Address (Village, District, State, Pin Code)"></textarea>
-</div>
+  <!-- ADDRESS -->
+  <div class="card">
+    <h2>Delivery Address</h2>
 
-<!-- ===== PAYMENT ===== -->
-<div class="section">
-  <h3>Payment Method</h3>
+    <button class="secondary" onclick="openManageAddress()">Manage Address</button>
 
-  <div class="pay-option" onclick="selectPay('COD')" id="payCOD">
-    💵 Cash on Delivery
+    <input id="name" placeholder="Full Name">
+    <input id="mobile" placeholder="Mobile Number">
+    <textarea id="address" placeholder="Full Address (Village, District, State, Pin Code)"></textarea>
   </div>
 
-  <div class="pay-option" onclick="selectPay('UPI')" id="payUPI">
-    📱 UPI Payment
-    <div id="upiBox" style="display:none">
-      <p class="small">UPI ID: <b>paytmgr5m9yhroptys</b></p>
-      <div class="qr" id="qrBox"></div>
+  <!-- PAYMENT -->
+  <div class="card">
+    <h2>Payment Method</h2>
+
+    <div class="payment-option active" onclick="selectPay('cod')" id="cod">
+      💵 Cash on Delivery
+    </div>
+
+    <div class="payment-option" onclick="selectPay('upi')" id="upi">
+      📱 UPI Payment
+    </div>
+
+    <div id="upiBox" style="display:none;margin-top:10px">
+      <img id="qr" style="width:100%;border-radius:10px">
+      <p style="text-align:center;margin-top:8px">
+        Scan & Pay using any UPI App
+      </p>
     </div>
   </div>
-</div>
 
-<!-- ===== SUMMARY ===== -->
-<div class="section">
-  <div class="total">
-    Total Amount: ₹<span id="totalAmount">0</span>
+  <!-- TOTAL -->
+  <div class="card">
+    <h2>Total Amount: ₹<span id="total">0</span></h2>
+    <button onclick="placeOrder()">Place Order</button>
   </div>
-  <button onclick="placeOrder()">Place Order</button>
+
 </div>
 
+<!-- SUCCESS -->
+<div id="successBox">
+  <div id="successContent">
+    <h2>🎉 Congratulations!</h2>
+    <p>Your order has been placed successfully</p>
+    <button onclick="goHome()">Continue Shopping</button>
+  </div>
 </div>
 
 <script>
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
-let orders = JSON.parse(localStorage.getItem("orders")) || [];
-let selectedPayment = "";
-const UPI_ID = "paytmgr5m9yhroptys";
+let payment="cod";
 
 /* TOTAL */
-let total = cart.reduce((s,p)=>s+p.price,0);
-totalAmount.innerText = total;
+let total=0;
+cart.forEach(p=>total+=p.price*(p.qty||1));
+document.getElementById("total").textContent=total;
 
-/* PAYMENT SELECT */
-function selectPay(type){
-  selectedPayment = type;
-  payCOD.classList.remove("active");
-  payUPI.classList.remove("active");
-
-  if(type==="COD"){
-    payCOD.classList.add("active");
-    upiBox.style.display="none";
-  }else{
-    payUPI.classList.add("active");
-    upiBox.style.display="block";
-    generateQR();
-  }
+/* ADDRESS AUTO */
+const saved=JSON.parse(localStorage.getItem("address"));
+if(saved){
+  name.value=saved.name;
+  mobile.value=saved.mobile;
+  address.value=saved.address;
 }
 
-/* QR GENERATE */
-function generateQR(){
-  const url = `upi://pay?pa=${UPI_ID}&pn=ISI&am=${total}&cu=INR`;
-  qrBox.innerHTML = `
-    <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(url)}">
-    <div class="small">Scan & Pay ₹${total}</div>
-  `;
+/* MANAGE ADDRESS */
+function openManageAddress(){
+  const addr={
+    name:name.value,
+    mobile:mobile.value,
+    address:address.value
+  };
+  localStorage.setItem("address",JSON.stringify(addr));
+  alert("Address saved successfully");
+}
+
+/* PAYMENT */
+function selectPay(p){
+  payment=p;
+  cod.classList.remove("active");
+  upi.classList.remove("active");
+  document.getElementById(p).classList.add("active");
+
+  if(p==="upi"){
+    const upiId="paytmgr5m9yhroptys";
+    qr.src=`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=upi://pay?pa=${upiId}&am=${total}`;
+    upiBox.style.display="block";
+  }else{
+    upiBox.style.display="none";
+  }
 }
 
 /* PLACE ORDER */
 function placeOrder(){
-  if(!name.value || !mobile.value || !address.value){
-    alert("Please fill address details");
-    return;
-  }
-  if(!selectedPayment){
-    alert("Select payment method");
-    return;
-  }
-  if(cart.length===0){
-    alert("Cart empty");
-    return;
-  }
+  const order={
+    id:Date.now(),
+    cart,
+    address:{
+      name:name.value,
+      mobile:mobile.value,
+      address:address.value
+    },
+    payment,
+    total,
+    status:"Placed"
+  };
 
-  cart.forEach(p=>{
-    orders.push({
-      id: "ORD"+Date.now()+Math.floor(Math.random()*100),
-      productName: p.name,
-      amount: p.price,
-      payment: selectedPayment,
-      status: "Pending",
-      merchant: p.merchant,
-      customer:{
-        name: name.value,
-        mobile: mobile.value,
-        address: address.value
-      }
-    });
-  });
+  let orders=JSON.parse(localStorage.getItem("orders"))||[];
+  orders.push(order);
+  localStorage.setItem("orders",JSON.stringify(orders));
 
-  localStorage.setItem("orders", JSON.stringify(orders));
   localStorage.removeItem("cart");
+  showSuccess();
+}
 
-  alert("🎉 Order placed successfully!");
-  location.href="my-orders.html";
+/* SUCCESS */
+function showSuccess(){
+  successBox.style.display="flex";
+  for(let i=0;i<50;i++){
+    const c=document.createElement("div");
+    c.className="confetti";
+    c.style.left=Math.random()*100+"%";
+    c.style.background=`hsl(${Math.random()*360},100%,50%)`;
+    c.style.animationDelay=Math.random()*3+"s";
+    document.body.appendChild(c);
+  }
+}
+
+/* HOME */
+function goHome(){
+  location.href="index.html";
 }
 </script>
 
