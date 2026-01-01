@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Login</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{margin:0;font-family:Arial;background:#f1f3f6}
+header{background:#2874f0;color:#fff;padding:12px;text-align:center}
+.card{background:#fff;margin:20px;padding:20px;border-radius:14px}
+input{width:100%;padding:12px;margin-bottom:12px;border-radius:8px;border:1px solid #ccc}
+button{
+  width:100%;padding:12px;background:#2874f0;
+  color:#fff;border:none;border-radius:10px;font-size:16px
+}
+</style>
+</head>
+
+<body>
+
+<header><b>Admin Login</b></header>
+
+<div class="card">
+  <input id="adminId" placeholder="Admin ID">
+  <input id="adminPass" type="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+</div>
+
+<script>
+/* DEMO ADMIN CREDENTIALS */
+const ADMIN_ID = "226492031189";
+const ADMIN_PASS = "Cavpa@3961k";
+
+function login(){
+  if(adminId.value === ADMIN_ID && adminPass.value === ADMIN_PASS){
+    localStorage.setItem("adminLoggedIn","yes");
+    location.href="admin.html";
+  }else{
+    alert("Invalid Admin ID or Password");
+  }
+}
+</script>
+
+</body>
+</html>
