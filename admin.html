@@ -2,148 +2,150 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>ISI – Admin Panel</title>
+<title>Admin Panel</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{margin:0;font-family:Arial;background:#f1f3f6}
+header{
+  background:#2874f0;color:#fff;padding:12px;
+  display:flex;justify-content:space-between;align-items:center
+}
+header b{font-size:18px}
+.container{padding:12px}
+.section{
+  background:#fff;padding:12px;border-radius:14px;margin-bottom:15px
+}
+input{width:100%;padding:10px;margin-bottom:10px;border-radius:8px;border:1px solid #ccc}
+button{padding:8px 12px;border:none;border-radius:8px;cursor:pointer}
+.btn{background:#2874f0;color:#fff}
+.btn.red{background:#e53935}
+.order.grey{opacity:.6}
+</style>
 </head>
 
-<body style="margin:0;font-family:Arial;background:#f1f3f6">
+<body>
 
-<!-- ================= HEADER ================= -->
-<header style="
-display:flex;align-items:center;justify-content:space-between;
-padding:12px;background:#000;color:white">
-  <span onclick="history.back()" style="font-size:22px;cursor:pointer">⬅️</span>
+<header>
+  <span onclick="location.href='index.html'">🏠</span>
   <b>Admin Panel</b>
-  <span onclick="location.href='index.html'" style="font-size:22px;cursor:pointer">🏠</span>
+  <span></span>
 </header>
 
-<div style="padding:10px">
+<div class="container">
 
-<!-- ================= CATEGORY MANAGEMENT ================= -->
-<div class="card">
-  <h3>Manage Categories</h3>
+<!-- ===== MERCHANT CREATE ===== -->
+<div class="section">
+  <h3>Create Merchant</h3>
+  <input id="shopName" placeholder="Shop Name">
+  <input id="userId" placeholder="User ID">
+  <input id="password" placeholder="Password">
+  <button class="btn" onclick="createMerchant()">Create Merchant</button>
 
-  <input id="newCategory" placeholder="Add new category (e.g. Kurti)"
-    style="width:100%;padding:8px;margin-bottom:6px">
+  <div id="merchantList" style="margin-top:10px"></div>
+</div>
 
-  <button onclick="addCategory()">Add Category</button>
-
+<!-- ===== CATEGORY ===== -->
+<div class="section">
+  <h3>Categories</h3>
+  <input id="newCategory" placeholder="New Category Name">
+  <button class="btn" onclick="addCategory()">Add Category</button>
   <div id="categoryList" style="margin-top:10px"></div>
 </div>
 
-<!-- ================= ORDERS ================= -->
-<div class="card">
+<!-- ===== ORDERS ===== -->
+<div class="section">
   <h3>All Orders</h3>
-  <div id="ordersBox"></div>
+  <div id="orderList"></div>
 </div>
 
 </div>
 
 <script>
-/* ================= CATEGORY SYSTEM ================= */
-let categories = JSON.parse(localStorage.getItem("categories")) || [
-  "beauty","trouser","jeans","jacket","kurti","lehenga","saree"
-];
+/* ===== DATA ===== */
+let merchants = JSON.parse(localStorage.getItem("merchants")) || [];
+let categories = JSON.parse(localStorage.getItem("categories")) || [];
+let orders = JSON.parse(localStorage.getItem("orders")) || [];
 
-function renderCategories(){
-  const box = document.getElementById("categoryList");
-  box.innerHTML = "";
-
-  categories.forEach((c,i)=>{
-    box.innerHTML += `
-      <div style="
-        display:flex;justify-content:space-between;
-        padding:6px 0;border-bottom:1px solid #eee">
-        <span>${c}</span>
-        <button onclick="deleteCategory(${i})"
-          style="background:red;color:white;border:none;border-radius:4px">
-          Delete
-        </button>
-      </div>
-    `;
+/* ===== MERCHANT CREATE ===== */
+function createMerchant(){
+  if(!shopName.value || !userId.value || !password.value){
+    alert("Fill all fields"); return;
+  }
+  merchants.push({
+    shopName: shopName.value,
+    userId: userId.value,
+    password: password.value
   });
-
-  localStorage.setItem("categories", JSON.stringify(categories));
+  localStorage.setItem("merchants", JSON.stringify(merchants));
+  shopName.value=userId.value=password.value="";
+  renderMerchants();
+}
+function renderMerchants(){
+  merchantList.innerHTML="";
+  merchants.forEach((m,i)=>{
+    merchantList.innerHTML+=`
+      <div>
+        <b>${m.shopName}</b> ( ${m.userId} )
+        <button class="btn red" onclick="deleteMerchant(${i})">Delete</button>
+      </div>`;
+  });
+}
+function deleteMerchant(i){
+  merchants.splice(i,1);
+  localStorage.setItem("merchants",JSON.stringify(merchants));
+  renderMerchants();
 }
 
+/* ===== CATEGORY ===== */
 function addCategory(){
-  const val = newCategory.value.trim().toLowerCase();
-  if(!val){
-    alert("Enter category name");
-    return;
-  }
-  if(categories.includes(val)){
-    alert("Category already exists");
-    return;
-  }
-  categories.push(val);
+  if(!newCategory.value) return;
+  const id=newCategory.value.toLowerCase().replace(/\s+/g,"-");
+  categories.push({id:id,name:newCategory.value});
+  localStorage.setItem("categories",JSON.stringify(categories));
   newCategory.value="";
   renderCategories();
 }
-
+function renderCategories(){
+  categoryList.innerHTML="";
+  categories.forEach((c,i)=>{
+    categoryList.innerHTML+=`
+      <div>${c.name}
+      <button class="btn red" onclick="deleteCategory(${i})">Delete</button>
+      </div>`;
+  });
+}
 function deleteCategory(i){
-  if(confirm("Delete this category?")){
-    categories.splice(i,1);
-    renderCategories();
-  }
+  categories.splice(i,1);
+  localStorage.setItem("categories",JSON.stringify(categories));
+  renderCategories();
 }
 
-renderCategories();
-
-/* ================= ORDERS ================= */
-const orders = JSON.parse(localStorage.getItem("orders")) || [];
-const box = document.getElementById("ordersBox");
-
-if(orders.length === 0){
-  box.innerHTML = "<p>No orders yet</p>";
+/* ===== ORDERS ===== */
+function renderOrders(){
+  orderList.innerHTML="";
+  orders.forEach((o,i)=>{
+    orderList.innerHTML+=`
+      <div class="order ${o.status==='Delivered'?'grey':''}">
+        <b>${o.productName}</b><br>
+        Merchant: ${o.merchant}<br>
+        ₹${o.amount} | ${o.payment}<br>
+        Status: ${o.status}<br>
+        <button class="btn" onclick="confirmOrder(${i})">Confirm Delivered</button>
+      </div>`;
+  });
 }
-
-orders.forEach((o, i)=>{
-  box.innerHTML += `
-    <div style="
-      background:#fafafa;padding:10px;
-      margin-bottom:10px;border-radius:8px;
-      ${o.status==='Delivered'?'opacity:0.6':''}
-    ">
-      <b>Order ID:</b> ${o.id}<br>
-      <b>Amount:</b> ₹${o.amount}<br>
-      <b>Payment:</b> ${o.payment}<br>
-      <b>Status:</b> ${o.status}<br><br>
-
-      <button onclick="confirmOrder(${i})"
-        style="background:green;color:white;border:none;
-        padding:6px;border-radius:6px">
-        Confirm Delivered
-      </button>
-    </div>
-  `;
-});
-
 function confirmOrder(i){
-  orders[i].status = "Delivered";
-  localStorage.setItem("orders", JSON.stringify(orders));
-  alert("Order marked as Delivered");
-  location.reload();
+  orders[i].status="Delivered";
+  localStorage.setItem("orders",JSON.stringify(orders));
+  renderOrders();
 }
-</script>
 
-<style>
-.card{
-  background:#fff;
-  padding:15px;
-  margin-bottom:15px;
-  border-radius:10px;
-}
-button{
-  width:100%;
-  padding:8px;
-  background:#2874f0;
-  color:white;
-  border:none;
-  border-radius:6px;
-  margin-top:6px;
-}
-</style>
+/* INIT */
+renderMerchants();
+renderCategories();
+renderOrders();
+</script>
 
 </body>
 </html>
