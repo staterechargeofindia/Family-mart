@@ -1,163 +1,65 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Checkout</title>
-
-<style>
-body{
-  margin:0;
-  font-family:Arial,Helvetica,sans-serif;
-  background:#f5f6f8;
-}
-header{
-  background:#2874f0;
-  color:#fff;
-  padding:12px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-}
-header h2{margin:0;font-size:18px}
-
-.container{padding:15px}
-
-.card{
-  background:#fff;
-  border-radius:12px;
-  padding:15px;
-  margin-bottom:15px;
-}
-
-input, textarea{
-  width:100%;
-  padding:12px;
-  margin-bottom:10px;
-  border-radius:8px;
-  border:1px solid #ccc;
-  background:#f9f9f9;
-}
-
-.method{
-  display:flex;
-  align-items:center;
-  padding:12px;
-  border:1px solid #ddd;
-  border-radius:10px;
-  margin-bottom:10px;
-  cursor:pointer;
-}
-.method.active{
-  border-color:#2874f0;
-  background:#eaf2ff;
-}
-
-.total{
-  font-size:18px;
-  font-weight:bold;
-  margin-bottom:10px;
-}
-
-.place-btn{
-  width:100%;
-  padding:14px;
-  background:#2874f0;
-  color:#fff;
-  font-size:16px;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
-}
-
-/* SUCCESS POPUP */
-#successBox{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.6);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:999;
-}
-.popup{
-  background:#fff;
-  padding:25px;
-  border-radius:15px;
-  text-align:center;
-  width:80%;
-  animation:pop .4s ease;
-}
-@keyframes pop{
-  from{transform:scale(.7);opacity:0}
-  to{transform:scale(1);opacity:1}
-}
-.popup h2{color:#28a745;margin-bottom:10px}
-.confetti{
-  position:fixed;
-  top:-10px;
-  width:8px;
-  height:14px;
-  background:red;
-  animation:fall 3s linear infinite;
-}
-@keyframes fall{
-  to{transform:translateY(110vh) rotate(360deg)}
-}
-</style>
+  <title>Checkout</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body{font-family:Arial;background:#f4f6f8;margin:0}
+    header{background:#2874f0;color:#fff;padding:12px;text-align:center;font-size:18px}
+    .card{background:#fff;margin:12px;padding:15px;border-radius:10px}
+    .addr-box{line-height:1.6}
+    .edit-btn{margin-top:10px;padding:6px 10px;font-size:13px;border:1px solid #2874f0;background:#fff;color:#2874f0;border-radius:6px}
+    .method{padding:12px;border:1px solid #ddd;border-radius:8px;margin-bottom:10px;cursor:pointer}
+    .active{border:2px solid #2874f0;background:#eef4ff}
+    .place-btn{width:100%;padding:14px;background:#2874f0;color:#fff;border:none;border-radius:8px;font-size:16px}
+    #upiBox{text-align:center;margin-top:10px}
+    #successBox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);align-items:center;justify-content:center}
+    .popup{background:#fff;padding:25px;border-radius:12px;text-align:center;width:85%}
+  </style>
 </head>
 
 <body>
 
-<header>
-  <span onclick="history.back()" style="cursor:pointer">←</span>
-  <h2>Checkout</h2>
-  <span onclick="location.href='index.html'" style="cursor:pointer">🏠</span>
-</header>
+<header>Checkout</header>
 
-<div class="container">
+<!-- ADDRESS VIEW -->
+<div class="card">
+  <h3>Delivery Address</h3>
 
-  <!-- ADDRESS -->
-  <div class="card">
-    <h3>Delivery Address</h3>
+  <div id="addressView" class="addr-box"></div>
 
-    <input id="name" placeholder="Full Name">
-    <input id="mobile" placeholder="Mobile Number">
-    <textarea id="address" placeholder="Full Address"></textarea>
-    <input id="district" placeholder="District">
-    <input id="state" placeholder="State">
-    <input id="pincode" placeholder="Pin Code">
+  <button type="button" class="edit-btn"
+    onclick="location.href='manage-address.html'">
+    Edit / Manage Address
+  </button>
+</div>
 
-    <button onclick="location.href='manage-address.html'">
-      Manage Address
-    </button>
+<!-- PAYMENT -->
+<div class="card">
+  <h3>Payment Method</h3>
+
+  <div id="cod" class="method active" onclick="selectPay('cod')">
+    💵 Cash on Delivery
   </div>
 
-  <!-- PAYMENT -->
-  <div class="card">
-    <h3>Payment Method</h3>
-
-    <div class="method active" onclick="selectPay('cod')" id="cod">
-      💵 Cash on Delivery
-    </div>
-
-    <div class="method" onclick="selectPay('upi')" id="upi">
-      📱 UPI Payment
-    </div>
-
-    <div id="upiBox" style="display:none;text-align:center">
-      <p>Scan & Pay</p>
-      <img id="qr" width="200">
-    </div>
+  <div id="upi" class="method" onclick="selectPay('upi')">
+    📱 UPI Payment
   </div>
 
-  <!-- TOTAL -->
-  
-  <div class="card">
-    <div class="total">Total Amount: ₹<span id="total">0</span></div>
-    <button type="button" class="place-btn" onclick="placeOrder()">
-  Place Order
-</button>
+  <div id="upiBox" style="display:none">
+    <p>Scan & Pay</p>
+    <img id="qr" width="200">
+  </div>
+</div>
+
+<!-- TOTAL -->
+<div class="card">
+  <div style="font-size:18px;margin-bottom:10px">
+    Total Amount: ₹<span id="total">0</span>
+  </div>
+  <button type="button" class="place-btn" onclick="placeOrder()">
+    Place Order
+  </button>
 </div>
 
 <!-- SUCCESS -->
@@ -166,83 +68,71 @@ input, textarea{
     <h2>🎉 Order Successful!</h2>
     <p>
       Congratulations!  
-      Aapka order successfully submit ho gaya hai.  
-      Thank you for shopping with ISI ❤️
+      Aapka order successfully submit ho gaya hai.
     </p>
-    <button onclick="finish()">Go to Home</button>
+    <button onclick="finish()" class="place-btn">Go to Home</button>
   </div>
 </div>
 
 <script>
-/* LOAD ADDRESS */
-const saved = JSON.parse(localStorage.getItem("savedAddress")) || {};
-name.value = saved.name || "";
-mobile.value = saved.mobile || "";
-address.value = saved.address || "";
-district.value = saved.district || "";
-state.value = saved.state || "";
-pincode.value = saved.pincode || "";
+let selectedPay = "cod";
 
-/* LOAD CART */
+/* LOAD ADDRESS */
+const addr = JSON.parse(localStorage.getItem("savedAddress"));
+
+const addressView = document.getElementById("addressView");
+
+if(addr){
+  addressView.innerHTML = `
+    <b>${addr.name}</b><br>
+    ${addr.mobile}<br>
+    ${addr.address}<br>
+    ${addr.district}, ${addr.state} - ${addr.pincode}
+  `;
+}else{
+  addressView.innerHTML = `
+    <span style="color:red">
+      No address saved. Please add address.
+    </span>
+  `;
+}
+
+/* TOTAL */
 const cart = JSON.parse(localStorage.getItem("cart")) || [];
 let total = 0;
-cart.forEach(p => total += Number(p.price || 0));
+cart.forEach(i=> total += Number(i.price || 0));
 document.getElementById("total").innerText = total;
 
 /* PAYMENT */
-let payment = "cod";
 function selectPay(type){
-  payment = type;
+  selectedPay = type;
   document.getElementById("cod").classList.remove("active");
   document.getElementById("upi").classList.remove("active");
   document.getElementById(type).classList.add("active");
 
   if(type==="upi"){
     document.getElementById("upiBox").style.display="block";
-    const upiId="paytmgr5m9yhroptys";
-    document.getElementById("qr").src=
-      `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=upi://pay?pa=${upiId}&am=${total}`;
+    document.getElementById("qr").src =
+      "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=paytmgr5m9yhroptys&am="+total;
   }else{
     document.getElementById("upiBox").style.display="none";
   }
 }
 
-/* PLACE ORDER */
+/* ORDER */
 function placeOrder(){
-  if(cart.length===0){
-    alert("Cart empty");
-    return;
-  }
-
-  const order={
-    id:"ORD"+Date.now(),
-    items:cart,
-    address:saved,
-    payment,
-    total,
-    status:"Placed"
+  const order = {
+    address: addr || {},
+    payment: selectedPay,
+    cart: cart,
+    total: total,
+    time: new Date().toLocaleString()
   };
 
-  let orders=JSON.parse(localStorage.getItem("orders"))||[];
-  orders.push(order);
-  localStorage.setItem("orders",JSON.stringify(orders));
+  localStorage.setItem("lastOrder", JSON.stringify(order));
   localStorage.removeItem("cart");
 
-  showSuccess();
-}
-
-/* SUCCESS EFFECT */
-function showSuccess(){
   document.getElementById("successBox").style.display="flex";
-  for(let i=0;i<30;i++){
-    let c=document.createElement("div");
-    c.className="confetti";
-    c.style.left=Math.random()*100+"%";
-    c.style.background=`hsl(${Math.random()*360},80%,60%)`;
-    c.style.animationDuration=2+Math.random()*3+"s";
-    document.body.appendChild(c);
-    setTimeout(()=>c.remove(),4000);
-  }
 }
 
 function finish(){
