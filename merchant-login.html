@@ -2,21 +2,65 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Merchant Login</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Merchant Login – ISI</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#f1f3f6}
+*{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
+body{margin:0;background:#f5f6f8}
+
+/* HEADER */
 header{
-  background:#2874f0;color:#fff;padding:12px;
-  display:flex;justify-content:space-between;align-items:center
+  background:#2874f0;
+  color:#fff;
+  padding:12px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
 }
-.container{padding:20px}
-.card{background:#fff;padding:20px;border-radius:14px}
-input{width:100%;padding:12px;margin-bottom:15px;border-radius:8px;border:1px solid #ccc}
+header span{font-size:20px;cursor:pointer}
+
+/* LOGIN CARD */
+.container{
+  padding:15px;
+}
+.card{
+  background:#fff;
+  border-radius:14px;
+  padding:20px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.1);
+}
+.card h2{
+  margin-top:0;
+  text-align:center;
+}
+
+/* INPUT */
+input{
+  width:100%;
+  padding:12px;
+  margin-bottom:12px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:15px;
+}
+
+/* BUTTON */
 button{
-  width:100%;padding:12px;background:#2874f0;
-  color:white;border:none;border-radius:10px;font-size:16px
+  width:100%;
+  padding:14px;
+  background:#2874f0;
+  color:#fff;
+  border:none;
+  border-radius:12px;
+  font-size:16px;
+  cursor:pointer;
+}
+.note{
+  margin-top:10px;
+  font-size:13px;
+  color:#555;
+  text-align:center;
 }
 </style>
 </head>
@@ -24,33 +68,58 @@ button{
 <body>
 
 <header>
-  <span onclick="location.href='index.html'">🏠</span>
+  <span onclick="history.back()">←</span>
   <b>Merchant Login</b>
-  <span></span>
+  <span onclick="location.href='index.html'">🏠</span>
 </header>
 
 <div class="container">
-<div class="card">
+  <div class="card">
+    <h2>Merchant Login</h2>
 
-<input id="userId" placeholder="User ID">
-<input id="password" type="password" placeholder="Password">
-<button onclick="login()">Login</button>
+    <input id="mid" placeholder="Merchant ID">
+    <input id="mpass" type="password" placeholder="Password">
 
-</div>
+    <button onclick="login()">Login</button>
+
+    <div class="note">
+      Only approved merchants can login.<br>
+      Contact admin for ID & password.
+    </div>
+  </div>
 </div>
 
 <script>
-function login(){
-  const merchants = JSON.parse(localStorage.getItem("merchants")) || [];
-  const u=userId.value, p=password.value;
+/*
+  ADMIN BANAYE HUE MERCHANTS
+  (Abhi demo ke liye yahin store kar rahe hain)
+  Baad me admin-panel se add karwa denge
+*/
+const merchants = [
+  {
+    id: "226492031189",
+    password: "Cavpa@3961k",
+    shop: "Demo Merchant Shop"
+  }
+];
 
-  const found = merchants.find(m=>m.userId===u && m.password===p);
+function login(){
+  const id = document.getElementById("mid").value.trim();
+  const pass = document.getElementById("mpass").value.trim();
+
+  const found = merchants.find(m => m.id === id && m.password === pass);
+
   if(!found){
-    alert("Invalid ID or Password"); return;
+    alert("Invalid Merchant ID or Password");
+    return;
   }
 
-  localStorage.setItem("merchantName", found.shopName);
-  location.href="merchant-dashboard.html";
+  // SAVE MERCHANT SESSION
+  localStorage.setItem("merchantId", found.id);
+  localStorage.setItem("merchantShop", found.shop);
+
+  // GO TO DASHBOARD
+  location.href = "merchant-dashboard.html";
 }
 </script>
 
