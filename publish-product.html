@@ -2,28 +2,44 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Publish Product</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Publish Product</title>
 
 <style>
-body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f1f3f6}
+body{margin:0;background:#f4f6f8;font-family:Arial}
 header{
-  background:#2874f0;color:#fff;padding:12px;
-  display:flex;justify-content:space-between;align-items:center
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:12px;
+  background:#1b3c8b;
+  color:#fff;
 }
-header b{font-size:18px}
-.container{padding:15px}
-.card{background:#fff;padding:15px;border-radius:14px}
-input,select,textarea{
-  width:100%;padding:10px;margin-bottom:12px;
-  border-radius:8px;border:1px solid #ccc
+.container{
+  padding:12px;
+}
+.card{
+  background:#fff;
+  border-radius:14px;
+  padding:12px;
+}
+input,textarea,select{
+  width:100%;
+  padding:10px;
+  margin-bottom:10px;
+  border-radius:8px;
+  border:1px solid #ccc;
 }
 button{
-  width:100%;padding:12px;background:#2874f0;
-  color:white;border:none;border-radius:10px;font-size:16px
+  width:100%;
+  padding:12px;
+  background:#2874f0;
+  color:#fff;
+  border:none;
+  border-radius:10px;
+  font-size:16px;
 }
-small{color:#555}
-.note{font-size:12px;color:#777;margin-bottom:10px}
+small{color:#666}
 </style>
 </head>
 
@@ -36,130 +52,116 @@ small{color:#555}
 </header>
 
 <div class="container">
-<div class="card">
+  <div class="card">
 
-<!-- CATEGORY (FIXED) -->
-<select id="category">
-  <option value="">Select Category</option>
-</select>
+    <!-- CATEGORY -->
+    <select id="category">
+      <option value="">Select Category</option>
+    </select>
 
-<!-- PHONE TYPE -->
-<select id="phoneType">
-  <option value="">Select Phone Type</option>
-  <option value="new">New Phone</option>
-  <option value="old">Old Phone</option>
-</select>
+    <!-- PHONE TYPE -->
+    <select id="phoneType">
+      <option value="">Phone Type (optional)</option>
+      <option value="new">New Phone</option>
+      <option value="old">Old Phone</option>
+    </select>
 
-<!-- BRAND -->
-<select id="brand">
-  <option value="">Select Brand</option>
-  <option value="samsung">Samsung</option>
-  <option value="vivo">Vivo</option>
-  <option value="oppo">Oppo</option>
-  <option value="xiaomi">Xiaomi</option>
-  <option value="realme">Realme</option>
-  <option value="oneplus">OnePlus</option>
-  <option value="apple">Apple (iPhone)</option>
-  <option value="motorola">Motorola</option>
-</select>
+    <!-- BRAND -->
+    <select id="brand">
+      <option value="">Select Brand (optional)</option>
+      <option>Samsung</option>
+      <option>Vivo</option>
+      <option>Oppo</option>
+      <option>Realme</option>
+      <option>Xiaomi</option>
+      <option>Apple</option>
+      <option>Motorola</option>
+      <option>OnePlus</option>
+    </select>
 
-<!-- PRODUCT INFO -->
-<input id="name" placeholder="Product Name">
-<input id="model" placeholder="Model Name">
-<textarea id="desc" placeholder="Product Description"></textarea>
+    <!-- MODEL -->
+    <input id="model" placeholder="Model Name (optional)">
 
-<!-- PRICE -->
-<input id="mrp" type="number" placeholder="MRP">
-<input id="price" type="number" placeholder="Selling Price" onkeyup="calcDiscount()">
-<small id="discountText"></small>
+    <!-- PRODUCT DETAILS -->
+    <input id="name" placeholder="Product Name">
+    <textarea id="desc" placeholder="Product Description"></textarea>
 
-<!-- IMAGES -->
-<div class="note">Upload up to 4 images (minimum 1 required)</div>
-<input type="file" id="img1" accept="image/*">
-<input type="file" id="img2" accept="image/*">
-<input type="file" id="img3" accept="image/*">
-<input type="file" id="img4" accept="image/*">
+    <input id="mrp" type="number" placeholder="Original Price (MRP)">
+    <input id="price" type="number" placeholder="Selling Price" oninput="calcDiscount()">
 
-<button onclick="publish()">Publish Product</button>
+    <p><b>Discount:</b> <span id="discount">0%</span></p>
 
-</div>
+    <!-- IMAGES -->
+    <small>Upload up to 4 images (minimum 1)</small>
+    <input type="file" id="img1" accept="image/*">
+    <input type="file" id="img2" accept="image/*">
+    <input type="file" id="img3" accept="image/*">
+    <input type="file" id="img4" accept="image/*">
+
+    <button onclick="publish()">Publish Product</button>
+  </div>
 </div>
 
 <script>
-/* ===== LOAD CATEGORIES (INDEX / ADMIN SAME SOURCE) ===== */
-const categorySelect = document.getElementById("category");
 const categories = JSON.parse(localStorage.getItem("categories")) || [];
+const merchant = JSON.parse(localStorage.getItem("merchant")) || {};
 
 categories.forEach(c=>{
-  // SAFETY CHECK (object format)
-  if(c.id && c.name){
-    const opt = document.createElement("option");
-    opt.value = c.id;     // system use
-    opt.textContent = c.name; // display name
-    categorySelect.appendChild(opt);
-  }
+  category.innerHTML += `<option value="${c.id}">${c.name}</option>`;
 });
 
-/* ===== DISCOUNT ===== */
 function calcDiscount(){
-  const m=+mrp.value;
-  const p=+price.value;
-  if(m>0 && p>0){
-    discountText.innerText =
-      "Discount: " + Math.round(((m-p)/m)*100) + "%";
+  const mrp = Number(document.getElementById("mrp").value);
+  const price = Number(document.getElementById("price").value);
+  if(mrp && price && mrp>price){
+    const d = Math.round(((mrp-price)/mrp)*100);
+    discount.innerText = d + "%";
   }else{
-    discountText.innerText="";
+    discount.innerText = "0%";
   }
 }
 
-/* ===== IMAGE TO BASE64 ===== */
-function toBase64(file){
+function getBase64(file){
   return new Promise(res=>{
-    const r=new FileReader();
+    if(!file) return res(null);
+    const r = new FileReader();
     r.onload=()=>res(r.result);
     r.readAsDataURL(file);
   });
 }
 
-/* ===== PUBLISH PRODUCT ===== */
 async function publish(){
-  if(!category.value || !name.value || !price.value || !mrp.value){
-    alert("Please fill required fields");
+  const images=[];
+  const f1=img1.files[0], f2=img2.files[0], f3=img3.files[0], f4=img4.files[0];
+  if(!f1){
+    alert("Please upload at least 1 image");
     return;
   }
 
-  const products = JSON.parse(localStorage.getItem("products")) || [];
-  const images = [];
-
-  if(img1.files[0]) images.push(await toBase64(img1.files[0]));
-  if(img2.files[0]) images.push(await toBase64(img2.files[0]));
-  if(img3.files[0]) images.push(await toBase64(img3.files[0]));
-  if(img4.files[0]) images.push(await toBase64(img4.files[0]));
-
-  if(images.length === 0){
-    alert("Please upload at least one image");
-    return;
+  for(const f of [f1,f2,f3,f4]){
+    if(f) images.push(await getBase64(f));
   }
 
-  const product = {
-    id: Date.now(),
-    category: category.value,
-    phoneType: phoneType.value,
-    brand: brand.value,
-    name: name.value,
-    model: model.value,
-    description: desc.value,
-    mrp: +mrp.value,
-    price: +price.value,
-    images: images,
-    merchant: localStorage.getItem("merchantName") || "Merchant"
+  const product={
+    id:Date.now(),
+    name:name.value || "No name",
+    desc:desc.value || "",
+    category:category.value || "other",
+    phoneType:phoneType.value || "",
+    brand:brand.value.toLowerCase() || "",
+    model:model.value || "",
+    mrp:Number(mrp.value)||0,
+    price:Number(price.value)||0,
+    images,
+    merchantShop:merchant.shop || "Unknown Shop"
   };
 
-  products.push(product);
-  localStorage.setItem("products", JSON.stringify(products));
+  const list = JSON.parse(localStorage.getItem("products")) || [];
+  list.push(product);
+  localStorage.setItem("products",JSON.stringify(list));
 
-  alert("Product published successfully");
-  location.href = "merchant-dashboard.html";
+  alert("✅ Product Published Successfully");
+  location.href="merchant-dashboard.html";
 }
 </script>
 
