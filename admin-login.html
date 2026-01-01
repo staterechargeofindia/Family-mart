@@ -2,43 +2,177 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Admin Login</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel – ISI</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#f1f3f6}
-header{background:#2874f0;color:#fff;padding:12px;text-align:center}
-.card{background:#fff;margin:20px;padding:20px;border-radius:14px}
-input{width:100%;padding:12px;margin-bottom:12px;border-radius:8px;border:1px solid #ccc}
-button{
-  width:100%;padding:12px;background:#2874f0;
-  color:#fff;border:none;border-radius:10px;font-size:16px
+*{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
+body{margin:0;background:#f5f6f8}
+
+/* HEADER */
+header{
+  background:#1b3c8b;
+  color:#fff;
+  padding:12px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+header span{font-size:20px;cursor:pointer}
+
+/* LOGIN */
+.login-box{
+  max-width:360px;
+  margin:80px auto;
+  background:#fff;
+  padding:20px;
+  border-radius:14px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.2);
+}
+.login-box h2{text-align:center;margin-top:0}
+.login-box input{
+  width:100%;
+  padding:12px;
+  margin-bottom:12px;
+  border-radius:10px;
+  border:1px solid #ccc;
+}
+.login-box button{
+  width:100%;
+  padding:14px;
+  background:#1b3c8b;
+  color:#fff;
+  border:none;
+  border-radius:12px;
+  font-size:16px;
+  cursor:pointer;
+}
+
+/* PANEL */
+.container{padding:12px}
+.card{
+  background:#fff;
+  border-radius:12px;
+  padding:15px;
+  margin-bottom:12px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.1);
+}
+.card h2{margin-top:0}
+
+/* ORDER */
+.order{
+  border:1px solid #ddd;
+  border-radius:10px;
+  padding:10px;
+  margin-bottom:10px;
+}
+.order.grey{
+  background:#eee;
+  opacity:0.7;
+}
+.order b{font-size:14px}
+
+/* BUTTON */
+button.confirm{
+  margin-top:8px;
+  padding:8px 12px;
+  background:#28a745;
+  color:#fff;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
 }
 </style>
 </head>
 
 <body>
 
-<header><b>Admin Login</b></header>
-
-<div class="card">
-  <input id="adminId" placeholder="Admin ID">
-  <input id="adminPass" type="password" placeholder="Password">
+<!-- LOGIN -->
+<div id="loginPage" class="login-box">
+  <h2>Admin Login</h2>
+  <input id="aid" placeholder="Admin ID">
+  <input id="apass" type="password" placeholder="Password">
   <button onclick="login()">Login</button>
 </div>
 
-<script>
-/* DEMO ADMIN CREDENTIALS */
-const ADMIN_ID = "226492031189";
-const ADMIN_PASS = "Cavpa@3961k";
+<!-- PANEL -->
+<div id="panel" style="display:none">
 
+<header>
+  <span onclick="history.back()">←</span>
+  <b>Admin Panel</b>
+  <span onclick="location.href='index.html'">🏠</span>
+</header>
+
+<div class="container">
+  <div class="card">
+    <h2>All Orders</h2>
+    <div id="orderList"></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+/* ADMIN CREDENTIALS */
+const ADMIN_ID="226492031189";
+const ADMIN_PASS="Cavpa@3961k";
+
+/* LOGIN */
 function login(){
-  if(adminId.value === ADMIN_ID && adminPass.value === ADMIN_PASS){
-    localStorage.setItem("adminLoggedIn","yes");
-    location.href="admin.html";
+  if(aid.value===ADMIN_ID && apass.value===ADMIN_PASS){
+    document.getElementById("loginPage").style.display="none";
+    document.getElementById("panel").style.display="block";
+    renderOrders();
   }else{
     alert("Invalid Admin ID or Password");
   }
+}
+
+/* LOAD DATA */
+let orders = JSON.parse(localStorage.getItem("orders")) || [];
+
+/* RENDER ORDERS */
+function renderOrders(){
+  const box=document.getElementById("orderList");
+  box.innerHTML="";
+
+  if(orders.length===0){
+    box.innerHTML="<p>No orders yet</p>";
+    return;
+  }
+
+  orders.forEach((o,i)=>{
+    const div=document.createElement("div");
+    div.className="order"+(o.status==="Confirmed"?" grey":"");
+
+    const merchantNames=[...new Set(o.cart.map(p=>p.merchantShop))].join(", ");
+
+    div.innerHTML=`
+      <b>Order ID:</b> ${o.id}<br>
+      <b>Merchant:</b> ${merchantNames}<br>
+      <b>Total:</b> ₹${o.total}<br>
+      <b>Payment:</b> ${o.payment}<br>
+      <b>Customer:</b> ${o.address.name}<br>
+      <b>Mobile:</b> ${o.address.mobile}<br>
+      <b>Address:</b> ${o.address.address}<br>
+      <b>Status:</b> ${o.status}<br>
+      ${
+        o.status!=="Confirmed"
+        ? `<button class="confirm" onclick="confirmOrder(${i})">Confirm Order</button>`
+        : `<i>Order Completed</i>`
+      }
+    `;
+    box.appendChild(div);
+  });
+}
+
+/* CONFIRM */
+function confirmOrder(i){
+  if(!confirm("Confirm this order?"))return;
+  orders[i].status="Confirmed";
+  localStorage.setItem("orders",JSON.stringify(orders));
+  renderOrders();
 }
 </script>
 
