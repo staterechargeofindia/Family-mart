@@ -2,27 +2,55 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>ISI – Home</title>
+<title>ISI Marketplace</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-*{box-sizing:border-box;font-family:Arial}
-body{margin:0;background:#f4f6f8}
+*{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
+html,body{
+  margin:0;
+  padding:0;
+  width:100%;
+  height:100%;
+  overflow-y:auto;
+  background:#f4f6f8;
+}
 
-/* HEADER */
+/* ================= HEADER ================= */
 header{
-  background:#2874f0;
+  position:sticky;
+  top:0;
+  z-index:50;
+  background:#2f78ff;
   color:#fff;
   padding:12px;
   display:flex;
   align-items:center;
   justify-content:space-between;
 }
-header b{font-size:20px}
-header span{cursor:pointer;font-size:20px}
+header .left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+header .menu{
+  font-size:22px;
+  cursor:pointer;
+}
+header .title{
+  font-size:20px;
+  font-weight:bold;
+}
+header .cart{
+  font-size:22px;
+  cursor:pointer;
+}
 
-/* SEARCH */
-.search-box{padding:10px}
+/* ================= SEARCH ================= */
+.search-box{
+  padding:10px;
+  background:#f4f6f8;
+}
 .search-box input{
   width:100%;
   padding:12px;
@@ -31,35 +59,37 @@ header span{cursor:pointer;font-size:20px}
   font-size:16px;
 }
 
-/* CATEGORY */
+/* ================= CATEGORIES ================= */
 .categories{
   display:flex;
   gap:10px;
   padding:10px;
   overflow-x:auto;
+  background:#f4f6f8;
 }
+.categories::-webkit-scrollbar{display:none;}
 .cat{
   background:#fff;
-  padding:8px 14px;
+  padding:8px 16px;
   border-radius:20px;
+  font-size:14px;
   white-space:nowrap;
   cursor:pointer;
-  font-weight:bold;
+  border:1px solid #e0e0e0;
 }
 
-/* PRODUCT GRID */
-#productGrid{
+/* ================= PRODUCTS ================= */
+.products{
   display:grid;
   grid-template-columns:repeat(2,1fr);
   gap:12px;
   padding:12px;
 }
-
-/* CARD */
 .card{
   background:#fff;
-  border-radius:14px;
+  border-radius:12px;
   overflow:hidden;
+  box-shadow:0 2px 6px rgba(0,0,0,.08);
 }
 .card img{
   width:100%;
@@ -67,40 +97,99 @@ header span{cursor:pointer;font-size:20px}
   object-fit:cover;
   cursor:pointer;
 }
-.card-body{padding:10px}
-.card-body h3{
+.card .info{
+  padding:10px;
+}
+.card h4{
+  margin:0;
+  font-size:15px;
+}
+.card p{
   margin:4px 0;
-  font-size:16px;
+  font-size:13px;
+  color:#555;
 }
 .price{
+  font-size:15px;
   font-weight:bold;
 }
-.mrp{text-decoration:line-through;color:#999;margin-left:6px}
-.off{color:green;margin-left:6px}
-
+.old{
+  text-decoration:line-through;
+  color:#999;
+  font-size:12px;
+  margin-left:6px;
+}
+.off{
+  color:green;
+  font-size:12px;
+  margin-left:6px;
+}
 .btn{
   width:100%;
   padding:8px;
+  margin-top:6px;
   border:none;
   border-radius:8px;
   cursor:pointer;
-  margin-top:6px;
-  font-size:15px;
+  font-size:14px;
 }
-.add{background:#2874f0;color:#fff}
-.desc{background:#eee}
+.btn.add{background:#2f78ff;color:#fff}
+.btn.desc{background:#eee;color:#000}
 
-/* MODAL */
-.modal{
+/* ================= EMPTY ================= */
+.empty{
+  text-align:center;
+  padding:40px;
+  color:#777;
+}
+
+/* ================= SIDE MENU ================= */
+#sideMenu{
+  position:fixed;
+  top:0;
+  left:-260px;
+  width:260px;
+  height:100%;
+  background:#fff;
+  box-shadow:2px 0 10px rgba(0,0,0,.3);
+  transition:.3s;
+  z-index:1000;
+  padding:15px;
+}
+#sideMenu h3{margin-top:0;}
+#sideMenu p{
+  padding:10px 0;
+  border-bottom:1px solid #eee;
+  cursor:pointer;
+}
+
+/* ================= IMAGE ZOOM ================= */
+#imgZoom{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.8);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:2000;
+}
+#imgZoom img{
+  max-width:90%;
+  max-height:90%;
+  border-radius:10px;
+}
+
+/* ================= DESCRIPTION MODAL ================= */
+#descModal{
   position:fixed;
   inset:0;
   background:rgba(0,0,0,.7);
   display:none;
   align-items:center;
   justify-content:center;
-  z-index:999;
+  z-index:2000;
 }
-.modal-content{
+#descModal .box{
   background:#fff;
   width:90%;
   max-height:80%;
@@ -108,114 +197,139 @@ header span{cursor:pointer;font-size:20px}
   border-radius:14px;
   padding:15px;
 }
-.modal img{
-  width:100%;
-  border-radius:10px;
-}
 .close{
   text-align:right;
   font-size:22px;
   cursor:pointer;
 }
-.empty{text-align:center;padding:40px;color:#666}
 </style>
 </head>
 
 <body>
 
+<!-- ========== SIDE MENU ========== -->
+<div id="sideMenu">
+  <h3>Menu</h3>
+  <p onclick="go('index.html')">🏠 Home</p>
+  <p onclick="go('cart.html')">🛒 Cart</p>
+  <p onclick="go('my-orders.html')">📦 My Orders</p>
+  <p onclick="go('merchant-login.html')">🏪 Merchant</p>
+  <p onclick="go('admin-login.html')">🛠 Admin</p>
+</div>
+
+<!-- ========== HEADER ========== -->
 <header>
-  <span onclick="toggleMenu()">☰</span>
-  <b>ISI</b>
-  <span onclick="location.href='cart.html'">🛒</span>
+  <div class="left">
+    <div class="menu" onclick="toggleMenu()">☰</div>
+    <div class="title">ISI</div>
+  </div>
+  <div class="cart" onclick="go('cart.html')">🛒</div>
 </header>
 
+<!-- ========== SEARCH ========== -->
 <div class="search-box">
-  <input id="search" placeholder="Search products..." oninput="searchProducts()">
+  <input type="text" placeholder="Search products..." oninput="searchProducts(this.value)">
 </div>
 
+<!-- ========== CATEGORIES ========== -->
 <div class="categories">
-  <div class="cat" onclick="filterCat('all')">All</div>
-  <div class="cat" onclick="filterCat('Fashion')">Fashion</div>
-  <div class="cat" onclick="filterCat('Beauty')">Beauty</div>
-  <div class="cat" onclick="filterCat('Electronics')">Electronics</div>
-  <div class="cat" onclick="filterCat('New Phone')">New Phone</div>
-  <div class="cat" onclick="filterCat('Old Phone')">Old Phone</div>
-  <div class="cat" onclick="filterCat('Grocery')">Grocery</div>
-  <div class="cat" onclick="filterCat('Meat')">Meads</div>
-  <div class="cat" onclick="filterCat('Biryani')">Biryani</div>
+  <div class="cat" onclick="filterCategory('all')">All</div>
+  <div class="cat" onclick="filterCategory('fashion')">Fashion</div>
+  <div class="cat" onclick="filterCategory('beauty')">Beauty</div>
+  <div class="cat" onclick="filterCategory('electronics')">Electronics</div>
+  <div class="cat" onclick="filterCategory('kids')">Kids</div>
+  <div class="cat" onclick="filterCategory('home')">Home</div>
+  <div class="cat" onclick="filterCategory('top-deals')">Top Deals</div>
+  <div class="cat" onclick="filterCategory('new-phone')">New Phone</div>
+  <div class="cat" onclick="filterCategory('old-phone')">Old Phone</div>
+  <div class="cat" onclick="filterCategory('cover')">Mobile Cover</div>
+  <div class="cat" onclick="filterCategory('grocery')">Grocery</div>
+  <div class="cat" onclick="filterCategory('vegetable')">Vegetable</div>
+  <div class="cat" onclick="filterCategory('fruits')">Fruits</div>
+  <div class="cat" onclick="filterCategory('cooked')">Cooked</div>
+  <div class="cat" onclick="filterCategory('meat')">Meat</div>
+  <div class="cat" onclick="filterCategory('mithai')">Mithai</div>
+  <div class="cat" onclick="filterCategory('biryani')">Biryani</div>
 </div>
 
-<div id="productGrid"></div>
+<!-- ========== PRODUCTS ========== -->
+<div id="productBox" class="products"></div>
+<div id="emptyBox" class="empty" style="display:none">No products available</div>
 
-<!-- IMAGE ZOOM MODAL -->
-<div class="modal" id="imgModal">
-  <div class="modal-content">
-    <div class="close" onclick="closeModal()">✖</div>
-    <img id="zoomImg">
-  </div>
+<!-- ========== IMAGE ZOOM ========== -->
+<div id="imgZoom" onclick="this.style.display='none'">
+  <img id="zoomImg">
 </div>
 
-<!-- DESCRIPTION MODAL -->
-<div class="modal" id="descModal">
-  <div class="modal-content">
+<!-- ========== DESCRIPTION MODAL ========== -->
+<div id="descModal">
+  <div class="box">
     <div class="close" onclick="closeDesc()">✖</div>
-    <h3 id="dName"></h3>
-    <p id="dText"></p>
+    <h3 id="descName"></h3>
+    <p id="descText"></p>
   </div>
 </div>
 
 <script>
-let products = JSON.parse(localStorage.getItem("products")) || [];
-let filtered = [...products];
+/* ========== MENU ========== */
+let menuOpen=false;
+function toggleMenu(){
+  const m=document.getElementById("sideMenu");
+  m.style.left = menuOpen ? "-260px" : "0";
+  menuOpen=!menuOpen;
+}
+function go(p){location.href=p;}
 
-/* RENDER */
+/* ========== DATA ========== */
+let products = JSON.parse(localStorage.getItem("products")) || [];
+let currentCategory="all";
+
+/* ========== RENDER PRODUCTS ========== */
 function render(list){
-  const grid = document.getElementById("productGrid");
-  grid.innerHTML = "";
+  const box=document.getElementById("productBox");
+  const empty=document.getElementById("emptyBox");
+  box.innerHTML="";
 
   if(list.length===0){
-    grid.innerHTML = "<div class='empty'>No products available</div>";
+    empty.style.display="block";
     return;
   }
+  empty.style.display="none";
 
   list.forEach(p=>{
-    grid.innerHTML += `
+    const off = p.mrp ? Math.round(((p.mrp-p.price)/p.mrp)*100) : 0;
+    box.innerHTML+=`
       <div class="card">
-        <img src="${p.images[0]}" onclick="zoom('${p.images[0]}')">
-        <div class="card-body">
-          <h3>${p.name}</h3>
+        <img src="${p.images[0]}" onclick="zoomImage('${p.images[0]}')">
+        <div class="info">
+          <h4>${p.name}</h4>
+          <p>${p.description || ""}</p>
           <div class="price">
             ₹${p.price}
-            <span class="mrp">₹${p.mrp}</span>
-            <span class="off">${p.discount}% OFF</span>
+            ${p.mrp?`<span class="old">₹${p.mrp}</span>`:""}
+            ${off?`<span class="off">${off}% OFF</span>`:""}
           </div>
-
-          <button class="btn add" onclick='addToCart(${JSON.stringify(p)})'>
-            Add to Cart
-          </button>
-
-          <button class="btn desc" onclick="showDesc('${p.name}','${p.description.replace(/'/g,"")}')">
-            Description
-          </button>
+          <button class="btn add" onclick='addToCart(${JSON.stringify(p)})'>Add to Cart</button>
+          <button class="btn desc" onclick="showDesc('${p.name.replace(/'/g,"")}','${(p.description||"").replace(/'/g,"")}')">Description</button>
         </div>
-      </div>
-    `;
+      </div>`;
   });
 }
 
-/* SEARCH */
-function searchProducts(){
-  const q = search.value.toLowerCase();
-  render(products.filter(p=>p.name.toLowerCase().includes(q)));
-}
-
-/* CATEGORY */
-function filterCat(cat){
+/* ========== FILTER ========== */
+function filterCategory(cat){
+  currentCategory=cat;
   if(cat==="all"){render(products);return;}
   render(products.filter(p=>p.category===cat));
 }
 
-/* CART */
+/* ========== SEARCH ========== */
+function searchProducts(q){
+  q=q.toLowerCase();
+  render(products.filter(p=>p.name.toLowerCase().includes(q)));
+}
+
+/* ========== CART ========== */
 function addToCart(p){
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
   cart.push(p);
@@ -223,26 +337,23 @@ function addToCart(p){
   alert("Added to cart");
 }
 
-/* IMAGE ZOOM */
-function zoom(src){
-  zoomImg.src = src;
-  imgModal.style.display="flex";
-}
-function closeModal(){
-  imgModal.style.display="none";
+/* ========== IMAGE ZOOM ========== */
+function zoomImage(src){
+  document.getElementById("zoomImg").src=src;
+  document.getElementById("imgZoom").style.display="flex";
 }
 
-/* DESCRIPTION */
+/* ========== DESCRIPTION ========== */
 function showDesc(n,d){
-  dName.innerText = n;
-  dText.innerText = d;
-  descModal.style.display="flex";
+  document.getElementById("descName").innerText=n;
+  document.getElementById("descText").innerText=d;
+  document.getElementById("descModal").style.display="flex";
 }
 function closeDesc(){
-  descModal.style.display="none";
+  document.getElementById("descModal").style.display="none";
 }
 
-/* INIT */
+/* ========== INIT ========== */
 render(products);
 </script>
 
