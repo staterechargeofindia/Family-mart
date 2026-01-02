@@ -1,61 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Orders – ISI</title>
-
-<style>
-*{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
-body{margin:0;background:#f5f6f8}
-
-/* HEADER */
-header{
-  background:#2874f0;
-  color:#fff;
-  padding:12px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-}
-header span{font-size:20px;cursor:pointer}
-
-/* CONTENT */
-.container{padding:12px}
-.order{
-  background:#fff;
-  border-radius:12px;
-  padding:12px;
-  margin-bottom:12px;
-  box-shadow:0 2px 6px rgba(0,0,0,0.1);
-}
-.order.grey{
-  background:#eee;
-  opacity:0.7;
-}
-.order h3{
-  margin:0 0 6px;
-  font-size:16px;
-}
-.order p{
-  margin:4px 0;
-  font-size:14px;
-}
-.badge{
-  display:inline-block;
-  padding:4px 10px;
-  border-radius:20px;
-  font-size:12px;
-  margin-top:6px;
-}
-.placed{background:#fff3cd;color:#856404}
-.confirmed{background:#d4edda;color:#155724}
-.empty{
-  text-align:center;
-  padding:40px;
-  color:#777;
-}
-</style>
+<title>My Orders</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -66,39 +15,25 @@ header span{font-size:20px;cursor:pointer}
   <span onclick="location.href='index.html'">🏠</span>
 </header>
 
-<div class="container" id="orderList"></div>
+<div class="container" id="orders"></div>
 
 <script>
-/* LOAD ORDERS */
 const orders = JSON.parse(localStorage.getItem("orders")) || [];
-const box = document.getElementById("orderList");
-
-function renderOrders(){
-  box.innerHTML="";
-
-  if(orders.length===0){
-    box.innerHTML='<div class="empty">No orders placed yet</div>';
-    return;
-  }
-
-  orders.slice().reverse().forEach(o=>{
-    const div=document.createElement("div");
-    div.className="order"+(o.status==="Confirmed"?" grey":"");
-
-    div.innerHTML=`
-      <h3>Order ID: ${o.id}</h3>
-      <p><b>Total:</b> ₹${o.total}</p>
-      <p><b>Payment:</b> ${o.payment}</p>
-      <p><b>Deliver To:</b> ${o.address.name}, ${o.address.address}</p>
-      <span class="badge ${o.status==="Confirmed"?"confirmed":"placed"}">
-        ${o.status}
-      </span>
+if(orders.length===0){
+  orders.innerHTML="<p>No orders yet</p>";
+}else{
+  orders.reverse().forEach(o=>{
+    const d=document.createElement("div");
+    d.className="card";
+    d.innerHTML=`
+      <b>Order ID:</b> ${o.id}<br>
+      <b>Date:</b> ${o.date}<br>
+      <b>Payment:</b> ${o.payment}<br>
+      <b>Items:</b> ${o.items.length}
     `;
-    box.appendChild(div);
+    document.getElementById("orders").appendChild(d);
   });
 }
-
-renderOrders();
 </script>
 
 </body>
