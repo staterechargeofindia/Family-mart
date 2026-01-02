@@ -4,59 +4,47 @@
 <meta charset="UTF-8">
 <title>Manage Address</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
 body{
   margin:0;
-  font-family:Arial,Helvetica,sans-serif;
-  background:#f2f4f7;
+  font-family:Arial, sans-serif;
+  background:#f5f6fa;
 }
-header{
-  background:#2874f0;
+.header{
+  background:#2f7cf6;
   color:#fff;
-  padding:12px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+  padding:14px;
+  text-align:center;
+  font-size:18px;
 }
-header span{cursor:pointer}
-
 .card{
   background:#fff;
-  margin:15px;
-  padding:15px;
-  border-radius:12px;
+  margin:16px;
+  padding:16px;
+  border-radius:10px;
 }
-
 input,textarea{
   width:100%;
   padding:12px;
-  margin:8px 0;
-  border-radius:8px;
+  margin-bottom:12px;
   border:1px solid #ccc;
+  border-radius:8px;
   font-size:15px;
 }
-
-textarea{resize:none;height:90px}
-
+textarea{resize:none;height:80px;}
 button{
   width:100%;
-  background:#2874f0;
-  color:#fff;
   padding:14px;
   font-size:16px;
   border:none;
   border-radius:10px;
-  margin-top:10px;
-  cursor:pointer;
-  z-index:10;
-  position:relative;
+  background:#2f7cf6;
+  color:#fff;
 }
-
 .note{
+  text-align:center;
   font-size:13px;
   color:#555;
-  text-align:center;
   margin-top:10px;
 }
 </style>
@@ -64,15 +52,9 @@ button{
 
 <body>
 
-<header>
-  <span onclick="history.back()">←</span>
-  <b>Manage Address</b>
-  <span onclick="location.href='index.html'">🏠</span>
-</header>
+<div class="header">Manage Address</div>
 
 <div class="card">
-  <h3>Delivery Address</h3>
-
   <input id="name" placeholder="Full Name">
   <input id="mobile" placeholder="Mobile Number">
   <textarea id="address" placeholder="Full Address"></textarea>
@@ -80,45 +62,37 @@ button{
   <input id="state" placeholder="State">
   <input id="pincode" placeholder="Pin Code">
 
-  <!-- VERY IMPORTANT -->
   <button type="button" onclick="saveAddress()">Save Address</button>
 
   <div class="note">
-    Address ek baar save hone ke baad checkout me automatic aa jayega.
+    Address ek baar save karne ke baad order ke time automatically use hoga.
   </div>
 </div>
 
 <script>
 function saveAddress(){
   const data = {
-    name: document.getElementById("name").value.trim(),
-    mobile: document.getElementById("mobile").value.trim(),
-    address: document.getElementById("address").value.trim(),
-    district: document.getElementById("district").value.trim(),
-    state: document.getElementById("state").value.trim(),
-    pincode: document.getElementById("pincode").value.trim()
+    name: name.value.trim(),
+    mobile: mobile.value.trim(),
+    address: address.value.trim(),
+    district: district.value.trim(),
+    state: state.value.trim(),
+    pincode: pincode.value.trim()
   };
 
-  if(!data.name || !data.mobile || !data.address){
-    alert("Name, Mobile aur Address zaroori hai");
-    return;
-  }
-
   localStorage.setItem("savedAddress", JSON.stringify(data));
-  alert("✅ Address Saved Successfully");
+  alert("Address saved successfully");
   window.location.href = "checkout.html";
 }
 
-// auto fill
+// auto load saved
 const saved = JSON.parse(localStorage.getItem("savedAddress") || "{}");
-if(saved.name){
-  name.value = saved.name;
-  mobile.value = saved.mobile;
-  address.value = saved.address;
-  district.value = saved.district;
-  state.value = saved.state;
-  pincode.value = saved.pincode;
-}
+name.value = saved.name || "";
+mobile.value = saved.mobile || "";
+address.value = saved.address || "";
+district.value = saved.district || "";
+state.value = saved.state || "";
+pincode.value = saved.pincode || "";
 </script>
 
 </body>
