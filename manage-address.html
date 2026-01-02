@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Manage Address</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="style.css">
 </head>
 
@@ -24,55 +24,69 @@
     <input id="district" placeholder="District">
     <input id="state" placeholder="State">
     <input id="pincode" placeholder="Pin Code">
-    <button onclick="addAddress()">Add Address</button>
+    <button onclick="saveAddress()">Save Address</button>
   </div>
 
-  <div id="addressList"></div>
+  <div id="list"></div>
 
 </div>
 
 <script>
 let addresses = JSON.parse(localStorage.getItem("addresses")) || [];
 
-function addAddress(){
-  const obj={
-    id:Date.now(),
-    name:name.value,
-    mobile:mobile.value,
-    address:address.value,
-    district:district.value,
-    state:state.value,
-    pincode:pincode.value,
-    primary:addresses.length===0
+function saveAddress(){
+  const obj = {
+    id: Date.now(),
+    name: name.value.trim(),
+    mobile: mobile.value.trim(),
+    address: address.value.trim(),
+    district: district.value.trim(),
+    state: state.value.trim(),
+    pincode: pincode.value.trim(),
+    primary: addresses.length === 0
   };
+
+  if(!obj.name || !obj.mobile || !obj.address){
+    alert("Please fill required fields");
+    return;
+  }
+
   addresses.push(obj);
-  localStorage.setItem("addresses",JSON.stringify(addresses));
+  localStorage.setItem("addresses", JSON.stringify(addresses));
+  clearForm();
   render();
 }
 
 function setPrimary(id){
-  addresses.forEach(a=>a.primary=false);
-  addresses.find(a=>a.id===id).primary=true;
-  localStorage.setItem("addresses",JSON.stringify(addresses));
+  addresses.forEach(a => a.primary = false);
+  const found = addresses.find(a => a.id === id);
+  if(found) found.primary = true;
+  localStorage.setItem("addresses", JSON.stringify(addresses));
   render();
 }
 
 function render(){
-  addressList.innerHTML="";
-  addresses.forEach(a=>{
-    const d=document.createElement("div");
-    d.className="address-item"+(a.primary?" primary":"");
-    d.innerHTML=`
-      <div class="primary-btn ${a.primary?'active':''}"
-        onclick="setPrimary(${a.id})">✓</div>
+  list.innerHTML = "";
+  addresses.forEach(a => {
+    const d = document.createElement("div");
+    d.className = "address-item" + (a.primary ? " primary" : "");
+    d.innerHTML = `
+      <div class="primary-btn ${a.primary ? "active":""}"
+           onclick="setPrimary(${a.id})">✓</div>
       <b>${a.name}</b><br>
       ${a.mobile}<br>
       ${a.address}<br>
       ${a.district}, ${a.state} - ${a.pincode}
     `;
-    addressList.appendChild(d);
+    list.appendChild(d);
   });
 }
+
+function clearForm(){
+  name.value = mobile.value = address.value =
+  district.value = state.value = pincode.value = "";
+}
+
 render();
 </script>
 
