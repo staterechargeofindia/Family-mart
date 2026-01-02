@@ -5,6 +5,31 @@
 <title>Checkout</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="style.css">
+<style>
+#successBox{
+  position:fixed; inset:0;
+  background:rgba(0,0,0,.6);
+  display:none; align-items:center; justify-content:center;
+  z-index:9999;
+}
+.popup{
+  background:#fff;
+  width:90%; max-width:360px;
+  border-radius:14px;
+  padding:20px; text-align:center;
+  animation:zoom .3s ease;
+}
+@keyframes zoom{from{transform:scale(.7)}to{transform:scale(1)}}
+.confetti{
+  position:fixed; top:-10px;
+  width:8px; height:14px;
+  background:gold;
+  animation:fall 2.5s linear infinite;
+}
+@keyframes fall{
+  to{transform:translateY(110vh) rotate(360deg)}
+}
+</style>
 </head>
 
 <body>
@@ -18,11 +43,6 @@
 <div class="container">
 
   <div class="card">
-    <h3>Product Details</h3>
-    <p>Selected product from cart</p>
-  </div>
-
-  <div class="card">
     <h3>Delivery Address</h3>
     <div id="addrBox"></div>
     <button onclick="location.href='manage-address.html'">
@@ -32,12 +52,8 @@
 
   <div class="card">
     <h3>Payment Method</h3>
-    <div id="cod" class="method active" onclick="selectPay('cod')">
-      💵 Cash on Delivery
-    </div>
-    <div id="upi" class="method" onclick="selectPay('upi')">
-      📱 UPI Payment
-    </div>
+    <div id="cod" class="method active" onclick="selectPay('cod')">💵 Cash on Delivery</div>
+    <div id="upi" class="method" onclick="selectPay('upi')">📱 UPI Payment</div>
     <div id="upiBox" style="display:none;text-align:center">
       <img width="220"
       src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=upi://pay?pa=test@upi">
@@ -53,43 +69,63 @@
 <div id="successBox">
   <div class="popup">
     <h2>🎉 Order Successful</h2>
-    <p>Your order has been placed successfully</p>
-    <button onclick="location.href='index.html'">Go Home</button>
+    <p>
+      Aapka order successfully submit ho gaya hai.<br>
+      Thank you for shopping with <b>ISI</b> ❤️
+    </p>
+    <button onclick="location.href='my-orders.html'">View My Orders</button>
   </div>
 </div>
 
 <script>
 let pay = "cod";
-
 function selectPay(p){
   pay = p;
   cod.classList.remove("active");
   upi.classList.remove("active");
   document.getElementById(p).classList.add("active");
-  upiBox.style.display = p === "upi" ? "block" : "none";
+  upiBox.style.display = p==="upi"?"block":"none";
 }
 
 const addresses = JSON.parse(localStorage.getItem("addresses")) || [];
-const primary = addresses.find(a => a.primary);
-
-if(primary){
-  addrBox.innerHTML = `
-    <b>${primary.name}</b><br>
-    ${primary.mobile}<br>
-    ${primary.address}<br>
-    ${primary.district}, ${primary.state} - ${primary.pincode}
-  `;
-}else{
-  addrBox.innerHTML =
-    `<span style="color:red">No primary address selected</span>`;
-}
+const primary = addresses.find(a=>a.primary);
+addrBox.innerHTML = primary
+? `<b>${primary.name}</b><br>${primary.mobile}<br>${primary.address}<br>${primary.district}, ${primary.state} - ${primary.pincode}`
+: `<span style="color:red">No primary address selected</span>`;
 
 function placeOrder(){
-  if(!primary){
-    alert("Please select a primary address");
-    return;
+  if(!primary){ alert("Please select a primary address"); return; }
+
+  const cart = JSON.parse(localStorage.getItem("cart")) || [];
+  if(cart.length===0){ alert("Cart is empty"); return; }
+
+  const orders = JSON.parse(localStorage.getItem("orders")) || [];
+
+  orders.push({
+    id: Date.now(),
+    items: cart,
+    address: primary,
+    payment: pay,
+    date: new Date().toLocaleString()
+  });
+
+  localStorage.setItem("orders", JSON.stringify(orders));
+  localStorage.removeItem("cart");
+
+  successBox.style.display="flex";
+  rain();
+}
+
+function rain(){
+  for(let i=0;i<40;i++){
+    const c=document.createElement("div");
+    c.className="confetti";
+    c.style.left=Math.random()*100+"%";
+    c.style.background=["#ff0","#0f0","#f0f","#0ff"][Math.floor(Math.random()*4)];
+    c.style.animationDuration=2+Math.random()*2+"s";
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),3000);
   }
-  successBox.style.display = "flex";
 }
 </script>
 
