@@ -4,63 +4,81 @@
 <meta charset="UTF-8">
 <title>Checkout</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
 body{
   margin:0;
-  font-family:Arial,Helvetica,sans-serif;
-  background:#f2f4f7;
+  font-family:Arial, sans-serif;
+  background:#f5f6fa;
 }
-header{
-  background:#2874f0;
+.header{
+  background:#2f7cf6;
   color:#fff;
-  padding:12px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+  padding:14px;
+  text-align:center;
+  font-size:18px;
 }
 .card{
   background:#fff;
-  margin:15px;
-  padding:15px;
-  border-radius:12px;
+  margin:16px;
+  padding:16px;
+  border-radius:10px;
+}
+.address-box{
+  font-size:14px;
+  line-height:1.5;
+}
+.manage-btn{
+  margin-top:10px;
+  padding:10px;
+  width:100%;
+  background:#e9f0ff;
+  border:1px solid #2f7cf6;
+  color:#2f7cf6;
+  border-radius:8px;
+  font-size:15px;
 }
 .method{
-  border:2px solid #ccc;
-  padding:12px;
+  border:1px solid #ccc;
+  padding:14px;
   border-radius:10px;
   margin-bottom:10px;
 }
 .method.active{
-  border-color:#2874f0;
-  background:#eaf1ff;
+  border-color:#2f7cf6;
+  background:#eef4ff;
+}
+#upiBox{
+  display:none;
+  text-align:center;
+  margin-top:10px;
+}
+.total{
+  font-size:18px;
+  font-weight:bold;
+  margin-bottom:12px;
 }
 .place-btn{
   width:100%;
-  background:#2874f0;
+  padding:16px;
+  background:#2f7cf6;
   color:#fff;
-  padding:15px;
   border:none;
   border-radius:12px;
   font-size:18px;
-  margin-top:10px;
-  cursor:pointer;
-  position:relative;
-  z-index:20;
 }
 #successBox{
+  display:none;
   position:fixed;
   inset:0;
   background:rgba(0,0,0,.6);
-  display:none;
-  align-items:center;
-  justify-content:center;
   z-index:9999;
 }
 .popup{
   background:#fff;
-  padding:25px;
-  border-radius:15px;
+  margin:25% auto;
+  padding:20px;
+  width:85%;
+  border-radius:14px;
   text-align:center;
 }
 </style>
@@ -68,67 +86,88 @@ header{
 
 <body>
 
-<header>
-  <span onclick="history.back()">←</span>
-  <b>Checkout</b>
-  <span onclick="location.href='index.html'">🏠</span>
-</header>
+<div class="header">Checkout</div>
 
 <div class="card">
   <h3>Delivery Address</h3>
-  <div id="addressBox"></div>
-  <br>
-  <button type="button" onclick="location.href='manage-address.html'">
+  <div id="addrText" class="address-box"></div>
+  <button class="manage-btn" onclick="location.href='manage-address.html'">
     Edit / Manage Address
   </button>
 </div>
 
 <div class="card">
   <h3>Payment Method</h3>
-  <div class="method active">💵 Cash on Delivery</div>
+
+  <div id="cod" class="method active" onclick="selectPay('cod')">
+    💵 Cash on Delivery
+  </div>
+
+  <div id="upi" class="method" onclick="selectPay('upi')">
+    📱 UPI Payment
+  </div>
+
+  <div id="upiBox">
+    <p>Scan & Pay</p>
+    <img src="upi-qr.png" width="220">
+  </div>
 </div>
 
 <div class="card">
-  <div><b>Total Amount:</b> ₹10</div>
-  <button type="button" class="place-btn" onclick="placeOrder()">
-    Place Order
-  </button>
+  <div class="total">Total Amount: ₹10</div>
+  <button class="place-btn" type="button" onclick="placeOrder()">Place Order</button>
 </div>
 
 <div id="successBox">
   <div class="popup">
-    <h2>🎉 Order Successful</h2>
+    <h2>🎉 Order Successful!</h2>
     <p>
       Congratulations!<br>
-      Aapka order successfully submit ho gaya hai ❤️
+      Aapka order successfully submit ho gaya hai.<br>
+      Thank you for shopping with ISI ❤️
     </p>
-    <button type="button" onclick="location.href='index.html'">
-      Go to Home
-    </button>
+    <button onclick="finish()">Go to Home</button>
   </div>
 </div>
 
 <script>
-const saved = JSON.parse(localStorage.getItem("savedAddress"));
-const box = document.getElementById("addressBox");
+let payment = "cod";
 
-if(saved){
-  box.innerHTML = `
-    <b>${saved.name}</b><br>
-    ${saved.mobile}<br>
-    ${saved.address}<br>
-    ${saved.district}, ${saved.state} - ${saved.pincode}
-  `;
+function selectPay(type){
+  payment = type;
+  document.getElementById("cod").classList.remove("active");
+  document.getElementById("upi").classList.remove("active");
+  document.getElementById(type).classList.add("active");
+  document.getElementById("upiBox").style.display =
+    type === "upi" ? "block" : "none";
+}
+
+// load address
+const saved = JSON.parse(localStorage.getItem("savedAddress"));
+const addrText = document.getElementById("addrText");
+
+if(saved && saved.name){
+  addrText.innerHTML =
+    `<b>${saved.name}</b><br>
+     ${saved.mobile}<br>
+     ${saved.address}<br>
+     ${saved.district}, ${saved.state} - ${saved.pincode}`;
 }else{
-  box.innerHTML = "<span style='color:red'>No address saved</span>";
+  addrText.innerHTML =
+    `<span style="color:red">No address saved. Please add address.</span>`;
 }
 
 function placeOrder(){
-  if(!saved){
+  if(!saved || !saved.name){
     alert("Please add address first");
     return;
   }
-  document.getElementById("successBox").style.display="flex";
+  document.getElementById("successBox").style.display="block";
+}
+
+function finish(){
+  localStorage.removeItem("cart");
+  location.href="index.html";
 }
 </script>
 
