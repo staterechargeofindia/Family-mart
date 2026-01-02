@@ -1,124 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Manage Address</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-body{
-  margin:0;
-  font-family: Arial, sans-serif;
-  background:#f2f4f7;
+body{font-family:Arial;background:#f5f6f8;margin:0}
+header{background:#2874f0;color:#fff;padding:12px;text-align:center}
+.card{background:#fff;margin:15px;padding:15px;border-radius:10px}
+input,textarea{
+  width:100%;padding:12px;margin:8px 0;
+  border:1px solid #ccc;border-radius:8px;font-size:15px
 }
-
-.header{
-  background:#2f7bf6;
-  color:#fff;
-  padding:14px;
-  text-align:center;
-  font-size:18px;
-  position:sticky;
-  top:0;
-}
-
-.back{
-  position:absolute;
-  left:12px;
-  top:14px;
-  font-size:18px;
-  cursor:pointer;
-}
-
-.card{
-  background:#fff;
-  margin:16px;
-  padding:16px;
-  border-radius:12px;
-}
-
-.card h3{
-  margin-top:0;
-}
-
-input, textarea{
-  width:100%;
-  padding:12px;
-  margin-top:10px;
-  border-radius:8px;
-  border:1px solid #ccc;
-  font-size:15px;
-  box-sizing:border-box;
-}
-
-textarea{
-  resize:none;
-  height:80px;
-}
-
 button{
-  width:100%;
-  margin-top:16px;
-  padding:14px;
-  background:#2f7bf6;
-  color:#fff;
-  border:none;
-  border-radius:10px;
-  font-size:16px;
-  cursor:pointer;
-}
-
-.note{
-  margin-top:10px;
-  font-size:13px;
-  color:#555;
-  text-align:center;
+  width:100%;padding:14px;
+  background:#2874f0;color:#fff;
+  border:none;border-radius:10px;
+  font-size:16px;cursor:pointer
 }
 </style>
 </head>
 
 <body>
 
-<div class="header">
-  <span class="back" onclick="history.back()">←</span>
-  Manage Address
-</div>
+<header>Manage Address</header>
 
 <div class="card">
-  <h3>Delivery Address</h3>
-
   <input id="name" placeholder="Full Name">
   <input id="mobile" placeholder="Mobile Number">
-  <textarea id="address" placeholder="Full Address (Village, Area)"></textarea>
+  <textarea id="address" placeholder="Full Address"></textarea>
   <input id="district" placeholder="District">
   <input id="state" placeholder="State">
   <input id="pincode" placeholder="Pin Code">
 
-  <!-- IMPORTANT: type="button" -->
-  <button type="button" onclick="saveAddress()">Save Address</button>
-
-  <div class="note">
-    Address ek baar save karne ke baad<br>
-    order ke time automatically use hoga.
-  </div>
+  <button id="saveBtn">Save Address</button>
 </div>
 
 <script>
-/* AUTO FILL IF ALREADY SAVED */
-window.onload = function(){
-  const saved = JSON.parse(localStorage.getItem("savedAddress"));
-  if(!saved) return;
+document.getElementById("saveBtn").onclick = function () {
 
-  document.getElementById("name").value = saved.name || "";
-  document.getElementById("mobile").value = saved.mobile || "";
-  document.getElementById("address").value = saved.address || "";
-  document.getElementById("district").value = saved.district || "";
-  document.getElementById("state").value = saved.state || "";
-  document.getElementById("pincode").value = saved.pincode || "";
-};
-
-/* SAVE ADDRESS */
-function saveAddress(){
   const data = {
     name: name.value.trim(),
     mobile: mobile.value.trim(),
@@ -129,15 +49,15 @@ function saveAddress(){
   };
 
   if(!data.name || !data.mobile || !data.address){
-    alert("Name, Mobile aur Address zaroori hai");
+    alert("Please fill required fields");
     return;
   }
 
   localStorage.setItem("savedAddress", JSON.stringify(data));
+  alert("Address saved successfully ✅");
 
-  alert("✅ Address successfully saved");
-  window.location.href = "checkout.html";
-}
+  location.href = "checkout.html";
+};
 </script>
 
 </body>
