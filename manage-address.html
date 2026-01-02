@@ -16,19 +16,18 @@ header{
   color:#fff;
   padding:12px;
   display:flex;
-  align-items:center;
   justify-content:space-between;
+  align-items:center;
 }
-header span{
-  cursor:pointer;
-  font-size:18px;
-}
+header span{cursor:pointer}
+
 .card{
   background:#fff;
   margin:15px;
   padding:15px;
   border-radius:12px;
 }
+
 input,textarea{
   width:100%;
   padding:12px;
@@ -37,7 +36,9 @@ input,textarea{
   border:1px solid #ccc;
   font-size:15px;
 }
+
 textarea{resize:none;height:90px}
+
 button{
   width:100%;
   background:#2874f0;
@@ -48,7 +49,10 @@ button{
   border-radius:10px;
   margin-top:10px;
   cursor:pointer;
+  z-index:10;
+  position:relative;
 }
+
 .note{
   font-size:13px;
   color:#555;
@@ -71,47 +75,49 @@ button{
 
   <input id="name" placeholder="Full Name">
   <input id="mobile" placeholder="Mobile Number">
-  <textarea id="address" placeholder="Full Address (Village / Area)"></textarea>
+  <textarea id="address" placeholder="Full Address"></textarea>
   <input id="district" placeholder="District">
   <input id="state" placeholder="State">
   <input id="pincode" placeholder="Pin Code">
 
-  <button onclick="saveAddress()">Save Address</button>
+  <!-- VERY IMPORTANT -->
+  <button type="button" onclick="saveAddress()">Save Address</button>
 
   <div class="note">
-    Address ek baar save karne ke baad order ke time automatically use hoga.
+    Address ek baar save hone ke baad checkout me automatic aa jayega.
   </div>
 </div>
 
 <script>
-// Load saved address if exists
-const saved = JSON.parse(localStorage.getItem("savedAddress")) || {};
-
-name.value = saved.name || "";
-mobile.value = saved.mobile || "";
-address.value = saved.address || "";
-district.value = saved.district || "";
-state.value = saved.state || "";
-pincode.value = saved.pincode || "";
-
 function saveAddress(){
   const data = {
-    name: name.value.trim(),
-    mobile: mobile.value.trim(),
-    address: address.value.trim(),
-    district: district.value.trim(),
-    state: state.value.trim(),
-    pincode: pincode.value.trim()
+    name: document.getElementById("name").value.trim(),
+    mobile: document.getElementById("mobile").value.trim(),
+    address: document.getElementById("address").value.trim(),
+    district: document.getElementById("district").value.trim(),
+    state: document.getElementById("state").value.trim(),
+    pincode: document.getElementById("pincode").value.trim()
   };
 
   if(!data.name || !data.mobile || !data.address){
-    alert("Please fill minimum required address details");
+    alert("Name, Mobile aur Address zaroori hai");
     return;
   }
 
   localStorage.setItem("savedAddress", JSON.stringify(data));
-  alert("Address saved successfully");
-  history.back();
+  alert("✅ Address Saved Successfully");
+  window.location.href = "checkout.html";
+}
+
+// auto fill
+const saved = JSON.parse(localStorage.getItem("savedAddress") || "{}");
+if(saved.name){
+  name.value = saved.name;
+  mobile.value = saved.mobile;
+  address.value = saved.address;
+  district.value = saved.district;
+  state.value = saved.state;
+  pincode.value = saved.pincode;
 }
 </script>
 
