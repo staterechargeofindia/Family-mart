@@ -1,142 +1,94 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Checkout</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body{font-family:Arial;background:#f4f6f8;margin:0}
-    header{background:#2874f0;color:#fff;padding:12px;text-align:center;font-size:18px}
-    .card{background:#fff;margin:12px;padding:15px;border-radius:10px}
-    .addr-box{line-height:1.6}
-    .edit-btn{margin-top:10px;padding:6px 10px;font-size:13px;border:1px solid #2874f0;background:#fff;color:#2874f0;border-radius:6px}
-    .method{padding:12px;border:1px solid #ddd;border-radius:8px;margin-bottom:10px;cursor:pointer}
-    .active{border:2px solid #2874f0;background:#eef4ff}
-    .place-btn{width:100%;padding:14px;background:#2874f0;color:#fff;border:none;border-radius:8px;font-size:16px}
-    #upiBox{text-align:center;margin-top:10px}
-    #successBox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);align-items:center;justify-content:center}
-    .popup{background:#fff;padding:25px;border-radius:12px;text-align:center;width:85%}
-  </style>
+<meta charset="UTF-8">
+<title>Checkout</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{font-family:Arial;background:#f5f6f8;margin:0}
+header{background:#2874f0;color:#fff;padding:12px;text-align:center}
+.card{background:#fff;margin:15px;padding:15px;border-radius:10px}
+.btn{
+  width:100%;padding:14px;margin-top:10px;
+  background:#2874f0;color:#fff;
+  border:none;border-radius:10px;
+  font-size:16px;cursor:pointer
+}
+.method{border:1px solid #ccc;padding:12px;border-radius:8px;margin:8px 0}
+.active{border-color:#2874f0;background:#eaf2ff}
+#success{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  background:rgba(0,0,0,.6);display:none;
+  align-items:center;justify-content:center
+}
+.popup{
+  background:#fff;padding:25px;border-radius:15px;
+  width:80%;text-align:center
+}
+</style>
 </head>
 
 <body>
 
 <header>Checkout</header>
 
-<!-- ADDRESS VIEW -->
 <div class="card">
   <h3>Delivery Address</h3>
-
-  <div id="addressView" class="addr-box"></div>
-
-  <button type="button" class="edit-btn"
-    onclick="location.href='manage-address.html'">
+  <div id="addrBox"></div>
+  <button class="btn" onclick="location.href='manage-address.html'">
     Edit / Manage Address
   </button>
 </div>
 
-<!-- PAYMENT -->
 <div class="card">
   <h3>Payment Method</h3>
-
-  <div id="cod" class="method active" onclick="selectPay('cod')">
-    💵 Cash on Delivery
-  </div>
-
-  <div id="upi" class="method" onclick="selectPay('upi')">
-    📱 UPI Payment
-  </div>
-
-  <div id="upiBox" style="display:none">
-    <p>Scan & Pay</p>
-    <img id="qr" width="200">
-  </div>
+  <div id="cod" class="method active" onclick="selectPay('cod')">💵 Cash on Delivery</div>
+  <div id="upi" class="method" onclick="selectPay('upi')">📱 UPI Payment</div>
 </div>
 
-<!-- TOTAL -->
 <div class="card">
-  <div style="font-size:18px;margin-bottom:10px">
-    Total Amount: ₹<span id="total">0</span>
-  </div>
-  <button type="button" class="place-btn" onclick="placeOrder()">
-    Place Order
-  </button>
+  <h3>Total Amount: ₹10</h3>
+  <button class="btn" onclick="placeOrder()">Place Order</button>
 </div>
 
-<!-- SUCCESS -->
-<div id="successBox">
+<div id="success">
   <div class="popup">
     <h2>🎉 Order Successful!</h2>
-    <p>
-      Congratulations!  
-      Aapka order successfully submit ho gaya hai.
-    </p>
-    <button onclick="finish()" class="place-btn">Go to Home</button>
+    <p>Congratulations!  
+    Aapka order successfully submit ho gaya hai.</p>
+    <button class="btn" onclick="location.href='index.html'">Go to Home</button>
   </div>
 </div>
 
 <script>
-let selectedPay = "cod";
+let payment = "cod";
 
-/* LOAD ADDRESS */
-const addr = JSON.parse(localStorage.getItem("savedAddress"));
+function selectPay(p){
+  payment = p;
+  cod.classList.remove("active");
+  upi.classList.remove("active");
+  document.getElementById(p).classList.add("active");
+}
 
-const addressView = document.getElementById("addressView");
+const saved = JSON.parse(localStorage.getItem("savedAddress"));
 
-if(addr){
-  addressView.innerHTML = `
-    <b>${addr.name}</b><br>
-    ${addr.mobile}<br>
-    ${addr.address}<br>
-    ${addr.district}, ${addr.state} - ${addr.pincode}
+if(saved){
+  addrBox.innerHTML = `
+    <b>${saved.name}</b><br>
+    ${saved.mobile}<br>
+    ${saved.address}<br>
+    ${saved.district}, ${saved.state} - ${saved.pincode}
   `;
 }else{
-  addressView.innerHTML = `
-    <span style="color:red">
-      No address saved. Please add address.
-    </span>
-  `;
+  addrBox.innerHTML = `<span style="color:red">No address saved</span>`;
 }
 
-/* TOTAL */
-const cart = JSON.parse(localStorage.getItem("cart")) || [];
-let total = 0;
-cart.forEach(i=> total += Number(i.price || 0));
-document.getElementById("total").innerText = total;
-
-/* PAYMENT */
-function selectPay(type){
-  selectedPay = type;
-  document.getElementById("cod").classList.remove("active");
-  document.getElementById("upi").classList.remove("active");
-  document.getElementById(type).classList.add("active");
-
-  if(type==="upi"){
-    document.getElementById("upiBox").style.display="block";
-    document.getElementById("qr").src =
-      "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=paytmgr5m9yhroptys&am="+total;
-  }else{
-    document.getElementById("upiBox").style.display="none";
-  }
-}
-
-/* ORDER */
 function placeOrder(){
-  const order = {
-    address: addr || {},
-    payment: selectedPay,
-    cart: cart,
-    total: total,
-    time: new Date().toLocaleString()
-  };
-
-  localStorage.setItem("lastOrder", JSON.stringify(order));
-  localStorage.removeItem("cart");
-
-  document.getElementById("successBox").style.display="flex";
-}
-
-function finish(){
-  location.href="index.html";
+  if(!saved){
+    alert("Please add address first");
+    return;
+  }
+  document.getElementById("success").style.display="flex";
 }
 </script>
 
