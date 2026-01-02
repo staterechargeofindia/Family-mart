@@ -1,98 +1,79 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
 <title>Manage Address</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-body{
-  margin:0;
-  font-family:Arial, sans-serif;
-  background:#f5f6fa;
-}
-.header{
-  background:#2f7cf6;
-  color:#fff;
-  padding:14px;
-  text-align:center;
-  font-size:18px;
-}
-.card{
-  background:#fff;
-  margin:16px;
-  padding:16px;
-  border-radius:10px;
-}
-input,textarea{
-  width:100%;
-  padding:12px;
-  margin-bottom:12px;
-  border:1px solid #ccc;
-  border-radius:8px;
-  font-size:15px;
-}
-textarea{resize:none;height:80px;}
-button{
-  width:100%;
-  padding:14px;
-  font-size:16px;
-  border:none;
-  border-radius:10px;
-  background:#2f7cf6;
-  color:#fff;
-}
-.note{
-  text-align:center;
-  font-size:13px;
-  color:#555;
-  margin-top:10px;
-}
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<div class="header">Manage Address</div>
+<header>
+  <span onclick="history.back()">←</span>
+  <b>Manage Address</b>
+  <span onclick="location.href='index.html'">🏠</span>
+</header>
 
-<div class="card">
-  <input id="name" placeholder="Full Name">
-  <input id="mobile" placeholder="Mobile Number">
-  <textarea id="address" placeholder="Full Address"></textarea>
-  <input id="district" placeholder="District">
-  <input id="state" placeholder="State">
-  <input id="pincode" placeholder="Pin Code">
+<div class="container">
 
-  <button type="button" onclick="saveAddress()">Save Address</button>
-
-  <div class="note">
-    Address ek baar save karne ke baad order ke time automatically use hoga.
+  <div class="card">
+    <input id="name" placeholder="Full Name">
+    <input id="mobile" placeholder="Mobile Number">
+    <textarea id="address" placeholder="Full Address"></textarea>
+    <input id="district" placeholder="District">
+    <input id="state" placeholder="State">
+    <input id="pincode" placeholder="Pin Code">
+    <button onclick="addAddress()">Add Address</button>
   </div>
+
+  <div id="addressList"></div>
+
 </div>
 
 <script>
-function saveAddress(){
-  const data = {
-    name: name.value.trim(),
-    mobile: mobile.value.trim(),
-    address: address.value.trim(),
-    district: district.value.trim(),
-    state: state.value.trim(),
-    pincode: pincode.value.trim()
-  };
+let addresses = JSON.parse(localStorage.getItem("addresses")) || [];
 
-  localStorage.setItem("savedAddress", JSON.stringify(data));
-  alert("Address saved successfully");
-  window.location.href = "checkout.html";
+function addAddress(){
+  const obj={
+    id:Date.now(),
+    name:name.value,
+    mobile:mobile.value,
+    address:address.value,
+    district:district.value,
+    state:state.value,
+    pincode:pincode.value,
+    primary:addresses.length===0
+  };
+  addresses.push(obj);
+  localStorage.setItem("addresses",JSON.stringify(addresses));
+  render();
 }
 
-// auto load saved
-const saved = JSON.parse(localStorage.getItem("savedAddress") || "{}");
-name.value = saved.name || "";
-mobile.value = saved.mobile || "";
-address.value = saved.address || "";
-district.value = saved.district || "";
-state.value = saved.state || "";
-pincode.value = saved.pincode || "";
+function setPrimary(id){
+  addresses.forEach(a=>a.primary=false);
+  addresses.find(a=>a.id===id).primary=true;
+  localStorage.setItem("addresses",JSON.stringify(addresses));
+  render();
+}
+
+function render(){
+  addressList.innerHTML="";
+  addresses.forEach(a=>{
+    const d=document.createElement("div");
+    d.className="address-item"+(a.primary?" primary":"");
+    d.innerHTML=`
+      <div class="primary-btn ${a.primary?'active':''}"
+        onclick="setPrimary(${a.id})">✓</div>
+      <b>${a.name}</b><br>
+      ${a.mobile}<br>
+      ${a.address}<br>
+      ${a.district}, ${a.state} - ${a.pincode}
+    `;
+    addressList.appendChild(d);
+  });
+}
+render();
 </script>
 
 </body>
